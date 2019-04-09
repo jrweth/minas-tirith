@@ -436,22 +436,23 @@ export class Terrain {
       if(possibleSet.size == 0) break;
 
       let coords = this.getRandomSetValue(2.2 + x, possibleSet).split('-');
-      this.createBuilding(
-        parseInt(coords[0]),
-        parseInt(coords[1]),
-        x,
-        possibleSet
-      );
+      // this.createBuilding(
+      //   parseInt(coords[0]),
+      //   parseInt(coords[1]),
+      //   x,
+      //   possibleSet
+      // );
     }
 
+    let numBuildings = 1;
 
-    for(let i = 0; i < 10; i++) {
-      // this.buildings.push(new Building({
-      //   pos: vec3.fromValues(150 + i * 20,0,250),
-      //   rotation: 0,
-      //   footprint: vec3.fromValues(15, 40, 15),
-      //   seed: Random.random2to1(vec2.fromValues(i, 34.32), vec2.fromValues(this.buildingSeed, 2.2))
-      // }));
+    for(let i = 0; i < numBuildings; i++) {
+      this.buildings.push(new Building({
+        pos: vec3.fromValues(250 - numBuildings * 10 + i * 20,0,250),
+        rotation: vec3.fromValues(0,0,0),
+        footprint: vec3.fromValues(10, 10, 10),
+        seed: Random.random2to1(vec2.fromValues(i, 34.32), vec2.fromValues(this.buildingSeed, 2.2))
+      }));
 
     }
 
@@ -485,7 +486,7 @@ export class Terrain {
     footprint[1] = maxFootprint * 3 / 10;
     this.buildings.push(new Building({
       pos: pos,
-      rotation: 0,
+      rotation: vec3.fromValues(0,0,0),
       footprint: footprint,
       seed: seed
     }));

@@ -1,15 +1,15 @@
-import {vec2, vec3} from "gl-matrix";
+import {vec3} from "gl-matrix";
 import {Shape} from "./shape/shape";
-import {Box} from "./shape/box";
 import {Block, BlockType} from "./shape/block";
-import {Sample} from "./shape/sample";
 import Random from "../../noise/random";
+import {Wall} from "./shape/wall";
+import {StandardRoof} from "./shape/standardRoof";
 
 
 export class Building {
   pos: vec3;
   footprint: vec3;
-  rotation: number;
+  rotation: vec3;
   shapes: Shape[];
   seed: number;
 
@@ -17,7 +17,7 @@ export class Building {
   constructor(options: {
     pos: vec3,
     footprint: vec3,
-    rotation: number,
+    rotation: vec3,
     seed: number
   }) {
     this.pos = options.pos;
@@ -25,11 +25,17 @@ export class Building {
     this.rotation = options.rotation;
     this.seed = options.seed;
     this.shapes = [
-      new Box({
+      new Wall({
         footprint: this.footprint,
         pos: this.pos,
         rotation: this.rotation
       }),
+      new StandardRoof({
+        footprint: vec3.fromValues(3, 30, 3),
+        pos: this.pos,
+        rotation: this.rotation,
+        blockType: BlockType.CUBE
+      })
     ];
     this.runReplacements();
   }

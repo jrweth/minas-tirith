@@ -9,12 +9,13 @@ uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the p
 in vec4 vs_Pos;
 in vec4 vs_Nor;
 in vec4 vs_Col;
+in vec4 vs_Rotate;
 in vec4 vs_Translate;
 in vec4 vs_BlockInfo;
 
-out vec3 fs_Pos;
+out vec3 fs_Pos;   //position on unit cube (0 or 1)
 out vec4 fs_Nor;
-out vec4 fs_Col;
+out vec4 fs_Col;   //scale
 out vec4 fs_Translate;
 
 const float CUBE = 1.0;
@@ -23,6 +24,14 @@ const float TENT = 3.0;
 const float TRI_TUBE = 4.0;
 const float QUARTER_PYRAMID = 5.0;
 const float SLANT = 6.0;
+const float WEDGE = 7.0;
+
+float scaleBottom;  //contained in vs_BlockInfo[2]
+float scaleTop; //contained in vs_BlockInfo[3]
+float scaleX;  //contained in vs_Col[0];
+float scaleY; //contained in vs_Col[1];
+float scaleZ; //contained in vs_Col[2];
+bool scaleFromCenter; //boolean indicating if scaling should be done from the center - contained in vs_Col[3]
 
 float random1( vec2 p , vec2 seed) {
   return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
@@ -115,18 +124,81 @@ vec3 getQuarterPyramidVertexPosition() {
     }
 }
 
+vec3 getWedgeVertexPosition() {
+    float vertexNum = getVertexNum();
+    if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {
+        return mix(vec3(0.5, vs_Pos.y, 0.5), vs_Pos.xyz, scaleBottom);
+    }
+    else {
+        return mix(vec3(0.5, vs_Pos.yz), vs_Pos.xyz, scaleTop);
+    }
+}
+
+
+mat3 rotationMatrix(int axis, float angle) {
+    float c = cos(angle);
+    float s = sin(angle);
+    mat3 rot;
+    if(axis == 0) {
+        rot = mat3(
+        1.0, 0.0, 0.0,
+        0.0, c,   -s,
+        0.0, s,   c);
+    }
+
+    if(axis == 1) {
+        rot = mat3(
+        c,   0.0, s,
+        0.0, 1.0, 0.0,
+        -s,  0.0, c
+        );
+    }
+    if(axis == 2) {
+        rot =mat3(
+        c,  -s,   0.0,
+        s,   c,   0.0,
+        0.0, 0.0, 1.0
+        );
+    }
+
+    return rot;
+}
+
+vec3 rotate(vec3 pos) {
+    mat3 rot;
+    if(vs_Rotate.x > 0.0) {
+        mat3 rot = rotationMatrix(0, vs_Rotate.x);
+        pos = rot * pos;
+    }
+    if(vs_Rotate.y > 0.0) {
+        mat3 rot = rotationMatrix(1, vs_Rotate.y);
+        pos = rot * pos;
+    }
+    return pos;
+}
 
 vec3 getVertexPosition() {
+    vec3 shapePos;
     if(vs_BlockInfo[0] == CUBE
       || vs_BlockInfo[0] == PYRAMID
     ) {
-        return getCubeVertexPosition();
+        shapePos = getCubeVertexPosition();
     }
-    else if (vs_BlockInfo[0] == TENT) return getTentVertexPosition();
-    else if (vs_BlockInfo[0] == TRI_TUBE) return getTriTubeVertexPosition();
-    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) return getQuarterPyramidVertexPosition();
-    else if (vs_BlockInfo[0] == SLANT) return getSlantVertexPosition();
-    return vs_Pos.xyz;
+    else if (vs_BlockInfo[0] == TENT) shapePos = getTentVertexPosition();
+    else if (vs_BlockInfo[0] == TRI_TUBE) shapePos = getTriTubeVertexPosition();
+    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) shapePos = getQuarterPyramidVertexPosition();
+    else if (vs_BlockInfo[0] == SLANT) shapePos = getSlantVertexPosition();
+    else if (vs_BlockInfo[0] == WEDGE) shapePos = getWedgeVertexPosition();
+    else shapePos = vs_Pos.xyz;
+
+    if(scaleFromCenter) {
+        shapePos = shapePos - vec3(0.5, 0.5, 0.5);
+    }
+    shapePos.x = shapePos.x * scaleX;
+    shapePos.y = shapePos.y * scaleY;
+    shapePos.z = shapePos.z * scaleZ;
+    shapePos = rotate(shapePos);
+    return shapePos;
 }
 
 
@@ -134,22 +206,20 @@ void main()
 {
     fs_Pos = vs_Pos.xyz;
     fs_Translate = vs_Translate;
+    scaleBottom = vs_BlockInfo[2];
+    scaleTop = vs_BlockInfo[3];
+    scaleX = vs_Col[0];
+    scaleY = vs_Col[1];
+    scaleZ = vs_Col[2];
+    scaleFromCenter = (vs_Col[3] == 1.0);
+
     vec4 modelposition = vec4(getVertexPosition(), 1.0);
-   //scale by width and height
-    modelposition.x = modelposition.x * vs_Col.x; //vs_Col.x = length
-    modelposition.y = modelposition.y * vs_Col.y; //vs_Col.x = heigth
-    modelposition.z = modelposition.z * vs_Col.z; //vs_Col.y = width;
 
-    //fs_Pos.y = vs_Pos.y * vs_Col.y;
 
-    //rotate
-    float s = sin(vs_Col.w);
-    float c = cos(vs_Col.w);
-    modelposition.xz = mat2(c, s, -s, c) * modelposition.xz;
-
-    //translate
     modelposition.xyz += vs_Translate.xyz;
 
     modelposition = u_Model * modelposition;
     gl_Position = u_ViewProj * modelposition;
 }
+
+///redblobgames.com/maps/mapgen4

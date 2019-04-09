@@ -7,7 +7,7 @@ import {StandardRoof} from "./standardRoof";
 
 export class Box extends Shape{
 
-  constructor(options: {pos: vec3, footprint: vec3, rotation: number}) {
+  constructor(options: {pos: vec3, footprint: vec3, rotation: vec3}) {
     super(options);
     this.symbol = 'B';
     this.terminal = false;
@@ -20,7 +20,8 @@ export class Box extends Shape{
       pos: this.pos,
       adjustScaleTop: 1,
       adjustScaleBottom: 1,
-      rotation: this.rotation
+      rotation: this.rotation,
+      scaleFromCenter: false
     }];
   }
 

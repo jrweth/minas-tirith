@@ -22,7 +22,7 @@ export class NumOptions {
 export abstract class Shape {
   pos: vec3;
   footprint: vec3;
-  rotation: number;
+  rotation: vec3;
   symbol: string;
   terminal: boolean;
   children: number[] = [];
@@ -30,7 +30,7 @@ export abstract class Shape {
   protected constructor(options: {
     pos: vec3,
     footprint: vec3,
-    rotation: number
+    rotation: vec3
   }) {
     this.pos= options.pos;
     this.footprint = options.footprint;

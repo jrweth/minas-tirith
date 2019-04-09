@@ -4,7 +4,7 @@ import {vec3} from "gl-matrix";
 
 export class Sample extends Shape{
 
-  constructor(options: {pos: vec3, footprint: vec3, rotation: number}) {
+  constructor(options: {pos: vec3, footprint: vec3, rotation: vec3}) {
     super(options);
     this.symbol = 'S';
     this.terminal = true;
@@ -19,7 +19,8 @@ export class Sample extends Shape{
         pos: vec3.fromValues(this.pos[0] + 0 * this.footprint[0]/numBlocks, this.pos[1], this.pos[2]),
         adjustScaleTop: 1,
         adjustScaleBottom: 1,
-        rotation: this.rotation
+        rotation: this.rotation,
+        scaleFromCenter: false
       },
       {
         blockType: BlockType.PYRAMID,
@@ -27,7 +28,8 @@ export class Sample extends Shape{
         pos: vec3.fromValues(this.pos[0] + 1.1 * this.footprint[0]/numBlocks, this.pos[1], this.pos[2]),
         adjustScaleTop: 0,
         adjustScaleBottom: 1,
-        rotation: this.rotation
+        rotation: this.rotation,
+        scaleFromCenter: false
       },
       {
         blockType: BlockType.TENT,
@@ -35,7 +37,8 @@ export class Sample extends Shape{
         pos: vec3.fromValues(this.pos[0] + 2.2 * this.footprint[0]/numBlocks, this.pos[1], this.pos[2]),
         adjustScaleTop: 0.0,
         adjustScaleBottom: 1,
-        rotation: this.rotation
+        rotation: this.rotation,
+        scaleFromCenter: false
       },
       {
         blockType: BlockType.TRI_TUBE,
@@ -43,7 +46,8 @@ export class Sample extends Shape{
         pos: vec3.fromValues(this.pos[0] + 3.3 * this.footprint[0]/numBlocks, this.pos[1], this.pos[2]),
         adjustScaleTop: 1,
         adjustScaleBottom: 1,
-        rotation: this.rotation
+        rotation: this.rotation,
+        scaleFromCenter: false
       },
       {
         blockType: BlockType.QUARTER_PYRAMID,
@@ -51,7 +55,8 @@ export class Sample extends Shape{
         pos: vec3.fromValues(this.pos[0] + 4.4 * this.footprint[0]/numBlocks, this.pos[1], this.pos[2]),
         adjustScaleTop: 0,
         adjustScaleBottom: 1,
-        rotation: this.rotation
+        rotation: this.rotation,
+        scaleFromCenter: false
       }
     ];
   }

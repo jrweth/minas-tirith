@@ -6,7 +6,7 @@ export class StandardRoof extends Shape{
 
   blockType: BlockType;
 
-  constructor(options: {pos: vec3, footprint: vec3, rotation: number, blockType: BlockType}) {
+  constructor(options: {pos: vec3, footprint: vec3, rotation: vec3, blockType: BlockType}) {
     super(options);
     this.symbol = 'T';
     this.terminal = true;
@@ -20,7 +20,8 @@ export class StandardRoof extends Shape{
       pos: this.pos,
       adjustScaleTop: 0,
       adjustScaleBottom: 1,
-      rotation: this.rotation
+      rotation: this.rotation,
+      scaleFromCenter: false
     }];
   }
 

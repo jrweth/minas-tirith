@@ -173,11 +173,11 @@ class QuarterRound extends Drawable {
             block.footprint[0] * this.scale[0] / this.gridSize[0],
             block.footprint[1] * this.scale[0] / this.gridSize[0],
             block.footprint[2] * this.scale[1] / this.gridSize[1],
-            block.rotation
+            0
           );
           blockInfo.push(
             block.blockType,
-            block.rotation,
+            0,
             block.adjustScaleBottom,
             block.adjustScaleTop
           )

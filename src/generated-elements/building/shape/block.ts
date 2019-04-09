@@ -7,6 +7,7 @@ export enum BlockType  {
   'TRI_TUBE' = 4,
   'QUARTER_PYRAMID' = 5,
   'SLANT' = 6,
+  'WEDGE' = 7,
   'QUARTER_ROUND' = 10//standard quarter round
 };
 
@@ -18,5 +19,6 @@ export class Block {
   footprint: vec3;
   adjustScaleTop: number;
   adjustScaleBottom: number;
-  rotation: number;
+  rotation: vec3;
+  scaleFromCenter: boolean;
 }

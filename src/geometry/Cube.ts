@@ -13,6 +13,7 @@ class Cube extends Drawable {
   scale: vec2;
   gridSize: vec2;
   blockInfo: Float32Array;
+  rotations: Float32Array;
 
   constructor(options: {scale: vec2, gridSize: vec2}) {
     super(); // Call the constructor of the super class. This is required.
@@ -146,9 +147,11 @@ class Cube extends Drawable {
     this.generateTranslate();
     this.generateCol();
     this.generateBlockInfo();
+    this.generateRotate();
 
     let offsets: number[] = [];
     let colors: number[] = []; //set to footprint
+    let rotations: number[] = [];
     let blockInfo: number[] = [];
 
     this.numInstances = 0;
@@ -167,13 +170,19 @@ class Cube extends Drawable {
             block.footprint[0] * this.scale[0] / this.gridSize[0],
             block.footprint[1] * this.scale[0] / this.gridSize[0],
             block.footprint[2] * this.scale[1] / this.gridSize[1],
-            block.rotation
+            block.scaleFromCenter ? 1 : 0
           );
           blockInfo.push(
             block.blockType,
-            block.rotation,
+            0,
             block.adjustScaleBottom,
             block.adjustScaleTop
+          );
+          rotations.push(
+            block.rotation[0],
+            block.rotation[1],
+            block.rotation[2],
+            0
           )
 
         }
@@ -181,9 +190,12 @@ class Cube extends Drawable {
       }
     }
 
+    console.log(rotations);
+
     this.offsets = new Float32Array(offsets);
     this.colors = new Float32Array(colors);
     this.blockInfo = new Float32Array(blockInfo);
+    this.rotations = new Float32Array(rotations);
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
@@ -194,6 +206,9 @@ class Cube extends Drawable {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufBlockInfo);
     gl.bufferData(gl.ARRAY_BUFFER, this.blockInfo, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufRotate);
+    gl.bufferData(gl.ARRAY_BUFFER, this.rotations, gl.STATIC_DRAW);
 
   }
 };

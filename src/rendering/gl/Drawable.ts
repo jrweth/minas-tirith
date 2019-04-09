@@ -24,6 +24,7 @@ abstract class Drawable {
   bufCol: WebGLBuffer;
   bufTranslate: WebGLBuffer;
   bufBlockInfo: WebGLBuffer;
+  bufRotate: WebGLBuffer;
 
   idxBound: boolean = false;
   posBound: boolean = false;
@@ -32,6 +33,7 @@ abstract class Drawable {
   colBound: boolean = false;
   translateBound: boolean = false;
   blockInfoBound: boolean = false;
+  rotateBound: boolean = false;
 
   abstract create() : void;
 
@@ -81,6 +83,11 @@ abstract class Drawable {
     this.bufBlockInfo = gl.createBuffer();
   }
 
+  generateRotate() {
+    this.rotateBound = true;
+    this.bufRotate = gl.createBuffer();
+  }
+
   bindIdx(): boolean {
     if (this.idxBound) {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -128,6 +135,13 @@ abstract class Drawable {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufBlockInfo);
     }
     return this.blockInfoBound;
+  }
+
+  bindRotate(): boolean {
+    if (this.rotateBound) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufRotate);
+    }
+    return this.rotateBound;
   }
 
   elemCount(): number {
