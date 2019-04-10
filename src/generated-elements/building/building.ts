@@ -24,19 +24,16 @@ export class Building {
     this.footprint = options.footprint;
     this.rotation = options.rotation;
     this.seed = options.seed;
-    this.shapes = [
-      new Wall({
-        footprint: this.footprint,
-        pos: this.pos,
-        rotation: this.rotation
-      }),
-      new StandardRoof({
-        footprint: vec3.fromValues(3, 30, 3),
-        pos: this.pos,
-        rotation: this.rotation,
-        blockType: BlockType.CUBE
-      })
-    ];
+    this.shapes = [];
+    for(let i = 1; i <= 7; i++) {
+      this.shapes.push(
+        new Wall({
+          footprint: vec3.fromValues(i*5, 5, 2.5),
+          pos: vec3.fromValues(250.0, (7-i)*2.5, 250),
+          rotation: this.rotation
+        })
+      );
+    }
     this.runReplacements();
   }
 

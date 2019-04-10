@@ -26,7 +26,7 @@ export class Wall extends Shape{
     this.height = options.footprint[1];
     this.radius = options.footprint[0];
     this.sweep = options.sweep ? options.sweep :  Math.PI;
-    this.numSegments = options.numSegments ? options.numSegments: 5;
+    this.numSegments = options.numSegments ? options.numSegments: 20;
     this.terminal = true;
   }
 
