@@ -31,9 +31,13 @@ export class Wall extends Shape{
   }
 
   getBlocks(): Block[] {
+    let segmentAngle = this.sweep / (this.numSegments - 1);
+    let blockZ = 2 * (this.radius + this.width/2) * Math.tan(segmentAngle / 2);
+    let blockZ2 = 2 * (this.radius - this.width/2) * Math.tan(segmentAngle / 2);
+    let scaleBottom =   blockZ2 / blockZ;
     let blocks: Block[] = [];
     for(let i = 0; i < this.numSegments; i++) {
-      let angle = this.rotation[0] + (this.sweep * i) / (this.numSegments - 1);
+      let angle = this.rotation[0] + segmentAngle * i;
       blocks.push({
         pos: vec3.fromValues(
           this.center[0] + (this.radius * Math.cos(angle)),
@@ -43,11 +47,11 @@ export class Wall extends Shape{
         footprint: vec3.fromValues(
           this.width,
           this.height,
-          this.sweep * this.radius * 2 / this.numSegments,
+          blockZ
         ),
         blockType: BlockType.WEDGE,
-        adjustScaleBottom: 0.5,
-        adjustScaleTop: 1, //1 + (this.width + this.radius) / this.radius,
+        adjustScaleBottom: scaleBottom,
+        adjustScaleTop: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true
       });

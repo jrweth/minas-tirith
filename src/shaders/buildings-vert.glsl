@@ -127,9 +127,11 @@ vec3 getQuarterPyramidVertexPosition() {
 vec3 getWedgeVertexPosition() {
     float vertexNum = getVertexNum();
     if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {
-        return mix(vec3(0.5, vs_Pos.y, 0.5), vs_Pos.xyz, scaleBottom);
+        return mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, scaleBottom);
     }
     else {
+        vec3 adjPos = vs_Pos.xyz - vec3(0.5, 0.5, 0.5);
+
         return mix(vec3(0.5, vs_Pos.yz), vs_Pos.xyz, scaleTop);
     }
 }

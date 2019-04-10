@@ -60,6 +60,7 @@ export class Building {
     while(!this.allShapesTerminal() && count < 20) {
       count++;
       this.runReplacement();
+
     }
   }
 
