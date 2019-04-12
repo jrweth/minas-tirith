@@ -3,6 +3,7 @@ import Drawable from "../rendering/gl/Drawable";
 import {vec2, vec3} from "gl-matrix";
 import {Building} from "../generated-elements/building/building";
 import {Block, BlockType} from "../generated-elements/building/shape/block";
+import {City} from "../generated-elements/city/city";
 
 class Cube extends Drawable {
   indices: Uint32Array;
@@ -143,7 +144,7 @@ class Cube extends Drawable {
     return screenPos;
   }
 
-  setInstanceVBOs(buildings: Building[]) {
+  setInstanceVBOs(buildings: Building[], city: City) {
     this.generateTranslate();
     this.generateCol();
     this.generateBlockInfo();
@@ -189,8 +190,33 @@ class Cube extends Drawable {
 
       }
     }
+    let cityBlocks: Block[] = city.getBlocks();
+    for(let i = 0; i < cityBlocks.length; i++) {
+      let block: Block = cityBlocks[i];
+      this.numInstances++;
+      let startPosScreen = this.gridPosToScreenPos(block.pos);
+      offsets.push(startPosScreen[0], startPosScreen[1], startPosScreen[2], 0);
 
-    console.log(rotations);
+      colors.push(
+        block.footprint[0] * this.scale[0] / this.gridSize[0],
+        block.footprint[1] * this.scale[0] / this.gridSize[0],
+        block.footprint[2] * this.scale[1] / this.gridSize[1],
+        block.scaleFromCenter ? 1 : 0
+      );
+      blockInfo.push(
+        block.blockType,
+        0,
+        block.adjustScaleBottom,
+        block.adjustScaleTop
+      );
+      rotations.push(
+        block.rotation[0],
+        block.rotation[1],
+        block.rotation[2],
+        0
+      )
+
+    }
 
     this.offsets = new Float32Array(offsets);
     this.colors = new Float32Array(colors);

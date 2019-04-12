@@ -11,6 +11,7 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 import {Terrain} from "./generated-elements/terrain";
 import Roads from "./generated-elements/road/roads";
 import RoadSegments from "./geometry/RoadSegments";
+import {City} from "./generated-elements/city/city";
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
@@ -50,6 +51,7 @@ let aPressed: boolean;
 let sPressed: boolean;
 let dPressed: boolean;
 let planePos: vec2;
+let city: City;
 
 function loadScene() {
 
@@ -87,7 +89,7 @@ function loadScene() {
     scale: plane.scale
   });
   cube.create();
-  cube.setInstanceVBOs(terrain.buildings);
+  cube.setInstanceVBOs(terrain.buildings, city);
 
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
@@ -209,6 +211,11 @@ function addBuildingControls() {
 
 
 function main() {
+  city = new City({
+    pos: vec3.fromValues(250, 0, 250),
+    seed: 1234,
+  });
+
   window.addEventListener('keypress', function (e) {
     // console.log(e.key);
     switch(e.key) {
