@@ -258,13 +258,13 @@ function addLevelControls() {
   for(let i = 0; i < 7; i++) {
     let level = levels.addFolder('level ' + (i+1).toString());
     for(let property of properties) {
-      let control = level.add(controls.Levels[i],property).min(5).max(40).step(1).listen();
+      let control = level.add(controls.Levels[i],property).min(1).max(30).step(1).listen();
       control.onChange(()=>{adjustLevel(i,property)});
     }
   }
   let level = levels.addFolder('all levels');
   for(let property of properties) {
-    let control = level.add(controls.AllLevels, property).min(5).max(40).step(1).listen();
+    let control = level.add(controls.AllLevels, property).min(1).max(30).step(1).listen();
     control.onChange(()=>adjustAllLevels(property));
   }
 }
@@ -273,9 +273,10 @@ function addLevelControls() {
 function main() {
   initTerrain();
   city = new City({
-    pos: vec3.fromValues(250, 0, 150),
+    pos: vec3.fromValues(250, 0, 200),
     seed: 12345,
   });
+  city.initBuildings();
 
   window.addEventListener('keypress', function (e) {
     // console.log(e.key);

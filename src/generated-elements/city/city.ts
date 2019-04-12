@@ -26,6 +26,13 @@ export class City {
     }
   }
 
+  initBuildings(): void {
+    for (let i = 0; i < this.levels.length; i++) {
+      this.levels[i].initGrid();
+      this.levels[i].initRoads();
+    }
+  }
+
   //make an adjustment to a level and subsequent adjustments to other levels
   adjustLevel(levelIndex: number, propertyName: string, value: number) {
     let level: CityLevel = this.levels[levelIndex];

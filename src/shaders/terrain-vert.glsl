@@ -37,16 +37,16 @@ void main()
   vec4 modelposition = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z, 1.0);
   //water
   if(vs_Pos.y < 0.4) {
-     modelposition.y = 0.0;
+     modelposition.y = -0.5;
      fs_Pos.y = 0.4;
   }
   //sand
   else if(vs_Pos.y < 0.5) {
-     modelposition.y = vs_Pos.y;
+     modelposition.y = vs_Pos.y - 0.5;
   }
   //land
   else {
-     modelposition.y = 0.5;
+     modelposition.y = -0.001;
   }
   //building
   if(vs_Info.y == 1.0) {
