@@ -14,7 +14,6 @@ export class Wall extends Shape{
 
 
   constructor(options: {
-
     pos: vec3,
     footprint: vec3,
     rotation: vec3,
@@ -38,7 +37,7 @@ export class Wall extends Shape{
     let scaleBottom =   blockZ2 / blockZ;
     let blocks: Block[] = [];
     for(let i = 0; i < this.numSegments; i++) {
-      let angle = this.rotation[0] + segmentAngle * i;
+      let angle = this.rotation[1] + segmentAngle * i;
       blocks.push({
         pos: vec3.fromValues(
           this.center[0] + (this.radius * Math.cos(angle)),

@@ -14,16 +14,19 @@ export class LevelOptions {
   exitGate?: number;
 }
 
+export enum GatePosition {
+  'RIGHT' = 0,
+  'CENTER' = 1,
+  'LEFT' = 2
+}
 
 /**
  * Initialize all the values to their default based upon levelnum
  * @param levelNum
  */
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
-  let wallHeight = 10;
-  if(levelNum == 1) wallHeight = 12;
   return {
-    wallHeight : wallHeight,
+    wallHeight : 20,
     levelWidth : 10,
     wallWidth : 5
   };
@@ -35,8 +38,9 @@ export class CityLevel {
   wallHeight: number;
   wallWidth: number;
   levelWidth: number;
-  entranceGate: number;
-  exitGate: number;
+  entranceGate: GatePosition;
+  exitGate: GatePosition;
+  wall: Wall;
   shapes: Shape[];
 
   constructor(levelNum: number, city: City, options: LevelOptions)  {
@@ -66,20 +70,17 @@ export class CityLevel {
    */
   initGates(levelNum: number) {
     //set the positions of the gates for each level
-    let centerGatePos = Math.PI / 2;
-    let rightGatePos = Math.PI / 10;
-    let leftGatePos = Math.PI - Math.PI/10;
     if(levelNum == 0) {
-      this.entranceGate = centerGatePos;
-      this.exitGate = rightGatePos;
+      this.entranceGate = GatePosition.CENTER;
+      this.exitGate = GatePosition.RIGHT;
     }
     else if(levelNum % 2 == 1) {
-      this.entranceGate = rightGatePos;
-      this.exitGate = leftGatePos;
+      this.entranceGate = GatePosition.RIGHT;
+      this.exitGate = GatePosition.LEFT;
     }
     else {
-      this.entranceGate = leftGatePos;
-      this.exitGate = rightGatePos;
+      this.entranceGate = GatePosition.LEFT;
+      this.exitGate = GatePosition.RIGHT;
     }
   }
 
@@ -105,21 +106,63 @@ export class CityLevel {
     this.shapes = [];
     let levelHeight = this.getLevelHeight();
     let levelRadius = this.getLevelRadius();
-    this.shapes.push(new Wall({
-      pos: vec3.fromValues(this.city.pos[0], levelHeight, this.city.pos[2]),
-      footprint: vec3.fromValues(levelRadius, this.wallHeight, this.wallWidth),
-      rotation: vec3.fromValues(0,0,0),
-      sweep: Math.PI
-    }));
+    let numSegments = this.getNumWallSegments();
+
+    this.wall = new Wall({
+        pos: vec3.fromValues(this.city.pos[0], levelHeight, this.city.pos[2]),
+        footprint: vec3.fromValues(levelRadius, this.getWallHeight(), this.wallWidth),
+        rotation: vec3.fromValues(0, 0,0),
+        sweep: Math.PI,
+        numSegments: numSegments
+    });
+
+  }
+
+  /**
+   * Get the number of wall segments for each wall
+   */
+  getNumWallSegments(): number {
+    let levelRadius = this.getLevelRadius();
+    return Math.max(10, Math.floor(levelRadius / 3))
+  }
+
+  /**
+   * get the index of the wall segment that should be a gate
+   */
+  getGateWallBlockIndex() {
+    let numWallSegments = this.getNumWallSegments();
+    if(this.entranceGate == GatePosition.CENTER) {
+      return Math.floor(numWallSegments / 2);
+    }
+    else if(this.entranceGate == GatePosition.RIGHT) {
+      return Math.floor(numWallSegments * 0.9);
+    }
+    else if(this.entranceGate == GatePosition.LEFT) {
+      return Math.floor(numWallSegments * 0.1);
+    }
   }
 
   getBlocks(): Block[] {
     if(!this.shapes) this.initShapes();
     let blocks: Block[] = [];
-    for(let i = 0; i < this.shapes.length; i++) {
-      blocks = blocks.concat(this.shapes[i].getBlocks());
+    let wallBlocks = this.wall.getBlocks();
+    let gateIndex = this.getGateWallBlockIndex();
+    for(let i = 0; i < wallBlocks.length; i++) {
+      if(i !== gateIndex) {
+        blocks.push(wallBlocks[i]);
+      }
     }
+    // for(let i = 0; i < this.shapes.length; i++) {
+    //   blocks = blocks.concat(this.shapes[i].getBlocks());
+    // }
     return blocks;
+  }
+
+  getWallHeight(): number {
+    if(this.levelNum == 0) {
+      return this.wallHeight;
+    }
+    return this.city.levels[this.levelNum - 1].wallHeight / 2 + this.wallHeight;
   }
 
   setWallHeight(height: number) {
