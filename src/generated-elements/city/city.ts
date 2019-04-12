@@ -26,12 +26,28 @@ export class City {
     }
   }
 
+  //make an adjustment to a level and subsequent adjustments to other levels
+  adjustLevel(levelIndex: number, propertyName: string, value: number) {
+    let level: CityLevel = this.levels[levelIndex];
+    switch(propertyName) {
+      case 'wallHeight':
+        level.setWallHeight(value);
+        break;
+      case 'wallWidth':
+        console.log('setting wall width');
+        level.setWallWidth(value);
+        break;
+      case 'levelWidth':
+        level.setLevelWidth(value);
+        break;
+    }
+  }
+
   getBlocks(): Block[] {
     let blocks: Block[] = [];
     for(let i = 0; i < this.levels.length; i++) {
       blocks = blocks.concat(this.levels[i].getBlocks());
     }
-    console.log(blocks);
     return blocks;
   }
 

@@ -25,11 +25,11 @@ export class Building {
     this.rotation = options.rotation;
     this.seed = options.seed;
     this.shapes = [
-      new Box({
-        footprint: this.footprint,
-        pos: this.pos,
-        rotation: this.rotation
-      })
+      // new Box({
+      //   footprint: this.footprint,
+      //   pos: this.pos,
+      //   rotation: this.rotation
+      // })
     ];
     this.runReplacements();
   }

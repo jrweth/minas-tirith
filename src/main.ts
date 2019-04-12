@@ -12,17 +12,21 @@ import {Terrain} from "./generated-elements/terrain";
 import Roads from "./generated-elements/road/roads";
 import RoadSegments from "./geometry/RoadSegments";
 import {City} from "./generated-elements/city/city";
-import {LevelOptions} from "./generated-elements/city/city-level";
+import {getDefaultLevelOptions, LevelOptions} from "./generated-elements/city/city-level";
 
 function initLevels(): LevelOptions[] {
   let levels: LevelOptions[] = [];
+  for(let i =0; i < 7; i++) {
+    levels.push(getDefaultLevelOptions(i));
+  }
   return levels;
-
 }
+
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  // 'Levels':,
+  'Levels': initLevels(),
+  'AllLevels': getDefaultLevelOptions(0),
   'Theme': 2,
   'Show Highways': true,
   'Show Streets' : true,
@@ -60,8 +64,7 @@ let dPressed: boolean;
 let planePos: vec2;
 let city: City;
 
-function loadScene() {
-
+function initTerrain() {
   //initialize terrain
   terrain = new Terrain();
   terrain.elevationSeed = vec2.fromValues(2.0, controls["Elevation Seed"]);
@@ -74,6 +77,10 @@ function loadScene() {
   terrain.streetIterations = controls["Street Iterations"];
   terrain.numBuildings = controls["Num Buildings"];
   terrain.init();
+}
+
+function loadScene() {
+
 
   //create the plane geometry
   plane = new TerrainPlane(terrain);
@@ -216,8 +223,55 @@ function addBuildingControls() {
   // mapType.onChange();
 }
 
+function adjustLevel(i: number, property: string) {
+  switch(property) {
+    case 'levelWidth': city.adjustLevel(i, property, controls.Levels[i].levelWidth); break;
+    case 'wallWidth': city.adjustLevel(i, property, controls.Levels[i].wallWidth); break;
+    case 'wallHeight': city.adjustLevel(i, property, controls.Levels[i].wallHeight); break;
+  }
+  loadScene();
+}
+
+function adjustAllLevels(property: string) {
+  for(let i = 0; i < city.levels.length; i++) {
+    switch(property) {
+      case 'levelWidth':
+        controls.Levels[i].levelWidth = controls.AllLevels.levelWidth;
+        city.adjustLevel(i, property, controls.Levels[i].levelWidth);
+        break;
+      case 'wallWidth':
+        controls.Levels[i].wallWidth = controls.AllLevels.wallWidth;
+        city.adjustLevel(i, property, controls.Levels[i].wallWidth);
+        break;
+      case 'wallHeight':
+        controls.Levels[i].wallHeight = controls.AllLevels.wallHeight;
+        city.adjustLevel(i, property, controls.Levels[i].wallHeight);
+        break;
+    }
+  }
+  loadScene();
+}
+
+function addLevelControls() {
+  let levels = gui.addFolder('city levels');
+  let properties: string[] = ['wallWidth', 'wallHeight', 'levelWidth'];
+  for(let i = 0; i < 7; i++) {
+    let level = levels.addFolder('level ' + (i+1).toString());
+    for(let property of properties) {
+      let control = level.add(controls.Levels[i],property).min(5).max(20).step(1).listen();
+      control.onChange(()=>{adjustLevel(i,property)});
+    }
+  }
+  let level = levels.addFolder('all levels');
+  for(let property of properties) {
+    let control = level.add(controls.AllLevels, property).min(5).max(20).step(1).listen();
+    control.onChange(()=>adjustAllLevels(property));
+  }
+}
+
 
 function main() {
+  initTerrain();
   city = new City({
     pos: vec3.fromValues(250, 0, 150),
     seed: 12345,
@@ -316,6 +370,8 @@ function main() {
   addTerrainControls();
   addRoadControls();
   addBuildingControls();
+  addLevelControls();
+
 
   /**
    * more control stuff

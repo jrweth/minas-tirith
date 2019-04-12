@@ -7,13 +7,11 @@ import {getDefaultSettings} from "http2";
 
 
 export class LevelOptions {
-  levelHeight?: number;
   wallHeight?: number;
   wallWidth?: number;
   levelWidth?: number;
   entranceGate?: number;
   exitGate?: number;
-  levelRadius?: number;
 }
 
 
@@ -22,25 +20,23 @@ export class LevelOptions {
  * @param levelNum
  */
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
+  let wallHeight = 10;
+  if(levelNum == 1) wallHeight = 12;
   return {
-    wallHeight : 10,
-    levelHeight : levelNum * 5,
+    wallHeight : wallHeight,
     levelWidth : 10,
-    wallWidth : 5,
-    levelRadius : (7 - levelNum) * (10 + 5)
+    wallWidth : 5
   };
 }
 
 export class CityLevel {
-  levelNum: number;
   city: City;
-  levelHeight: number;
+  levelNum: number;
   wallHeight: number;
   wallWidth: number;
   levelWidth: number;
   entranceGate: number;
   exitGate: number;
-  levelRadius: number;
   shapes: Shape[];
 
   constructor(levelNum: number, city: City, options: LevelOptions)  {
@@ -52,15 +48,15 @@ export class CityLevel {
       ...options,
     };
 
-    if(options.wallHeight)   this.wallHeight   = options.wallHeight;
-    if(options.wallWidth)    this.wallWidth    = options.wallWidth;
-    if(options.levelWidth)   this.levelWidth   = options.levelWidth;
+    if (this.levelNum == 0) console.log(options);
+
+
+    this.wallHeight   = options.wallHeight;
+    this.wallWidth    = options.wallWidth;
+    this.levelWidth   = options.levelWidth;
     if(options.entranceGate) this.entranceGate = options.entranceGate;
     if(options.exitGate)     this.exitGate     = options.exitGate;
-    if(options.levelHeight)  this.levelHeight  = options.levelHeight;
-    if(options.levelRadius)  this.levelRadius  = options.levelRadius;
     this.initGates(this.levelNum);
-    this.initShapes();
   }
 
 
@@ -87,24 +83,68 @@ export class CityLevel {
     }
   }
 
+  getLevelHeight(): number {
+    let height: number = this.city.pos[1];
+    //only adjust levels 2 and higher based on height of first interior wall
+    for(let i = 1; i < this.levelNum; i++) {
+      height += this.city.levels[i].wallHeight / 2;
+    }
+    return height;
+  }
+
+  getLevelRadius(): number {
+    let radius: number = this.wallWidth + this.levelWidth;
+    for(let i = this.levelNum + 1; i < 7; i++) {
+      radius += this.city.levels[i].levelWidth + this.city.levels[i].wallWidth;
+    }
+    return radius;
+  }
+
   initShapes() {
     //initialize the wall
     this.shapes = [];
+    let levelHeight = this.getLevelHeight();
+    let levelRadius = this.getLevelRadius();
     this.shapes.push(new Wall({
-      pos: vec3.fromValues(this.city.pos[0], this.levelHeight, this.city.pos[2]),
-      footprint: vec3.fromValues(this.levelRadius, this.wallHeight, this.wallWidth),
+      pos: vec3.fromValues(this.city.pos[0], levelHeight, this.city.pos[2]),
+      footprint: vec3.fromValues(levelRadius, this.wallHeight, this.wallWidth),
       rotation: vec3.fromValues(0,0,0),
       sweep: Math.PI
     }));
   }
 
   getBlocks(): Block[] {
+    if(!this.shapes) this.initShapes();
     let blocks: Block[] = [];
-    console.log(this.shapes);
     for(let i = 0; i < this.shapes.length; i++) {
       blocks = blocks.concat(this.shapes[i].getBlocks());
     }
-    console.log(blocks);
     return blocks;
   }
+
+  setWallHeight(height: number) {
+    this.wallHeight = height;
+    //initialize shapes for all levels here and above
+    for(let i = this.levelNum; i < this.city.levels.length; i++) {
+      this.city.levels[i].initShapes()
+    }
+  }
+
+  setWallWidth(width: number) {
+    this.wallWidth = width;
+    //initialize shapes for all levels here and below
+    for(let i = this.levelNum; i >= 0; i--) {
+      this.city.levels[i].initShapes()
+    }
+  }
+
+
+  setLevelWidth(width: number) {
+    this.levelWidth = width;
+    //initialize shapes for all levels here and below
+    for(let i = this.levelNum; i >= 0; i--) {
+      this.city.levels[i].initShapes()
+    }
+  }
+
 };
