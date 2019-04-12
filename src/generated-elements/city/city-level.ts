@@ -2,10 +2,38 @@ import {Shape} from "../building/shape/shape";
 import {Block} from "../building/shape/block";
 import {Wall} from "../building/shape/wall";
 import {vec3} from "gl-matrix";
+import {City} from "./city";
+import {getDefaultSettings} from "http2";
 
+
+export class LevelOptions {
+  levelHeight?: number;
+  wallHeight?: number;
+  wallWidth?: number;
+  levelWidth?: number;
+  entranceGate?: number;
+  exitGate?: number;
+  levelRadius?: number;
+}
+
+
+/**
+ * Initialize all the values to their default based upon levelnum
+ * @param levelNum
+ */
+export function getDefaultLevelOptions(levelNum: number): LevelOptions {
+  return {
+    wallHeight : 10,
+    levelHeight : levelNum * 5,
+    levelWidth : 10,
+    wallWidth : 5,
+    levelRadius : (7 - levelNum) * (10 + 5)
+  };
+}
 
 export class CityLevel {
   levelNum: number;
+  city: City;
   levelHeight: number;
   wallHeight: number;
   wallWidth: number;
@@ -15,39 +43,26 @@ export class CityLevel {
   levelRadius: number;
   shapes: Shape[];
 
-  constructor(options: {
-    levelNum: number,
-    wallHeight?: number,
-    wallWidth?: number,
-    levelWidth?: number,
-    entranceGate?: number,
-    exitGate?: number,
-    levelRadius?: number
-    levelHeight?: number,
-  }) {
-    this.levelNum = options.levelNum;
-    this.init(this.levelNum);
+  constructor(levelNum: number, city: City, options: LevelOptions)  {
+    this.levelNum = levelNum;
+    this.city = city;
+    let defaultOptions = getDefaultLevelOptions(levelNum);
+    options = {
+      ...defaultOptions,
+      ...options,
+    };
+
     if(options.wallHeight)   this.wallHeight   = options.wallHeight;
     if(options.wallWidth)    this.wallWidth    = options.wallWidth;
     if(options.levelWidth)   this.levelWidth   = options.levelWidth;
     if(options.entranceGate) this.entranceGate = options.entranceGate;
     if(options.exitGate)     this.exitGate     = options.exitGate;
     if(options.levelHeight)  this.levelHeight  = options.levelHeight;
+    if(options.levelRadius)  this.levelRadius  = options.levelRadius;
     this.initGates(this.levelNum);
     this.initShapes();
   }
 
-  /**
-   * Initialize all the values to their default based upon levelnum
-   * @param levelNum
-   */
-  init(levelNum: number) {
-    this.wallHeight = 10;
-    this.levelHeight = levelNum * 5;
-    this.levelWidth = 10;
-    this.wallWidth = 5;
-    this.levelRadius = (7 - levelNum) * (this.levelWidth + this.wallWidth);
-  }
 
   /**
    * Initialize the gates based upon the level number
@@ -76,7 +91,7 @@ export class CityLevel {
     //initialize the wall
     this.shapes = [];
     this.shapes.push(new Wall({
-      pos: vec3.fromValues(250, this.levelHeight, 250),
+      pos: vec3.fromValues(this.city.pos[0], this.levelHeight, this.city.pos[2]),
       footprint: vec3.fromValues(this.levelRadius, this.wallHeight, this.wallWidth),
       rotation: vec3.fromValues(0,0,0),
       sweep: Math.PI

@@ -12,10 +12,17 @@ import {Terrain} from "./generated-elements/terrain";
 import Roads from "./generated-elements/road/roads";
 import RoadSegments from "./geometry/RoadSegments";
 import {City} from "./generated-elements/city/city";
+import {LevelOptions} from "./generated-elements/city/city-level";
 
+function initLevels(): LevelOptions[] {
+  let levels: LevelOptions[] = [];
+  return levels;
+
+}
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
+  // 'Levels':,
   'Theme': 2,
   'Show Highways': true,
   'Show Streets' : true,
@@ -212,8 +219,8 @@ function addBuildingControls() {
 
 function main() {
   city = new City({
-    pos: vec3.fromValues(250, 0, 250),
-    seed: 1234,
+    pos: vec3.fromValues(250, 0, 150),
+    seed: 12345,
   });
 
   window.addEventListener('keypress', function (e) {

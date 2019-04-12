@@ -22,7 +22,7 @@ export class City {
     this.seed = options.seed;
     this.levels = [];
     for(let i = 0; i < 7; i++) {
-      this.levels.push(new CityLevel({levelNum: i}))
+      this.levels.push(new CityLevel(i, this, {}));
     }
   }
 

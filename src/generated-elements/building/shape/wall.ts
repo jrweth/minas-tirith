@@ -14,6 +14,7 @@ export class Wall extends Shape{
 
 
   constructor(options: {
+
     pos: vec3,
     footprint: vec3,
     rotation: vec3,
