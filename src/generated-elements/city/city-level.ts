@@ -1,10 +1,12 @@
 import {Shape} from "../building/shape/shape";
 import {Block, BlockType} from "../building/shape/block";
 import {Wall} from "../building/shape/wall";
-import {vec3} from "gl-matrix";
+import {vec2, vec3} from "gl-matrix";
 import {City} from "./city";
 import {getDefaultSettings} from "http2";
 import {start} from "repl";
+import Random from "../../noise/random";
+import {Building} from "../building/building";
 
 
 export class LevelOptions {
@@ -14,6 +16,8 @@ export class LevelOptions {
   entranceGate?: number;
   exitGate?: number;
   gridWidth?: number;
+  seed?: number;
+  buildingFootprintTarget?: number;
 }
 
 export enum GatePosition {
@@ -49,7 +53,9 @@ export function getDefaultLevelOptions(levelNum: number): LevelOptions {
     wallHeight : 8,
     levelWidth : 4,
     wallWidth : 2,
-    gridWidth: 4
+    gridWidth: 4,
+    seed: 1.34 * levelNum,
+    buildingFootprintTarget: (levelNum + 0.65) * 2
   };
 }
 
@@ -58,13 +64,21 @@ export class CityLevel {
   levelNum: number;
   wallHeight: number;
   wallWidth: number;
-  levelWidth: number;
+  levelWidth: number;  //width of the streets
+  seed: vec2;
   entranceGate: GatePosition;
   exitGate: GatePosition;
   wall: Wall;
   gridWidth: number;
   gridLength: number;
   gridInfo: GridInfo[][];
+  boulevardStartIndex: number;
+  boulevardWidth: number;
+  inSpokes: number[];
+  outSpokes: number[];
+  buildingFootprintTarget: number;
+  buildings: Building[];
+
 
 
   constructor(levelNum: number, city: City, options: LevelOptions)  {
@@ -83,6 +97,8 @@ export class CityLevel {
     this.wallWidth    = options.wallWidth;
     this.levelWidth   = options.levelWidth;
     this.gridWidth    = options.gridWidth;
+    this.seed         = vec2.fromValues(this.levelNum, options.seed);
+    this.buildingFootprintTarget = options.buildingFootprintTarget;
     if(options.entranceGate) this.entranceGate = options.entranceGate;
     if(options.exitGate)     this.exitGate     = options.exitGate;
     this.initGates(this.levelNum);
@@ -181,11 +197,12 @@ export class CityLevel {
     let gateIndex = this.getGateWallBlockIndex();
     for(let i = 0; i < wallBlocks.length; i++) {
       if(i !== gateIndex) {
-        blocks.push(wallBlocks[i]);
+  //      blocks.push(wallBlocks[i]);
       }
     }
 
     blocks = blocks.concat(this.getRoadBlocks());
+    blocks = blocks.concat(this.getBuildingBlocks());
 
     return blocks;
   }
@@ -213,9 +230,10 @@ export class CityLevel {
     return blocks;
   }
 
+
   getGridLength(): number {
     let radius = this.getLevelRadius();
-    let gridLength = radius * this.city.sweep * this.levelWidth  / this.gridWidth;
+    let gridLength = radius * this.city.sweep * this.gridWidth  / this.levelWidth;
     return Math.floor(gridLength);
   }
 
@@ -252,6 +270,13 @@ export class CityLevel {
     }
   }
 
+  setGridWidth(width: number) {
+    console.log('setting grid width');
+    this.gridWidth = width;
+    //initialize shapes for all levels here and below
+    this.initDetails();
+  }
+
   getPosFromGridPos(i:number, j:number): vec3 {
     let radius = this.getLevelRadius() - this.wallWidth/2  - this.levelWidth + (i * this.levelWidth / this.gridWidth);
     let angle = this.getRotFromGridPos(i,j);
@@ -265,6 +290,11 @@ export class CityLevel {
     return vec3.fromValues(0,this.city.sweep * j / this.gridLength, 0);
   }
 
+  initDetails() {
+    this.initGrid();
+    this.initRoads();
+    this.initBuildings();
+  }
 
 
   initGrid() {
@@ -303,19 +333,20 @@ export class CityLevel {
     this.initBoulevard();
     this.initGateEntranceRoads();
     this.initGateExitRoads();
+    this.initSpokeRoads();
   }
 
   /**
    * Get the width of the Boulevard down each level
    */
   getBoulevardWidth() {
-    return Math.ceil(this.levelWidth / 6);
+    return Math.ceil(this.gridWidth / 6);
   }
 
   //get the start index of the boulevard
   getBoulevardStartIndex() {
     let roadWidth = this.getBoulevardWidth();
-    return Math.floor((this.levelWidth  - roadWidth/2) / 2);
+    return Math.floor((this.gridWidth  - roadWidth/2) / 2);
   }
 
   /**
@@ -323,15 +354,18 @@ export class CityLevel {
    */
   initBoulevard() {
     //add a central boulevard down the middle of the level
-    let roadWidth = this.getBoulevardWidth();
-    let startRoadGridPos = this.getBoulevardStartIndex();
-    for(let i = startRoadGridPos; i < startRoadGridPos + roadWidth; i++) {
+    this.boulevardWidth = this.getBoulevardWidth();
+    this.boulevardStartIndex = this.getBoulevardStartIndex();
+    for(let i = this.boulevardStartIndex; i < this.boulevardStartIndex + this.boulevardWidth; i++) {
       for(let j = 0; j < this.gridLength; j++) {
         this.gridInfo[i][j].gridType = GridType.ROAD;
       }
     }
   }
 
+  /**
+   * Set the GridInfo type to road for grid sections in front of level entrance gates
+   */
   initGateEntranceRoads() {
     let gateSegmentIndex = this.getGateWallBlockIndex();
     let entranceAngleWidth = this.city.sweep * 0.9 / (this.getNumWallSegments());
@@ -348,6 +382,9 @@ export class CityLevel {
     }
   }
 
+  /**
+   * Set the GridInfo to road for grid sections in front of exit gates
+   */
   initGateExitRoads() {
     //no exit road
     if(this.levelNum == this.city.levels.length - 1) return;
@@ -366,6 +403,253 @@ export class CityLevel {
         }
       }
     }
+  }
+
+  /**
+   * initialize all the spoke roads
+   */
+  initSpokeRoads() {
+    let spokeProbability = 0.25;
+    this.outSpokes = [-1];
+    for(let j = 0; j < this.gridLength; j ++) {
+      let rand = Random.random2to1(vec2.fromValues(j, 2.2), this.seed);
+      if (rand < spokeProbability) {
+        for (let i = this.boulevardStartIndex + this.boulevardWidth; i < this.gridWidth; i++) {
+          this.gridInfo[i][j].gridType = GridType.ROAD;
+        }
+        this.outSpokes.push(j);
+        j += 2;
+      }
+    }
+
+    this.inSpokes = [-1];
+    for(let j = 0; j < this.gridLength; j ++) {
+      let rand = Random.random2to1(vec2.fromValues(j, 34.343), this.seed);
+      if(rand < spokeProbability) {
+        for(let i = 0; i < this.boulevardStartIndex; i++) {
+          this.gridInfo[i][j].gridType = GridType.ROAD;
+        }
+        this.inSpokes.push(j);
+        j += 2;
+      }
+    }
+  }
+
+  initBuildings() {
+    this.buildings = [];
+    for(let k = 0; k < this.outSpokes.length; k++) {
+      let startI = this.boulevardStartIndex + this.boulevardWidth;
+      let startJ = this.outSpokes[k] + 1;
+      let endI = this.gridWidth - 1;
+      let endJ = this.gridLength - 1;
+      if(k < this.outSpokes.length -1) {
+        endJ = this.outSpokes[k+1] - 1;
+      }
+
+      this.initBlockBuildings(startI, startJ, endI, endJ);
+    }
+
+    for(let k = 0; k < this.inSpokes.length; k++) {
+      let startI = 0;
+      let startJ = this.inSpokes[k] + 1;
+      let endI = this.boulevardStartIndex - 1;
+      let endJ = this.gridLength - 1;
+      if(k < this.inSpokes.length -1) {
+        endJ = this.inSpokes[k+1] - 1;
+      }
+
+      this.initBlockBuildings(startI, startJ, endI, endJ);
+    }
+  }
+
+  initBlockBuildings(startI: number, startJ: number, endI: number, endJ: number) {
+    //create a set of possible locations
+    let blockArea = (endI - startI + 1) * (endJ - startJ + 1);
+    let numBuildings = Math.max(1, Math.floor(blockArea / this.buildingFootprintTarget) - 1);
+
+
+
+    //get the possible building locations
+    let possibleSet = new Set<string>();
+    for(let i = startI; i <= endI; i++) {
+      for(let j = startJ; j <= endJ; j++) {
+        possibleSet.add(i.toString() + '-' + j.toString());
+      }
+    }
+
+    //sample random points in our block and add buildings
+    let locations: vec2[] = [];
+    for(let x = 0; x < numBuildings; x++) {
+      if(possibleSet.size == 0) break;
+      let location: string = Random.getRandomSetValue(2.2 + x, possibleSet);
+      possibleSet.delete(location);
+      let coords = location.split('-');
+      let i = parseInt(coords[0]);
+      let j = parseInt(coords[1]);
+      if(this.gridInfo[i][j].gridType == GridType.OPEN) {
+        locations.push(vec2.fromValues(i, j));
+        this.gridInfo[i][j].gridType = GridType.BUILDING;
+      }
+    }
+
+    //get the footprints
+    let footprints: vec2[] = this.getBuildingFootprints(locations, possibleSet);
+    for(let k = 0; k < locations.length; k++) {
+      this.initBuilding(locations[k], footprints[k]);
+    }
+  }
+
+  getBuildingFootprints(locations: vec2[], possibleSet: Set<string>): vec2[] {
+    //loop through locations to get the footprint
+    let footprints: vec2[] = [];
+    for(let i=0; i < locations.length; i++) {
+      footprints.push(vec2.fromValues(1,1));
+    }
+    let expanded: boolean = true;
+    while(expanded) {
+      expanded  = false;
+      for(let i = 0; i < locations.length; i++) {
+        if(
+          false
+          || this.expandIn(locations[i],footprints[i],possibleSet)
+          || this.expandOut(locations[i],footprints[i],possibleSet)
+          || this.expandRight(locations[i],footprints[i],possibleSet)
+          || this.expandLeft(locations[i],footprints[i],possibleSet)
+        ) {
+          expanded = true;
+        }
+      }
+    }
+
+    return footprints;
+  }
+
+  expandRight(location: vec2, footprint: vec2, possibleSet: Set<string>): boolean {
+    for(let i = location[0]; i < location[0] + footprint[0]; i++) {
+      let j = location[1] + footprint[1];
+      let hash = i.toString() + '-' + j.toString();
+      if(!possibleSet.has(hash)) return false;
+    }
+
+    //adjust footprint and set grid and possibleset for new row
+    for(let i = location[0]; i < location[0] + footprint[0]; i++) {
+      let j = location[1] + footprint[1];
+      let hash = i.toString() + '-' + j.toString();
+      possibleSet.delete(hash);
+      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+    }
+    footprint[1]++;
+
+    return true;
+
+  }
+
+
+  expandLeft(location: vec2, footprint: vec2, possibleSet: Set<string>): boolean {
+    for(let i = location[0]; i < location[0] + footprint[0]; i++) {
+      let j = location[1] -1;
+      let hash = i.toString() + '-' + j.toString();
+      if(!possibleSet.has(hash)) return false;
+    }
+
+    //adjust footprint and set grid and possibleset for new row
+    for(let i = location[0]; i < location[0] + footprint[0]; i++) {
+      let j = location[1] - 1;
+      let hash = i.toString() + '-' + j.toString();
+      possibleSet.delete(hash);
+      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+    }
+    footprint[1]++;
+
+    return true;
+
+  }
+
+
+  expandOut(location: vec2, footprint: vec2, possibleSet: Set<string>): boolean {
+    for(let j = location[1]; j < location[1] + footprint[1]; j++) {
+      let i = location[0] + footprint[0];
+      let hash = i.toString() + '-' + j.toString();
+      if(!possibleSet.has(hash)) return false;
+    }
+
+    //adjust footprint and set grid and possibleset for new row
+    for(let j = location[1]; j < location[1] + footprint[1]; j++) {
+      let i = location[0] + footprint[0];
+      let hash = i.toString() + '-' + j.toString();
+      possibleSet.delete(hash);
+      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+    }
+    footprint[1]++;
+
+    return true;
+  }
+
+  expandIn(location: vec2, footprint: vec2, possibleSet: Set<string>): boolean {
+    for(let j = location[1]; j < location[1] + footprint[1]; j++) {
+      let i = location[0] - 1;
+      let hash = i.toString() + '-' + j.toString();
+      if(!possibleSet.has(hash)) return false;
+    }
+
+    //adjust footprint and set grid and possibleset for new row
+    for(let j = location[1]; j < location[1] + footprint[1]; j++) {
+      let i = location[0] - 1;
+      let hash = i.toString() + '-' + j.toString();
+      possibleSet.delete(hash);
+      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+    }
+    footprint[1]++;
+
+    return true;
+  }
+
+
+  initBuilding(location:vec2, footprint:vec2) {
+    let pos = this.getPosFromGridPos(location[0], location[1]);
+    let rot = this.getRotFromGridPos(location[0], location[1]);
+    let foot: vec3 = vec3.fromValues(footprint[0], 10, footprint[1]);
+    this.buildings.push(new Building({
+      pos: pos,
+      rotation: rot,
+      seed:  this.seed[1] * (this.buildings.length + 1),
+      footprint: foot
+    }));
+
+  }
+
+  getBuildingBlocks(): Block[] {
+    let blocks: Block[] = [];
+    let gridSize = this.levelWidth / this.gridWidth;
+    let footprint: vec3 = vec3.fromValues(gridSize, 4, gridSize);
+    for(let i = 0; i < this.gridWidth; i++) {
+      for(let j = 0; j < this.gridLength; j++) {
+        if(this.gridInfo[i][j].gridType == GridType.BUILDING) {
+          blocks.push({
+            blockType: BlockType.PYRAMID,
+            pos: this.gridInfo[i][j].pos,
+            footprint: footprint,
+            adjustScaleTop: 0,
+            adjustScaleBottom: 1,
+            rotation: this.gridInfo[i][j].rotation,
+            scaleFromCenter: false
+          })
+        }
+        if(this.gridInfo[i][j].gridType == GridType.TUNNEL) {
+          console.log('found tunnel')
+          blocks.push({
+            blockType: BlockType.PYRAMID,
+            pos: this.gridInfo[i][j].pos,
+            footprint: footprint,
+            adjustScaleTop: 1,
+            adjustScaleBottom: 1,
+            rotation: this.gridInfo[i][j].rotation,
+            scaleFromCenter: false
+          })
+        }
+      }
+    }
+    return blocks;
   }
 
 };

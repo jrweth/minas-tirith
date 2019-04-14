@@ -70,6 +70,17 @@ class Random {
     }
     return total;
   }
+
+  static getRandomSetValue(seed: number, set: Set<string>): string | null{
+    let index = Random.randomInt(set.size, seed);
+    let count = 0;
+    let val:string;
+    for(val of set) {
+      if(count == index) return val;
+      count++;
+    }
+    return val;
+  }
 }
 
 export default Random;

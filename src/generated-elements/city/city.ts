@@ -30,6 +30,7 @@ export class City {
     for (let i = 0; i < this.levels.length; i++) {
       this.levels[i].initGrid();
       this.levels[i].initRoads();
+      this.levels[i].initBuildings();
     }
   }
 
@@ -46,6 +47,9 @@ export class City {
         break;
       case 'levelWidth':
         level.setLevelWidth(value);
+        break;
+      case 'gridWidth':
+        level.setGridWidth(value);
         break;
     }
   }

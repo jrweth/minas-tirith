@@ -69,6 +69,8 @@ class Noise {
     return closestWorleyPoint;
   }
 
+
+
 }
 
 export default Noise;

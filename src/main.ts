@@ -228,6 +228,7 @@ function adjustLevel(i: number, property: string) {
     case 'levelWidth': city.adjustLevel(i, property, controls.Levels[i].levelWidth); break;
     case 'wallWidth': city.adjustLevel(i, property, controls.Levels[i].wallWidth); break;
     case 'wallHeight': city.adjustLevel(i, property, controls.Levels[i].wallHeight); break;
+    case 'gridWidth': city.adjustLevel(i, property, controls.Levels[i].gridWidth); break;
   }
   loadScene();
 }
@@ -247,6 +248,10 @@ function adjustAllLevels(property: string) {
         controls.Levels[i].wallHeight = controls.AllLevels.wallHeight;
         city.adjustLevel(i, property, controls.Levels[i].wallHeight);
         break;
+      case 'gridWidth':
+        controls.Levels[i].gridWidth = controls.AllLevels.gridWidth;
+        city.adjustLevel(i, property, controls.Levels[i].gridWidth);
+        break;
     }
   }
   loadScene();
@@ -261,12 +266,16 @@ function addLevelControls() {
       let control = level.add(controls.Levels[i],property).min(1).max(30).step(1).listen();
       control.onChange(()=>{adjustLevel(i,property)});
     }
+    let gridWidthControl = level.add(controls.Levels[i], 'gridWidth').min(4).max(10).step(1).listen();
+    gridWidthControl.onChange(()=>adjustLevel(i,'gridWidth'));
   }
   let level = levels.addFolder('all levels');
   for(let property of properties) {
     let control = level.add(controls.AllLevels, property).min(1).max(30).step(1).listen();
     control.onChange(()=>adjustAllLevels(property));
   }
+  let gridWidthControl = level.add(controls.AllLevels, 'gridWidth').min(1).max(10).step(1).listen();
+  gridWidthControl.onChange(()=>adjustAllLevels('gridWidth'));
 }
 
 
