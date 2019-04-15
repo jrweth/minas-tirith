@@ -21,7 +21,7 @@ export class StandardRoof extends Shape{
       adjustScaleTop: 0,
       adjustScaleBottom: 1,
       rotation: this.rotation,
-      scaleFromCenter: false
+      scaleFromCenter: true
     }];
   }
 

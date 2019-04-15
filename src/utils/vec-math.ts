@@ -42,6 +42,11 @@ export class VecMath {
     return vec3.add(out, this.convertToVec3(a), this.convertToVec3(b));
   }
 
+  public static add2(a: vec2 | number[] | number, b: vec2 | number[] | number) {
+    let out: vec2 = vec2.create();
+    return vec2.add(out, this.convertToVec2(a), this.convertToVec2(b));
+  }
+
   public static multiply3(a: vec3, b: vec3 | number[] | number): vec3 {
     let out: vec3 = vec3.create();
     return vec3.multiply(out, this.convertToVec3(a), this.convertToVec3(b));

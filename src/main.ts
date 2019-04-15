@@ -103,7 +103,7 @@ function loadScene() {
     scale: plane.scale
   });
   cube.create();
-  cube.setInstanceVBOs(terrain.buildings, city);
+  cube.setInstanceVBOs(city);
 
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();

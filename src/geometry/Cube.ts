@@ -144,7 +144,7 @@ class Cube extends Drawable {
     return screenPos;
   }
 
-  setInstanceVBOs(buildings: Building[], city: City) {
+  setInstanceVBOs(city: City) {
     this.generateTranslate();
     this.generateCol();
     this.generateBlockInfo();
@@ -157,39 +157,6 @@ class Cube extends Drawable {
 
     this.numInstances = 0;
 
-    for(let i = 0; i < buildings.length; i++) {
-      let blocks: Block[] = buildings[i].getBlocks();
-      for(let j = 0; j < blocks.length; j++) {
-        let block: Block = blocks[j];
-
-        if(block.blockType < 10) {
-          this.numInstances++;
-          let startPosScreen = this.gridPosToScreenPos(block.pos);
-
-          offsets.push(startPosScreen[0], startPosScreen[1], startPosScreen[2], 0);
-          colors.push(
-            block.footprint[0] * this.scale[0] / this.gridSize[0],
-            block.footprint[1] * this.scale[0] / this.gridSize[0],
-            block.footprint[2] * this.scale[1] / this.gridSize[1],
-            block.scaleFromCenter ? 1 : 0
-          );
-          blockInfo.push(
-            block.blockType,
-            0,
-            block.adjustScaleBottom,
-            block.adjustScaleTop
-          );
-          rotations.push(
-            block.rotation[0],
-            block.rotation[1],
-            block.rotation[2],
-            0
-          )
-
-        }
-
-      }
-    }
     let cityBlocks: Block[] = city.getBlocks();
     for(let i = 0; i < cityBlocks.length; i++) {
       let block: Block = cityBlocks[i];

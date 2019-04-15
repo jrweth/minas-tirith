@@ -444,7 +444,7 @@ export class Terrain {
       // );
     }
 
-    let numBuildings = 1;
+    let numBuildings = 0;
 
     for(let i = 0; i < numBuildings; i++) {
       this.buildings.push(new Building({

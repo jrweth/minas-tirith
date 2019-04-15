@@ -7,6 +7,7 @@ import {getDefaultSettings} from "http2";
 import {start} from "repl";
 import Random from "../../noise/random";
 import {Building} from "../building/building";
+import {VecMath} from "../../utils/vec-math";
 
 
 export class LevelOptions {
@@ -107,28 +108,10 @@ export class CityLevel {
 
   rescaleLevel() {
     this.updateGridPositions();
-    this.initShapes();
+    this.initWall();
+    this.initDetails()
   }
 
-  /**
-   * Initialize the gates based upon the level number
-   * @param levelNum
-   */
-  initGates(levelNum: number) {
-    //set the positions of the gates for each level
-    if(levelNum == 0) {
-      this.entranceGate = GatePosition.CENTER;
-      this.exitGate = GatePosition.RIGHT;
-    }
-    else if(levelNum % 2 == 1) {
-      this.entranceGate = GatePosition.RIGHT;
-      this.exitGate = GatePosition.LEFT;
-    }
-    else {
-      this.entranceGate = GatePosition.LEFT;
-      this.exitGate = GatePosition.RIGHT;
-    }
-  }
 
   getLevelHeight(): number {
     let height: number = this.city.pos[1];
@@ -139,6 +122,7 @@ export class CityLevel {
     return height;
   }
 
+
   getLevelRadius(): number {
     let radius: number = this.wallWidth + this.levelWidth;
     for(let i = this.levelNum + 1; i < 7; i++) {
@@ -147,18 +131,146 @@ export class CityLevel {
     return radius;
   }
 
-  initShapes() {
+
+  /**
+   * Get the actual blocks to be rendered
+   */
+  getBlocks(): Block[] {
+    if(!this.wall) this.initWall();
+    let blocks: Block[] = [];
+    let wallBlocks = this.wall.getBlocks();
+    let gateIndex = this.getGateWallBlockIndex();
+    for(let i = 0; i < wallBlocks.length; i++) {
+      if(i !== gateIndex) {
+        //blocks.push(wallBlocks[i]);
+      }
+    }
+
+    blocks = blocks.concat(this.getRoadBlocks());
+    blocks = blocks.concat(this.getBuildingBlocks());
+
+    return blocks;
+  }
+
+
+
+  getGridLength(): number {
+    let radius = this.getLevelRadius();
+    let gridLength = radius * this.city.sweep * this.gridWidth  / this.levelWidth;
+    return Math.floor(gridLength);
+  }
+
+
+  setLevelWidth(width: number) {
+    this.levelWidth = width;
+    //initialize shapes for all levels here and below
+    for(let i = this.levelNum; i >= 0; i--) {
+      this.city.levels[i].rescaleLevel();
+    }
+  }
+
+
+  initDetails() {
+    this.initGrid();
+    this.initRoads();
+    this.initBuildings();
+  }
+
+
+
+  /******************************************************************************************************/
+  /******************************************GRID *******************************************************/
+  /******************************************************************************************************/
+
+  updateGridPositions() {
+    for(let i =0; i < this.gridWidth; i++) {
+      for(let j =0; j < this.gridLength; j++) {
+        this.gridInfo[i][j].pos = this.getPosFromGridPos(i,j);
+      }
+    }
+  }
+
+  initGrid() {
+    this.gridLength = this.getGridLength();
+    //initialize the grid
+    this.gridInfo = [];
+    for(let i = 0; i < this.gridWidth; i++) {
+      this.gridInfo.push([]);
+      for(let j= 0; j < this.gridLength; j++) {
+        this.gridInfo[i].push({
+          i: i,
+          j: j,
+          level: this,
+          gridType: GridType.OPEN,
+          buildingIndex: null,
+          pos: this.getPosFromGridPos(i, j),
+          rotation: this.getRotFromGridPos(i,j)
+        });
+      }
+    }
+  }
+
+  setGridWidth(width: number) {
+    this.gridWidth = width;
+    //initialize shapes for all levels here and below
+    this.initDetails();
+  }
+
+  getPosFromGridPos(i:number, j:number): vec3 {
+    let radius = this.getLevelRadius() - this.wallWidth/2  - this.levelWidth + (i * this.levelWidth / this.gridWidth);
+    let angle = this.getRotFromGridPos(i,j);
+    let x = this.city.pos[0] + Math.cos(angle[1]) * radius;
+    let y = this.getLevelHeight();
+    let z = this.city.pos[2] + Math.sin(angle[1]) * radius;
+    return vec3.fromValues(x,y,z);
+  }
+
+  getRotFromGridPos(i:number, j: number): vec3 {
+    return vec3.fromValues(0,this.city.sweep * j / this.gridLength, 0);
+  }
+
+
+  /******************************************************************************************************/
+  /******************************************WALLS*******************************************************/
+  /******************************************************************************************************/
+
+  getWallHeight(): number {
+    if(this.levelNum == 0) {
+      return this.wallHeight;
+    }
+    return this.city.levels[this.levelNum - 1].wallHeight / 2 + this.wallHeight;
+  }
+
+  setWallHeight(height: number) {
+    this.wallHeight = height;
+    //initialize shapes for all levels here and above
+    for(let i = this.levelNum; i < this.city.levels.length; i++) {
+      this.city.levels[i].rescaleLevel();
+    }
+  }
+
+
+  setWallWidth(width: number) {
+    this.wallWidth = width;
+    //initialize shapes for all levels here and below
+    for(let i = this.levelNum; i >= 0; i--) {
+      this.city.levels[i].rescaleLevel();
+    }
+  }
+
+
+  initWall() {
     //initialize the wall
     let levelHeight = this.getLevelHeight();
     let levelRadius = this.getLevelRadius();
     let numSegments = this.getNumWallSegments();
 
     this.wall = new Wall({
-        pos: vec3.fromValues(this.city.pos[0], levelHeight, this.city.pos[2]),
-        footprint: vec3.fromValues(levelRadius, this.getWallHeight(), this.wallWidth),
-        rotation: vec3.fromValues(0, 0,0),
-        sweep: Math.PI,
-        numSegments: numSegments
+      pos: vec3.fromValues(this.city.pos[0], levelHeight, this.city.pos[2]),
+      footprint: vec3.fromValues(levelRadius, this.getWallHeight(), this.wallWidth),
+      rotation: vec3.fromValues(0, 0,0),
+      sweep: Math.PI,
+      numSegments: numSegments
     });
   }
 
@@ -188,143 +300,28 @@ export class CityLevel {
   }
 
   /**
-   * Get the actual blocks to be rendered
+   * Initialize the gates based upon the level number
+   * @param levelNum
    */
-  getBlocks(): Block[] {
-    if(!this.wall) this.initShapes();
-    let blocks: Block[] = [];
-    let wallBlocks = this.wall.getBlocks();
-    let gateIndex = this.getGateWallBlockIndex();
-    for(let i = 0; i < wallBlocks.length; i++) {
-      if(i !== gateIndex) {
-  //      blocks.push(wallBlocks[i]);
-      }
+  initGates(levelNum: number) {
+    //set the positions of the gates for each level
+    if(levelNum == 0) {
+      this.entranceGate = GatePosition.CENTER;
+      this.exitGate = GatePosition.RIGHT;
     }
-
-    blocks = blocks.concat(this.getRoadBlocks());
-    blocks = blocks.concat(this.getBuildingBlocks());
-
-    return blocks;
-  }
-
-
-  getRoadBlocks(): Block[] {
-    let blocks: Block[] = [];
-    let gridSize = this.levelWidth / this.gridWidth;
-    let footprint: vec3 = vec3.fromValues(gridSize, 1, gridSize);
-    for(let i = 0; i < this.gridWidth; i++) {
-      for(let j = 0; j < this.gridLength; j++) {
-        if(this.gridInfo[i][j].gridType == GridType.ROAD) {
-          blocks.push({
-            blockType: BlockType.CUBE,
-            pos: this.gridInfo[i][j].pos,
-            footprint: footprint,
-            adjustScaleTop: 1,
-            adjustScaleBottom: 1,
-            rotation: this.gridInfo[i][j].rotation,
-            scaleFromCenter: false
-          })
-        }
-      }
+    else if(levelNum % 2 == 1) {
+      this.entranceGate = GatePosition.RIGHT;
+      this.exitGate = GatePosition.LEFT;
     }
-    return blocks;
-  }
-
-
-  getGridLength(): number {
-    let radius = this.getLevelRadius();
-    let gridLength = radius * this.city.sweep * this.gridWidth  / this.levelWidth;
-    return Math.floor(gridLength);
-  }
-
-  getWallHeight(): number {
-    if(this.levelNum == 0) {
-      return this.wallHeight;
-    }
-    return this.city.levels[this.levelNum - 1].wallHeight / 2 + this.wallHeight;
-  }
-
-  setWallHeight(height: number) {
-    this.wallHeight = height;
-    //initialize shapes for all levels here and above
-    for(let i = this.levelNum; i < this.city.levels.length; i++) {
-      this.city.levels[i].rescaleLevel();
+    else {
+      this.entranceGate = GatePosition.LEFT;
+      this.exitGate = GatePosition.RIGHT;
     }
   }
 
-
-  setWallWidth(width: number) {
-    this.wallWidth = width;
-    //initialize shapes for all levels here and below
-    for(let i = this.levelNum; i >= 0; i--) {
-      this.city.levels[i].rescaleLevel();
-    }
-  }
-
-
-  setLevelWidth(width: number) {
-    this.levelWidth = width;
-    //initialize shapes for all levels here and below
-    for(let i = this.levelNum; i >= 0; i--) {
-      this.city.levels[i].rescaleLevel();
-    }
-  }
-
-  setGridWidth(width: number) {
-    console.log('setting grid width');
-    this.gridWidth = width;
-    //initialize shapes for all levels here and below
-    this.initDetails();
-  }
-
-  getPosFromGridPos(i:number, j:number): vec3 {
-    let radius = this.getLevelRadius() - this.wallWidth/2  - this.levelWidth + (i * this.levelWidth / this.gridWidth);
-    let angle = this.getRotFromGridPos(i,j);
-    let x = this.city.pos[0] + Math.cos(angle[1]) * radius;
-    let y = this.getLevelHeight();
-    let z = this.city.pos[2] + Math.sin(angle[1]) * radius;
-    return vec3.fromValues(x,y,z);
-  }
-
-  getRotFromGridPos(i:number, j: number): vec3 {
-    return vec3.fromValues(0,this.city.sweep * j / this.gridLength, 0);
-  }
-
-  initDetails() {
-    this.initGrid();
-    this.initRoads();
-    this.initBuildings();
-  }
-
-
-  initGrid() {
-    this.gridLength = this.getGridLength();
-    //initialize the grid
-    this.gridInfo = [];
-    for(let i = 0; i < this.gridWidth; i++) {
-      this.gridInfo.push([]);
-      for(let j= 0; j < this.gridLength; j++) {
-        this.gridInfo[i].push({
-          i: i,
-          j: j,
-          level: this,
-          gridType: GridType.OPEN,
-          buildingIndex: null,
-          pos: this.getPosFromGridPos(i, j),
-          rotation: this.getRotFromGridPos(i,j)
-        });
-      }
-    }
-  }
-
-  updateGridPositions() {
-    for(let i =0; i < this.gridWidth; i++) {
-      for(let j =0; j < this.gridLength; j++) {
-        this.gridInfo[i][j].pos = this.getPosFromGridPos(i,j);
-      }
-    }
-  }
-
+  /******************************************************************************************************/
+  /******************************************ROADS*******************************************************/
+  /******************************************************************************************************/
 
   /**
    * Initialize all of the roads
@@ -434,6 +431,34 @@ export class CityLevel {
       }
     }
   }
+
+
+
+  getRoadBlocks(): Block[] {
+    let blocks: Block[] = [];
+    let gridSize = this.levelWidth / this.gridWidth;
+    let footprint: vec3 = vec3.fromValues(gridSize, 1, gridSize);
+    for(let i = 0; i < this.gridWidth; i++) {
+      for(let j = 0; j < this.gridLength; j++) {
+        if(this.gridInfo[i][j].gridType == GridType.ROAD) {
+          blocks.push({
+            blockType: BlockType.CUBE,
+            pos: this.gridInfo[i][j].pos,
+            footprint: footprint,
+            adjustScaleTop: 1,
+            adjustScaleBottom: 1,
+            rotation: this.gridInfo[i][j].rotation,
+            scaleFromCenter: false
+          })
+        }
+      }
+    }
+    return blocks;
+  }
+
+  /******************************************************************************************************/
+  /******************************************BUILDINGS***************************************************/
+  /******************************************************************************************************/
 
   initBuildings() {
     this.buildings = [];
@@ -606,50 +631,26 @@ export class CityLevel {
 
 
   initBuilding(location:vec2, footprint:vec2) {
-    let pos = this.getPosFromGridPos(location[0], location[1]);
-    let rot = this.getRotFromGridPos(location[0], location[1]);
-    let foot: vec3 = vec3.fromValues(footprint[0], 10, footprint[1]);
+    let centerGridPosI = location[0] + footprint[0]/2;
+    let centerGridPosJ = location[1] + footprint[1]/2;
+    let foot: vec3 = vec3.fromValues(footprint[0]*0.75, this.levelNum +1, footprint[1]*0.75);
     this.buildings.push(new Building({
-      pos: pos,
-      rotation: rot,
+      pos: this.getPosFromGridPos(centerGridPosI, centerGridPosJ),
+      rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
       seed:  this.seed[1] * (this.buildings.length + 1),
       footprint: foot
     }));
-
   }
+
+
 
   getBuildingBlocks(): Block[] {
     let blocks: Block[] = [];
-    let gridSize = this.levelWidth / this.gridWidth;
-    let footprint: vec3 = vec3.fromValues(gridSize, 4, gridSize);
-    for(let i = 0; i < this.gridWidth; i++) {
-      for(let j = 0; j < this.gridLength; j++) {
-        if(this.gridInfo[i][j].gridType == GridType.BUILDING) {
-          blocks.push({
-            blockType: BlockType.PYRAMID,
-            pos: this.gridInfo[i][j].pos,
-            footprint: footprint,
-            adjustScaleTop: 0,
-            adjustScaleBottom: 1,
-            rotation: this.gridInfo[i][j].rotation,
-            scaleFromCenter: false
-          })
-        }
-        if(this.gridInfo[i][j].gridType == GridType.TUNNEL) {
-          console.log('found tunnel')
-          blocks.push({
-            blockType: BlockType.PYRAMID,
-            pos: this.gridInfo[i][j].pos,
-            footprint: footprint,
-            adjustScaleTop: 1,
-            adjustScaleBottom: 1,
-            rotation: this.gridInfo[i][j].rotation,
-            scaleFromCenter: false
-          })
-        }
-      }
+    for(let i =0; i < this.buildings.length; i++) {
+      blocks = blocks.concat(this.buildings[i].getBlocks());
     }
     return blocks;
   }
+
 
 };

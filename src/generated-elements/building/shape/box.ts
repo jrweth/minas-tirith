@@ -21,7 +21,7 @@ export class Box extends Shape{
       adjustScaleTop: 1,
       adjustScaleBottom: 1,
       rotation: this.rotation,
-      scaleFromCenter: false
+      scaleFromCenter: true
     }];
   }
 

@@ -1,4 +1,5 @@
 import {vec3} from "gl-matrix";
+import {TextureType} from "../../../texture/texture-type";
 
 export enum BlockType  {
   'CUBE' = 1, //standard cube
@@ -12,7 +13,6 @@ export enum BlockType  {
 };
 
 
-
 export class Block {
   blockType: BlockType;
   pos: vec3;
@@ -21,4 +21,5 @@ export class Block {
   adjustScaleBottom: number;
   rotation: vec3;
   scaleFromCenter: boolean;
+  textureType?: TextureType;
 }
