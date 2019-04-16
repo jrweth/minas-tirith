@@ -15,6 +15,8 @@ class Cube extends Drawable {
   gridSize: vec2;
   blockInfo: Float32Array;
   rotations: Float32Array;
+  scales: Float32Array;
+  adjustments: Float32Array;;
 
   constructor(options: {scale: vec2, gridSize: vec2}) {
     super(); // Call the constructor of the super class. This is required.
@@ -149,11 +151,15 @@ class Cube extends Drawable {
     this.generateCol();
     this.generateBlockInfo();
     this.generateRotate();
+    this.generateScale();
+    this.generateAdjustment();
 
     let offsets: number[] = [];
     let colors: number[] = []; //set to footprint
     let rotations: number[] = [];
     let blockInfo: number[] = [];
+    let scales: number[] = [];
+    let adjustments: number[] = [];
 
     this.numInstances = 0;
 
@@ -172,16 +178,29 @@ class Cube extends Drawable {
       );
       blockInfo.push(
         block.blockType,
-        0,
-        block.adjustScaleBottom,
-        block.adjustScaleTop
+        block.textureType,
+        block.adjustScale2,
+        block.adjustScale1
       );
       rotations.push(
         block.rotation[0],
         block.rotation[1],
         block.rotation[2],
         0
-      )
+      );
+      scales.push(
+        block.footprint[0] * this.scale[0] / this.gridSize[0],
+        block.footprint[1] * this.scale[0] / this.gridSize[0],
+        block.footprint[2] * this.scale[1] / this.gridSize[1],
+        block.scaleFromCenter ? 1 : 0
+      );
+      adjustments.push(
+        block.adjustScale1,
+        block.adjustScale2,
+        block.adjustScale3,
+        block.adjustScale4
+      );
+
 
     }
 
@@ -189,6 +208,8 @@ class Cube extends Drawable {
     this.colors = new Float32Array(colors);
     this.blockInfo = new Float32Array(blockInfo);
     this.rotations = new Float32Array(rotations);
+    this.scales = new Float32Array(scales);
+    this.adjustments = new Float32Array(adjustments);
 
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufTranslate);
@@ -202,6 +223,12 @@ class Cube extends Drawable {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufRotate);
     gl.bufferData(gl.ARRAY_BUFFER, this.rotations, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufScale);
+    gl.bufferData(gl.ARRAY_BUFFER, this.scales, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufAdjustment);
+    gl.bufferData(gl.ARRAY_BUFFER, this.adjustments, gl.STATIC_DRAW);
 
   }
 };

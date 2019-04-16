@@ -51,7 +51,6 @@ export abstract class Shape {
   shrink(axis: Axis, shrinkBy: NumOptions): void {
     let shrinkage = NumOptions.getValue(shrinkBy, this.footprint[axis]);
 
-    this.pos[axis] += shrinkage / 2;
     this.footprint[axis] -= shrinkage;
 
   }

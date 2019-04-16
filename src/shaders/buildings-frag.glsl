@@ -8,6 +8,7 @@ in vec3 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_Col;
 in vec4 fs_Translate;
+in vec4 fs_BlockInfo;
 
 //in float fs_Sine;
 
@@ -16,6 +17,12 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 float MAP_THEME = 1.0;
 float DAZZLE_THEME = 2.0;
+
+float TEXTURE_WALL     = 0.0;
+float TEXTURE_ROAD     = 1.0;
+float TEXTURE_ROOF     = 2.0;
+float TEXTURE_BUILDING = 3.0;
+
 
 vec3 getMapThemeColor() {
     vec3 buildingColor = vec3(0.9, 0.9, 0.9);
@@ -66,6 +73,13 @@ void main()
     else if(u_DisplayOptions[2] == DAZZLE_THEME) {
         buildingColor = getDazzleThemeColor();
         backgroundColor = getDazzleThemeBackground();
+    }
+
+    if(fs_BlockInfo[1] == TEXTURE_ROAD) {
+        buildingColor = vec3(0.4, 0.4, 0.4);
+    }
+    if(fs_BlockInfo[1] == TEXTURE_WALL) {
+        //buildingColor = vec3(0.9, 0.9, 0.9);
     }
 
 

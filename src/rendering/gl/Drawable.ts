@@ -25,6 +25,8 @@ abstract class Drawable {
   bufTranslate: WebGLBuffer;
   bufBlockInfo: WebGLBuffer;
   bufRotate: WebGLBuffer;
+  bufScale: WebGLBuffer;
+  bufAdjustment: WebGLBuffer;
 
   idxBound: boolean = false;
   posBound: boolean = false;
@@ -34,6 +36,8 @@ abstract class Drawable {
   translateBound: boolean = false;
   blockInfoBound: boolean = false;
   rotateBound: boolean = false;
+  scaleBound: boolean = false;
+  adjustmentBound: boolean = false;
 
   abstract create() : void;
 
@@ -46,6 +50,11 @@ abstract class Drawable {
     gl.deleteBuffer(this.bufPos);
     gl.deleteBuffer(this.bufNor);
     gl.deleteBuffer(this.bufCol);
+    gl.deleteBuffer(this.bufTranslate);
+    gl.deleteBuffer(this.bufBlockInfo);
+    gl.deleteBuffer(this.bufRotate);
+    gl.deleteBuffer(this.bufScale);
+    gl.deleteBuffer(this.bufAdjustment);
   }
 
   generateIdx() {
@@ -86,6 +95,17 @@ abstract class Drawable {
   generateRotate() {
     this.rotateBound = true;
     this.bufRotate = gl.createBuffer();
+  }
+
+  generateScale() {
+    console.log('genscale');
+    this.scaleBound = true;
+    this.bufScale = gl.createBuffer();
+  }
+
+  generateAdjustment() {
+    this.adjustmentBound = true;
+    this.bufAdjustment= gl.createBuffer();
   }
 
   bindIdx(): boolean {
@@ -142,6 +162,20 @@ abstract class Drawable {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.bufRotate);
     }
     return this.rotateBound;
+  }
+
+  bindScale(): boolean {
+    if (this.scaleBound) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufScale);
+    }
+    return this.scaleBound;
+  }
+
+  bindAdjustment(): boolean {
+    if (this.adjustmentBound) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.bufAdjustment);
+    }
+    return this.scaleBound;
   }
 
   elemCount(): number {

@@ -28,6 +28,8 @@ class ShaderProgram {
   attrTranslate: number;
   attrBlockInfo: number;
   attrRotate: number;
+  attrScale: number;
+  attrAdjustment: number;
 
   unifModel: WebGLUniformLocation;
   unifModelInvTr: WebGLUniformLocation;
@@ -53,12 +55,15 @@ class ShaderProgram {
     this.attrTranslate  = gl.getAttribLocation(this.prog, "vs_Translate");
     this.attrBlockInfo  = gl.getAttribLocation(this.prog, "vs_BlockInfo");
     this.attrRotate     = gl.getAttribLocation(this.prog, "vs_Rotate");
+    this.attrScale      = gl.getAttribLocation(this.prog, "vs_Scale");
+    this.attrAdjustment = gl.getAttribLocation(this.prog, "vs_Adjustment");
 
     this.unifModel      = gl.getUniformLocation(this.prog, "u_Model");
     this.unifModelInvTr = gl.getUniformLocation(this.prog, "u_ModelInvTr");
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifPlanePos   = gl.getUniformLocation(this.prog, "u_PlanePos");
     this.unifDisplayOptions = gl.getUniformLocation(this.prog, "u_DisplayOptions");
+
   }
 
   use() {
@@ -97,8 +102,6 @@ class ShaderProgram {
   }
 
   setDisplayOptions(options: vec4) {
-    console.log('setting display options');
-    console.log(options);
     this.use();
     if(this.unifDisplayOptions !== -1) {
       gl.uniform4fv(this.unifDisplayOptions, options);
@@ -150,6 +153,18 @@ class ShaderProgram {
       gl.vertexAttribDivisor(this.attrRotate, 1);
     }
 
+    if (this.attrScale != -1 && d.bindScale()) {
+      gl.enableVertexAttribArray(this.attrScale);
+      gl.vertexAttribPointer(this.attrScale, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrScale, 1);
+    }
+
+    if (this.attrAdjustment != -1 && d.bindAdjustment()) {
+      gl.enableVertexAttribArray(this.attrAdjustment);
+      gl.vertexAttribPointer(this.attrAdjustment, 4, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(this.attrAdjustment, 1);
+    }
+
     d.bindIdx();
     gl.drawElementsInstanced(d.drawMode(), d.elemCount(), gl.UNSIGNED_INT, 0, d.numInstances);
 
@@ -159,7 +174,9 @@ class ShaderProgram {
     if (this.attrTranslate != -1) gl.disableVertexAttribArray(this.attrTranslate);
     if (this.attrInfo != -1) gl.disableVertexAttribArray(this.attrInfo);
     if (this.attrBlockInfo != -1) gl.disableVertexAttribArray(this.attrBlockInfo);
-    if (this.attrRotate != -1) gl.disableVertexAttribArray(this.attrBlockInfo);
+    if (this.attrRotate != -1) gl.disableVertexAttribArray(this.attrRotate);
+    if (this.attrScale != -1) gl.disableVertexAttribArray(this.attrScale);
+    if (this.attrAdjustment != -1) gl.disableVertexAttribArray(this.attrAdjustment);
   }
 };
 

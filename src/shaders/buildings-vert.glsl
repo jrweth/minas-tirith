@@ -10,13 +10,16 @@ in vec4 vs_Pos;
 in vec4 vs_Nor;
 in vec4 vs_Col;
 in vec4 vs_Rotate;
+in vec4 vs_Scale;
 in vec4 vs_Translate;
 in vec4 vs_BlockInfo;
+in vec4 vs_Adjustment;
 
 out vec3 fs_Pos;   //position on unit cube (0 or 1)
 out vec4 fs_Nor;
 out vec4 fs_Col;   //scale
 out vec4 fs_Translate;
+out vec4 fs_BlockInfo;
 
 const float CUBE = 1.0;
 const float PYRAMID = 2.0;
@@ -26,8 +29,8 @@ const float QUARTER_PYRAMID = 5.0;
 const float SLANT = 6.0;
 const float WEDGE = 7.0;
 
-float scaleBottom;  //contained in vs_BlockInfo[2]
-float scaleTop; //contained in vs_BlockInfo[3]
+float adjust2;  //contained in vs_BlockInfo[2]
+float adjust1; //contained in vs_BlockInfo[3]
 float scaleX;  //contained in vs_Col[0];
 float scaleY; //contained in vs_Col[1];
 float scaleZ; //contained in vs_Col[2];
@@ -127,12 +130,12 @@ vec3 getQuarterPyramidVertexPosition() {
 vec3 getWedgeVertexPosition() {
     float vertexNum = getVertexNum();
     if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {
-        return mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, scaleBottom);
+        return mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, adjust2);
     }
     else {
         vec3 adjPos = vs_Pos.xyz - vec3(0.5, 0.5, 0.5);
 
-        return mix(vec3(0.5, vs_Pos.yz), vs_Pos.xyz, scaleTop);
+        return mix(vec3(0.5, vs_Pos.yz), vs_Pos.xyz, adjust1);
     }
 }
 
@@ -208,12 +211,13 @@ void main()
 {
     fs_Pos = vs_Pos.xyz;
     fs_Translate = vs_Translate;
-    scaleBottom = vs_BlockInfo[2];
-    scaleTop = vs_BlockInfo[3];
-    scaleX = vs_Col[0];
-    scaleY = vs_Col[1];
-    scaleZ = vs_Col[2];
-    scaleFromCenter = (vs_Col[3] == 1.0);
+    fs_BlockInfo = vs_BlockInfo;
+    adjust1 = vs_Adjustment[0];
+    adjust2 = vs_Adjustment[1];
+    scaleX = vs_Scale[0];
+    scaleY = vs_Scale[1];
+    scaleZ = vs_Scale[2];
+    scaleFromCenter = (vs_Scale[3] == 1.0);
 
     vec4 modelposition = vec4(getVertexPosition(), 1.0);
 

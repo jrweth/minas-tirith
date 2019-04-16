@@ -1,6 +1,8 @@
 import {Shape} from './shape'
 import {BlockType} from './block';
 import {vec3} from "gl-matrix";
+import {TerrainType} from "../../terrain";
+import {TextureType} from "../../../texture/texture-type";
 
 export class StandardRoof extends Shape{
 
@@ -18,10 +20,11 @@ export class StandardRoof extends Shape{
       blockType: this.blockType,
       footprint: this.footprint,
       pos: this.pos,
-      adjustScaleTop: 0,
-      adjustScaleBottom: 1,
+      adjustScale1: 0,
+      adjustScale2: 1,
       rotation: this.rotation,
-      scaleFromCenter: true
+      scaleFromCenter: true,
+      textureType: TextureType.ROOF
     }];
   }
 

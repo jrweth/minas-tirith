@@ -178,8 +178,8 @@ class QuarterRound extends Drawable {
           blockInfo.push(
             block.blockType,
             0,
-            block.adjustScaleBottom,
-            block.adjustScaleTop
+            block.adjustScale2,
+            block.adjustScale1
           )
 
         }

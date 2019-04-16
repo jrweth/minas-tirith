@@ -28,7 +28,7 @@ export class Building {
       new Box({
         footprint: this.footprint,
         pos: this.pos,
-        rotation: this.rotation
+        rotation: this.rotation,
       })
     ];
     this.runReplacements();

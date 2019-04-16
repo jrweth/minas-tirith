@@ -1,7 +1,7 @@
 import {Shape} from './shape'
 import {Block, BlockType} from './block';
 import {vec3} from "gl-matrix";
-import {VecMath} from "../../../utils/vec-math";
+import {TextureType} from "../../../texture/texture-type";
 
 export class Wall extends Shape{
 
@@ -50,10 +50,11 @@ export class Wall extends Shape{
           blockZ
         ),
         blockType: BlockType.WEDGE,
-        adjustScaleBottom: scaleBottom,
-        adjustScaleTop: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
+        adjustScale2: scaleBottom,
+        adjustScale1: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
         rotation: vec3.fromValues(0 , angle, 0),
-        scaleFromCenter: true
+        scaleFromCenter: true,
+        textureType: TextureType.WALL
       });
     }
     return blocks;

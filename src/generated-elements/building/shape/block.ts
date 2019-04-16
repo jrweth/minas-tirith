@@ -17,8 +17,10 @@ export class Block {
   blockType: BlockType;
   pos: vec3;
   footprint: vec3;
-  adjustScaleTop: number;
-  adjustScaleBottom: number;
+  adjustScale1?: number;
+  adjustScale2?: number;
+  adjustScale3?: number;
+  adjustScale4?: number;
   rotation: vec3;
   scaleFromCenter: boolean;
   textureType?: TextureType;

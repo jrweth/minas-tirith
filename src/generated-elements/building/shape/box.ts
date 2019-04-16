@@ -4,6 +4,7 @@ import {vec3} from "gl-matrix";
 import Random from "../../../noise/random";
 import {Axis} from "../../../geometry/Axis"
 import {StandardRoof} from "./standardRoof";
+import {TextureType} from "../../../texture/texture-type";
 
 export class Box extends Shape{
 
@@ -18,10 +19,11 @@ export class Box extends Shape{
       blockType: BlockType.CUBE,
       footprint: this.footprint,
       pos: this.pos,
-      adjustScaleTop: 1,
-      adjustScaleBottom: 1,
+      adjustScale1: 1,
+      adjustScale2: 1,
       rotation: this.rotation,
-      scaleFromCenter: true
+      scaleFromCenter: true,
+      textureType: TextureType.BUILDING
     }];
   }
 
@@ -47,9 +49,10 @@ export class Box extends Shape{
 
   addRoof(blockType: BlockType) {
     let height =  Math.min(this.footprint[Axis.X], this.footprint[Axis.Z]);
+    let posY = this.pos[1] + 0.5 * this.footprint[1] + 0.5 * height;
     let roof = new StandardRoof({
       blockType: blockType,
-      pos: vec3.fromValues(this.pos[0], this.pos[1] + this.footprint[1], this.pos[2]),
+      pos: vec3.fromValues(this.pos[0], posY, this.pos[2]),
       footprint: vec3.fromValues(this.footprint[0], height, this.footprint[2]),
       rotation: this.rotation
     });
@@ -92,23 +95,25 @@ export class Box extends Shape{
 
   split(axis: Axis, splitAt: NumOptions) {
     //too small to spit vertically
-    if(this.footprint[axis] < 2){
+    if(this.footprint[axis] < 0.4){
       return[this];
     }
 
-    let offset = NumOptions.getValue(splitAt, this.footprint[axis] * 0.9, this.footprint[axis]* 0.1);
+    let offset = NumOptions.getValue(splitAt, this.footprint[axis] * 0.7, this.footprint[axis]* 0.3);
 
     let newPos = vec3.fromValues(this.pos[0], this.pos[1], this.pos[2]);
-    newPos[axis] = newPos[axis] + offset;
+    newPos[axis] = this.pos[axis] + 0.5 * offset;
 
     let newFootprint = vec3.fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
-    newFootprint[axis] = newFootprint[axis] - offset;
+    newFootprint[axis] = this.footprint[axis] - offset;
 
     let newBox = new Box({
       pos: newPos,
       footprint: newFootprint,
       rotation: this.rotation
     });
+
+    this.pos[axis] = this.pos[axis] - this.footprint[axis]/2 + 0.5* offset;
     this.footprint[axis] = offset;
 
     //no more changes if we are supporting something on top
