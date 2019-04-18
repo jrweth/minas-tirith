@@ -29,8 +29,9 @@ const float QUARTER_PYRAMID = 5.0;
 const float SLANT = 6.0;
 const float WEDGE = 7.0;
 
-float adjust2;  //contained in vs_BlockInfo[2]
 float adjust1; //contained in vs_BlockInfo[3]
+float adjust2;  //contained in vs_BlockInfo[2]
+float adjust3; //contained in vs_BlockInfo[3]
 float scaleX;  //contained in vs_Col[0];
 float scaleY; //contained in vs_Col[1];
 float scaleZ; //contained in vs_Col[2];
@@ -129,14 +130,21 @@ vec3 getQuarterPyramidVertexPosition() {
 
 vec3 getWedgeVertexPosition() {
     float vertexNum = getVertexNum();
+    vec3 pos = vs_Pos.xyz;
+    //adjust interior points to be smaller
     if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {
-        return mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, adjust2);
+        pos = mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, adjust1);
     }
-    else {
-        vec3 adjPos = vs_Pos.xyz - vec3(0.5, 0.5, 0.5);
 
-        return mix(vec3(0.5, vs_Pos.yz), vs_Pos.xyz, adjust1);
+    if(vertexNum == 4.0 || vertexNum == 5.0) {
+        pos.y = pos.y * adjust2;
     }
+
+    if(vertexNum == 6.0 || vertexNum == 7.0) {
+        pos.y = pos.y * adjust3;
+    }
+
+    return pos;
 }
 
 
@@ -214,6 +222,7 @@ void main()
     fs_BlockInfo = vs_BlockInfo;
     adjust1 = vs_Adjustment[0];
     adjust2 = vs_Adjustment[1];
+    adjust3 = vs_Adjustment[2];
     scaleX = vs_Scale[0];
     scaleY = vs_Scale[1];
     scaleZ = vs_Scale[2];

@@ -5,6 +5,7 @@ import {City} from "./city";
 import Random from "../../noise/random";
 import {Building} from "../building/building";
 import {TextureType} from "../../texture/texture-type";
+import {Road} from "./road";
 
 
 export class LevelOptions {
@@ -70,6 +71,7 @@ export class CityLevel {
   entranceGate: GatePosition;
   exitGate: GatePosition;
   wall: Wall;
+  road: Road;
   gridWidth: number;
   gridLength: number;
   gridInfo: GridInfo[][];
@@ -140,12 +142,13 @@ export class CityLevel {
     let gateIndex = this.getGateWallBlockIndex();
     for(let i = 0; i < wallBlocks.length; i++) {
       if(i !== gateIndex) {
-        blocks.push(wallBlocks[i]);
+        //blocks.push(wallBlocks[i]);
       }
     }
 
-    blocks = blocks.concat(this.getRoadBlocks());
-    blocks = blocks.concat(this.getBuildingBlocks());
+    //blocks = blocks.concat(this.getRoadBlocks());
+    //blocks = blocks.concat(this.getBuildingBlocks());
+    blocks = blocks.concat(this.road.getBlocks());
 
     return blocks;
   }
@@ -233,16 +236,45 @@ export class CityLevel {
     }
     let elevationRise = nextLevelHeight - height;
 
+    let percentElevated = 0;
+    let percentSweep = j / this.gridLength;
     switch (this.entranceGate) {
-      case GatePosition.LEFT: height += elevationRise * j / this.gridLength; break;
-      case GatePosition.RIGHT:  height += elevationRise * (this.gridLength - j) / this.gridLength; break;
-      case GatePosition.CENTER:
-        if(j > (this.gridLength / 2)) {
-          height += elevationRise * (j - this.gridLength * 0.5) / (this.gridLength * 0.5);
+      case GatePosition.LEFT:
+        if(percentSweep < 0.15) {
+          percentElevated = 0;
         }
+        else if(percentSweep > 0.85) {
+          percentElevated = 1;
+        }
+        else {
+          percentElevated = (percentSweep - 0.15) / 0.7;
+        }
+        break;
+      case GatePosition.RIGHT:
+        if(percentSweep < 0.15) {
+          percentElevated = 1;
+        }
+        else if(percentSweep > 0.85) {
+          percentElevated = 0;
+        }
+        else {
+          percentElevated = (0.85 - percentSweep) / 0.7;
+        }
+        break;
+      case GatePosition.CENTER:
+        if(percentSweep < .55) {
+          percentElevated = 0;
+        }
+        else if (percentSweep > .85) {
+          percentElevated = 1;
+        }
+        else {
+          percentElevated = (percentSweep - 0.55) / 0.3;
+        }
+        break;
     }
 
-    return height;
+    return height + elevationRise * percentElevated;
 
   }
 
@@ -355,6 +387,23 @@ export class CityLevel {
     this.initGateEntranceRoads();
     this.initGateExitRoads();
     this.initSpokeRoads();
+
+    let roadBase = this.getLevelHeight();
+    if(this.levelNum > 0) {
+      roadBase -= this.city.levels[this.levelNum - 1].elevationRise;
+    }
+    let roadRadius = this.getLevelRadius() - 0.5 * (this.wallWidth + this.levelWidth);
+    let numSegments = this.getNumWallSegments();
+
+    this.road = new Road({
+      pos: vec3.fromValues(this.city.pos[0], roadBase, this.city.pos[2]),
+      footprint: vec3.fromValues(roadRadius, 0.1, this.levelWidth),
+      rotation: vec3.fromValues(0, 0,0),
+      sweep: Math.PI,
+      numSegments: numSegments,
+      cityLevel: this
+    });
+
   }
 
   /**
