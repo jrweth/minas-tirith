@@ -142,7 +142,7 @@ export class CityLevel {
     let gateIndex = this.getGateWallBlockIndex();
     for(let i = 0; i < wallBlocks.length; i++) {
       if(i !== gateIndex) {
-        //blocks.push(wallBlocks[i]);
+        blocks.push(wallBlocks[i]);
       }
     }
 
@@ -275,7 +275,6 @@ export class CityLevel {
     }
 
     return height + elevationRise * percentElevated;
-
   }
 
   getRotFromGridPos(i:number, j: number): vec3 {
@@ -392,12 +391,12 @@ export class CityLevel {
     if(this.levelNum > 0) {
       roadBase -= this.city.levels[this.levelNum - 1].elevationRise;
     }
-    let roadRadius = this.getLevelRadius() - 0.5 * (this.wallWidth + this.levelWidth);
+    let roadRadius = this.getLevelRadius() - 0.51 * (this.levelWidth);
     let numSegments = this.getNumWallSegments();
 
     this.road = new Road({
       pos: vec3.fromValues(this.city.pos[0], roadBase, this.city.pos[2]),
-      footprint: vec3.fromValues(roadRadius, 0.1, this.levelWidth),
+      footprint: vec3.fromValues(roadRadius, 0.1, this.levelWidth + this.wallWidth ),
       rotation: vec3.fromValues(0, 0,0),
       sweep: Math.PI,
       numSegments: numSegments,

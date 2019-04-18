@@ -54,8 +54,8 @@ export class Road extends Shape{
         ),
         blockType: BlockType.WEDGE,
         adjustScale1: scaleBottom,
-        adjustScale2: this.getLeftScale(i),
-        adjustScale3: this.getRightScale(i),
+        adjustScale2: this.getLeftScale(angle),
+        adjustScale3: this.getRightScale(angle),
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true,
         textureType: TextureType.WALL
@@ -65,7 +65,7 @@ export class Road extends Shape{
   }
   getBlockElevation(rotation: number): number {
     let j = this.cityLevel.gridLength * rotation / this.sweep;
-    return this.cityLevel.getHeightFromGridPos(0, j);
+    return this.cityLevel.getHeightFromGridPos(0, j) - 0.5;
   }
 
   getBlockPosition(angle: number): vec3 {
@@ -78,6 +78,9 @@ export class Road extends Shape{
   getRightScale(rotation: number) {
     let el1 = this.getBlockElevation(rotation);
     let el2 = this.getBlockElevation(rotation + this.segmentAngle);
+    if(this.cityLevel.levelNum == 0) {
+      console.log(rotation + '-' + el1 + '-' + el2);
+    }
     if(el1 >= el2) return 1;
 
     let scale = 1 + (el2 - el1);
