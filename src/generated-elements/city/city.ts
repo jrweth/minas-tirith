@@ -12,6 +12,9 @@ export class City {
   seed: number; //seed for random generation
   levels: CityLevel[];  //the levels of the city
   sweep: number = Math.PI;
+  showBuildings: boolean = true;
+  showRoads: boolean = true;
+  showWalls: boolean = true;
 
 
   constructor(options: {

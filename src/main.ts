@@ -164,12 +164,12 @@ function addDisplayControls(options: {
   renderer: OpenGLRenderer
 }) {
   let displayFolder = gui.addFolder('display');
-  let theme = displayFolder.add(controls, 'Theme', {'Map': 1, 'Electric Night': 2}).listen();
-  let showHighways = displayFolder.add(controls, 'Show Highways').listen();
-  let showStreets = displayFolder.add(controls, 'Show Streets').listen();
-  let showPop = displayFolder.add(controls, 'Show Population Density').listen();
+  let theme = displayFolder.add(controls, 'Theme', {'Map': 1, 'White City': 2}).listen();
+  //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
+  //let showStreets = displayFolder.add(controls, 'Show Streets').listen();
+  //let showPop = displayFolder.add(controls, 'Show Population Density').listen();
   let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();
-  let showBuildSites = displayFolder.add(controls, 'Show Build Sites').listen();
+  //let showBuildSites = displayFolder.add(controls, 'Show Build Sites').listen();
 
   theme.onChange(() => {
     options.terrainShader.setDisplayOptions(getDisplayOptions());
@@ -177,14 +177,14 @@ function addDisplayControls(options: {
     options.buildingShader.setDisplayOptions(getDisplayOptions());
     options.renderer.setClearColor3(getBackgroundColor());
   })
-  showHighways.onChange(redoRoads);
-  showStreets.onChange(redoRoads);
-  showPop.onChange(() => {
-    options.terrainShader.setDisplayOptions(getDisplayOptions());
-  });
-  showBuildSites.onChange(() => {
-    options.terrainShader.setDisplayOptions(getDisplayOptions());
-  })
+  //showHighways.onChange(redoRoads);
+  //showStreets.onChange(redoRoads);
+  //showPop.onChange(() => {
+  //  options.terrainShader.setDisplayOptions(getDisplayOptions());
+  //});
+  // showBuildSites.onChange(() => {
+  //   options.terrainShader.setDisplayOptions(getDisplayOptions());
+  // })
 }
 
 function addRoadControls() {
@@ -382,9 +382,9 @@ function main() {
     roadShader: roadShader,
     renderer: renderer
   });
-  addTerrainControls();
-  addRoadControls();
-  addBuildingControls();
+  //addTerrainControls();
+  //addRoadControls();
+  //addBuildingControls();
   addLevelControls();
 
 

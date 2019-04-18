@@ -140,15 +140,19 @@ export class CityLevel {
     let blocks: Block[] = [];
     let wallBlocks = this.wall.getBlocks();
     let gateIndex = this.getGateWallBlockIndex();
-    for(let i = 0; i < wallBlocks.length; i++) {
-      if(i !== gateIndex) {
-        blocks.push(wallBlocks[i]);
+
+    blocks = blocks.concat(this.road.getBlocks());
+
+    if(this.city.showWalls) {
+      for(let i = 0; i < wallBlocks.length; i++) {
+        if(i !== gateIndex) {
+          blocks.push(wallBlocks[i]);
+        }
       }
     }
 
-    //blocks = blocks.concat(this.getRoadBlocks());
-    blocks = blocks.concat(this.getBuildingBlocks());
-    blocks = blocks.concat(this.road.getBlocks());
+    if(this.city.showRoads) blocks = blocks.concat(this.getRoadBlocks());
+    if(this.city.showBuildings) blocks = blocks.concat(this.getBuildingBlocks());
 
     return blocks;
   }
