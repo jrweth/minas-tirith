@@ -58,7 +58,7 @@ export class Road extends Shape{
         adjustScale3: this.getRightScale(angle),
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true,
-        textureType: TextureType.ROAD
+        textureType: TextureType.LEVEL_GROUND
       });
     }
     return blocks;

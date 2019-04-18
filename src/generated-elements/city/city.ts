@@ -13,7 +13,7 @@ export class City {
   levels: CityLevel[];  //the levels of the city
   sweep: number = Math.PI;
   showBuildings: boolean = true;
-  showRoads: boolean = true;
+  showRoads: boolean = false;
   showWalls: boolean = true;
 
 
@@ -56,6 +56,9 @@ export class City {
         break;
       case 'elevationRise':
         level.setElevationRise(value);
+        break
+      case 'buildingFootprintTarget':
+        level.setBuildingFootprintTarget(value);
         break
     }
   }

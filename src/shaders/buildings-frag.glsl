@@ -22,18 +22,23 @@ float TEXTURE_WALL     = 0.0;
 float TEXTURE_ROAD     = 1.0;
 float TEXTURE_ROOF     = 2.0;
 float TEXTURE_BUILDING = 3.0;
+float TEXTURE_LEVEL_GROUND = 4.0;
 
 
 vec3 getMapThemeColor() {
-    vec3 buildingColor = vec3(0.9, 0.9, 0.9);
+    vec3 buildingColor = vec3(0.0, 0.0, 0.0);
     if(fs_Pos.x > 0.999999) {
-        buildingColor = vec3(0.0, 0.0, 0.0);
+        buildingColor = vec3(0.8, 0.8, 0.8);
     }
     else if(fs_Pos.z < 0.0001) {
         buildingColor = vec3(0.3, 0.3, 0.3);
     }
     else if(fs_Pos.z > 0.999999) {
         buildingColor = vec3(0.6, 0.6, 0.6);
+    }
+    else if(fs_Pos.y > 0.99999) {
+        buildingColor = vec3(0.9, 0.9, 0.9);
+
     }
 
     return buildingColor;
@@ -76,8 +81,13 @@ void main()
     }
 
     if(fs_BlockInfo[1] == TEXTURE_ROAD) {
+        buildingColor = vec3(0.9, 0.4, 0.4);
+    }
+
+    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {
         buildingColor = vec3(0.4, 0.4, 0.4);
     }
+
     if(fs_BlockInfo[1] == TEXTURE_WALL) {
         //buildingColor = vec3(0.9, 0.9, 0.9);
     }

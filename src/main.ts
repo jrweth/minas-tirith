@@ -29,10 +29,11 @@ const controls = {
   'AllLevels': getDefaultLevelOptions(0),
   'Theme': 2,
   'Show Highways': true,
-  'Show Streets' : true,
+  'Show Streets' : false,
   'Show Population Density': true,
   'Show Buildings': true,
   'Show Build Sites': false,
+  'Show Walls': true,
 
   'Elevation Seed': 89.3943,
   'Population Seed': 1.234,
@@ -166,11 +167,15 @@ function addDisplayControls(options: {
   let displayFolder = gui.addFolder('display');
   let theme = displayFolder.add(controls, 'Theme', {'Map': 1, 'White City': 2}).listen();
   //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
-  //let showStreets = displayFolder.add(controls, 'Show Streets').listen();
+  let showStreets = displayFolder.add(controls, 'Show Streets').listen();
   //let showPop = displayFolder.add(controls, 'Show Population Density').listen();
   let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();
   //let showBuildSites = displayFolder.add(controls, 'Show Build Sites').listen();
+  let showWalls = displayFolder.add(controls, 'Show Walls');
 
+  showBuildings.onChange(() => {city.showBuildings = controls["Show Buildings"]; loadScene()});
+  showStreets.onChange(() => {city.showRoads = controls["Show Streets"]; loadScene()});
+  showWalls.onChange(() => {city.showWalls = controls["Show Walls"]; loadScene()});
   theme.onChange(() => {
     options.terrainShader.setDisplayOptions(getDisplayOptions());
     options.roadShader.setDisplayOptions(getDisplayOptions());
@@ -230,6 +235,7 @@ function adjustLevel(i: number, property: string) {
     case 'wallHeight': city.adjustLevel(i, property, controls.Levels[i].wallHeight); break;
     case 'gridWidth': city.adjustLevel(i, property, controls.Levels[i].gridWidth); break;
     case 'elevationRise': city.adjustLevel(i, property, controls.Levels[i].elevationRise); break;
+    case 'buildingFootprintTarget': city.adjustLevel(i, property, controls.Levels[i].buildingFootprintTarget); break;
   }
   loadScene();
 }
@@ -272,7 +278,9 @@ function addLevelControls() {
       control.onChange(()=>{adjustLevel(i,property)});
     }
     let gridWidthControl = level.add(controls.Levels[i], 'gridWidth').min(4).max(10).step(1).listen();
+    let buildingSizeControl = level.add(controls.Levels[i], 'buildingFootprintTarget').min(1).max(40).listen();
     gridWidthControl.onChange(()=>adjustLevel(i,'gridWidth'));
+    buildingSizeControl.onChange(()=>adjustLevel(i,'buildingFootprintTarget'));
   }
   let level = levels.addFolder('all levels');
   for(let property of properties) {
@@ -350,7 +358,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(-10, 5, 9), vec3.fromValues(0, 5, 0));
+  const camera = new Camera(vec3.fromValues(-12, 10, 7), vec3.fromValues(0, 5, -3));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -424,9 +432,7 @@ function main() {
     if(controls["Show Highways"] || controls["Show Streets"]) {
     //  renderer.render(camera, roadShader, [roadSegments]);
     }
-    if(controls["Show Buildings"]) {
-      renderer.render(camera, buildingShader, [cube]);
-    }
+    renderer.render(camera, buildingShader, [cube]);
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame

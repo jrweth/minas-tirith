@@ -50,13 +50,13 @@ export class GridInfo {
  */
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
   return {
-    wallHeight : 3,
+    wallHeight : 1,
     elevationRise: 6,
     levelWidth : 4,
     wallWidth : 2,
     gridWidth: 6,
     seed: 1.34 * levelNum,
-    buildingFootprintTarget: (levelNum + 0.65) * 2
+    buildingFootprintTarget: Math.pow(levelNum + 1.3, 1.7)
   };
 }
 
@@ -180,6 +180,12 @@ export class CityLevel {
     for(let i = this.levelNum; i >= 0; i--) {
       this.city.levels[i].rescaleLevel();
     }
+  }
+
+  setBuildingFootprintTarget(footprint: number) {
+    console.log('here');
+    this.buildingFootprintTarget = footprint;
+    this.rescaleLevel();
   }
 
   initDetails() {
@@ -429,6 +435,7 @@ export class CityLevel {
   //get the start index of the boulevard
   getBoulevardStartIndex() {
     let roadWidth = this.getBoulevardWidth();
+    if(this.levelNum > 2) return this.gridWidth - roadWidth;
     return Math.floor((this.gridWidth  - roadWidth/2) / 2);
   }
 
@@ -492,7 +499,7 @@ export class CityLevel {
    * initialize all the spoke roads
    */
   initSpokeRoads() {
-    let spokeProbability = 0.25;
+    let spokeProbability = Math.max(0.1, 0.25 / (this.levelNum + 1));
     this.outSpokes = [-1];
     for(let j = 0; j < this.gridLength; j ++) {
       let rand = Random.random2to1(vec2.fromValues(j, 2.2), this.seed);
@@ -527,9 +534,10 @@ export class CityLevel {
     for(let i = 0; i < this.gridWidth; i++) {
       for(let j = 0; j < this.gridLength; j++) {
         if(this.gridInfo[i][j].gridType == GridType.ROAD) {
+          let pos = this.gridInfo[i][j].pos;
           blocks.push({
             blockType: BlockType.CUBE,
-            pos: this.gridInfo[i][j].pos,
+            pos: vec3.fromValues(pos[0], pos[1] -0.35, pos[2]),
             footprint: footprint,
             adjustScale1: 1,
             adjustScale2: 1,
@@ -648,7 +656,7 @@ export class CityLevel {
       let j = location[1] + footprint[1];
       let hash = i.toString() + '-' + j.toString();
       possibleSet.delete(hash);
-      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+      this.gridInfo[i][j].gridType = GridType.BUILDING;
     }
     footprint[1]++;
 
@@ -669,8 +677,9 @@ export class CityLevel {
       let j = location[1] - 1;
       let hash = i.toString() + '-' + j.toString();
       possibleSet.delete(hash);
-      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+      this.gridInfo[i][j].gridType = GridType.BUILDING;
     }
+    location[1]--;
     footprint[1]++;
 
     return true;
@@ -690,9 +699,9 @@ export class CityLevel {
       let i = location[0] + footprint[0];
       let hash = i.toString() + '-' + j.toString();
       possibleSet.delete(hash);
-      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+      this.gridInfo[i][j].gridType = GridType.BUILDING;
     }
-    footprint[1]++;
+    footprint[0]++;
 
     return true;
   }
@@ -709,9 +718,10 @@ export class CityLevel {
       let i = location[0] - 1;
       let hash = i.toString() + '-' + j.toString();
       possibleSet.delete(hash);
-      this.gridInfo[i][j].gridType = GridType.TUNNEL;
+      this.gridInfo[i][j].gridType = GridType.BUILDING;
     }
-    footprint[1]++;
+    location[0]--;
+    footprint[0]++;
 
     return true;
   }
@@ -720,11 +730,12 @@ export class CityLevel {
   initBuilding(location:vec2, footprint:vec2) {
     let centerGridPosI = location[0] + footprint[0]/2;
     let centerGridPosJ = location[1] + footprint[1]/2;
-    let foot: vec3 = vec3.fromValues(footprint[0]*0.75, this.levelNum +1, footprint[1]*0.75);
+    let height = Math.min(footprint[0], footprint[1]);
+    let foot: vec3 = vec3.fromValues(footprint[0] * 0.5, height, footprint[1] * 0.5);
     this.buildings.push(new Building({
       pos: this.getBuildingPosition(centerGridPosI,centerGridPosJ, foot[1]),
       rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
-      seed:  this.seed[1] * (this.buildings.length + 1),
+      seed:  Math.pow(this.seed[1],this.buildings.length + 1),
       footprint: foot
     }));
   }
