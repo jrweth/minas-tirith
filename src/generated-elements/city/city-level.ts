@@ -51,7 +51,7 @@ export class GridInfo {
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
   return {
     wallHeight : 3,
-    elevationRise: (levelNum == 6 ? 0 : 6),
+    elevationRise: 6,
     levelWidth : 4,
     wallWidth : 2,
     gridWidth: 6,
@@ -147,7 +147,7 @@ export class CityLevel {
     }
 
     //blocks = blocks.concat(this.getRoadBlocks());
-    //blocks = blocks.concat(this.getBuildingBlocks());
+    blocks = blocks.concat(this.getBuildingBlocks());
     blocks = blocks.concat(this.road.getBlocks());
 
     return blocks;
@@ -170,6 +170,13 @@ export class CityLevel {
     }
   }
 
+  setElevationRise(rise: number) {
+    this.elevationRise = rise;
+    //initialize shapes for all levels here and below
+    for(let i = this.levelNum; i >= 0; i--) {
+      this.city.levels[i].rescaleLevel();
+    }
+  }
 
   initDetails() {
     this.initGrid();

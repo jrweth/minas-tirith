@@ -51,6 +51,9 @@ export class City {
       case 'gridWidth':
         level.setGridWidth(value);
         break;
+      case 'elevationRise':
+        level.setElevationRise(value);
+        break
     }
   }
 

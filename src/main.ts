@@ -229,6 +229,7 @@ function adjustLevel(i: number, property: string) {
     case 'wallWidth': city.adjustLevel(i, property, controls.Levels[i].wallWidth); break;
     case 'wallHeight': city.adjustLevel(i, property, controls.Levels[i].wallHeight); break;
     case 'gridWidth': city.adjustLevel(i, property, controls.Levels[i].gridWidth); break;
+    case 'elevationRise': city.adjustLevel(i, property, controls.Levels[i].elevationRise); break;
   }
   loadScene();
 }
@@ -252,6 +253,10 @@ function adjustAllLevels(property: string) {
         controls.Levels[i].gridWidth = controls.AllLevels.gridWidth;
         city.adjustLevel(i, property, controls.Levels[i].gridWidth);
         break;
+      case 'elevationRise':
+        controls.Levels[i].elevationRise = controls.AllLevels.elevationRise;
+        city.adjustLevel(i, property, controls.Levels[i].elevationRise);
+        break;
     }
   }
   loadScene();
@@ -259,7 +264,7 @@ function adjustAllLevels(property: string) {
 
 function addLevelControls() {
   let levels = gui.addFolder('city levels');
-  let properties: string[] = ['wallWidth', 'wallHeight', 'levelWidth'];
+  let properties: string[] = ['wallWidth', 'wallHeight', 'levelWidth', 'elevationRise'];
   for(let i = 0; i < 7; i++) {
     let level = levels.addFolder('level ' + (i+1).toString());
     for(let property of properties) {
@@ -345,7 +350,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(0, 10, 20), vec3.fromValues(0, 0, 0));
+  const camera = new Camera(vec3.fromValues(-10, 5, 9), vec3.fromValues(0, 5, 0));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
