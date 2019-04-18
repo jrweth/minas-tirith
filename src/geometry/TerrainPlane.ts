@@ -71,12 +71,12 @@ class TerrainPlane extends Drawable {
 
         // Make a strip of vertices along Z with the current X coord
         this.normals  [posIdx] = 0;
-        this.info     [posIdx] = this.terrain.getBuildingSuitability(vec2.fromValues(x,z)) ? 1 : 0;
+        this.info     [posIdx] = 0;//this.terrain.getBuildingSuitability(vec2.fromValues(x,z)) ? 1 : 0;
         this.colors   [posIdx] = 0;
         this.positions[posIdx++] = x * normalizeX * this.scale[0]  - this.scale[0] * 0.5;
 
         this.normals[posIdx] = 1;
-        this.info     [posIdx] = this.terrain.gridParts[x % this.gridSize[0]][z % this.gridSize[1]].hasBuilding ? 1: 0;
+        this.info     [posIdx] = 0;//this.terrain.gridParts[x % this.gridSize[0]][z % this.gridSize[1]].hasBuilding ? 1: 0;
         this.colors[posIdx] = 0;
         this.positions[posIdx++] = this.terrain.elevations[x][z];
 
@@ -85,7 +85,7 @@ class TerrainPlane extends Drawable {
         this.positions[posIdx++] = z * normalizeY* this.scale[1]  - this.scale[1] * 0.5;
         this.colors[posIdx] = 0;
 
-        this.normals[posIdx] = this.terrain.getPopulationDensity(vec2.fromValues(x, z));
+        this.normals[posIdx] = 0;//this.terrain.getPopulationDensity(vec2.fromValues(x, z));
         this.info     [posIdx] = 0;
         this.colors[posIdx] = 0;
         this.positions[posIdx++] = 1;

@@ -87,15 +87,15 @@ function loadScene() {
   plane.create();
 
   //create the road geometry
-  roadSegments = new RoadSegments({
-    gridSize: terrain.gridSize,
-    scale: plane.scale}
-  );
-  roadSegments.create();
-  roadSegments.setInstanceVBOs(terrain.roads.segments, terrain.roads.intersections, {
-    showHighways: controls["Show Highways"],
-    showStreets: controls["Show Streets"]
-  });
+  // roadSegments = new RoadSegments({
+  //   gridSize: terrain.gridSize,
+  //   scale: plane.scale}
+  // );
+  // roadSegments.create();
+  // roadSegments.setInstanceVBOs(terrain.roads.segments, terrain.roads.intersections, {
+  //   showHighways: controls["Show Highways"],
+  //   showStreets: controls["Show Streets"]
+  // });
 
   //create the building geometry
   cube = new Cube({
@@ -422,7 +422,7 @@ function main() {
       plane
     ]);
     if(controls["Show Highways"] || controls["Show Streets"]) {
-      renderer.render(camera, roadShader, [roadSegments]);
+    //  renderer.render(camera, roadShader, [roadSegments]);
     }
     if(controls["Show Buildings"]) {
       renderer.render(camera, buildingShader, [cube]);

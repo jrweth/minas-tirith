@@ -84,10 +84,10 @@ export class Terrain {
   init() {
     this.initElevations();
     this.initNormals();
-    this.initPopulation();
+    //this.initPopulation();
     this.initGridParts();
-    this.initRoads();
-    this.initBuildings();
+    //this.initRoads();
+    //this.initBuildings();
   }
 
   /**
@@ -178,13 +178,13 @@ export class Terrain {
         );
         this.setGridPartAttribute(i, j, 'minElevation',minElevation);
 
-        let avgDensity = (
-          this.populationDensities[i][j] +
-          this.populationDensities[i+1][j] +
-          this.populationDensities[i][j+1] +
-          this.populationDensities[i+1][j+1]
-        )/4;
-        this.setGridPartAttribute(i, j, 'avgDensity', avgDensity);
+        // let avgDensity = (
+        //   this.populationDensities[i][j] +
+        //   this.populationDensities[i+1][j] +
+        //   this.populationDensities[i][j+1] +
+        //   this.populationDensities[i+1][j+1]
+        // )/4;
+        // this.setGridPartAttribute(i, j, 'avgDensity', avgDensity);
       }
     }
 

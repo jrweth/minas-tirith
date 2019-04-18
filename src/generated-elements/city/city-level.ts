@@ -241,6 +241,9 @@ export class CityLevel {
     if(this.levelNum < this.city.levels.length -1) {
       nextLevelHeight = this.city.levels[this.levelNum + 1].getLevelHeight();
     }
+    else {
+      nextLevelHeight = height + this.elevationRise;
+    }
     let elevationRise = nextLevelHeight - height;
 
     let percentElevated = 0;

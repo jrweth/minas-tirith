@@ -40,7 +40,7 @@ vec3 getMapThemeColor() {
 }
 
 vec3 getDazzleThemeColor() {
-    vec3 color = vec3(0.5, 0.5, 1.0);
+    vec3 color = vec3(1.0, 1.0, 1.0);
 
     //highlight the edges
     float lum = 500.0 * (
@@ -49,7 +49,7 @@ vec3 getDazzleThemeColor() {
         pow(fs_Pos.z -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0)))
     );
     //lum = smoothstep(0.9999, 1.0, lum);
-    color = lum * color;
+    color = (1.0-lum) * color;
 
     return color;
 }
