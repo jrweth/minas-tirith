@@ -80,6 +80,7 @@ void main()
     float distToBase = vs_Pos.z - baseZ;
     if(vs_Pos.z < mtStart) {
       float scale = (mtStart - vs_Pos.z) / (mtStart - baseZ);
+      if(scale < 0.5) scale = smoothstep(0.0,1.0, scale);
       //modelposition.y = baseMtHeight + (baseZ - vs_Pos.z) * 0.1  *  vs_Pos.y*(maxElevation - baseMtHeight);
       modelposition.y = vs_Pos.y * scale + baseMtHeight * scale;
     }
