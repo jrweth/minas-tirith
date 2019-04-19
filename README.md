@@ -40,6 +40,7 @@ A randomized road system was created in order to create spacing between building
 
 ![](img/fortress_roads.png)
 
+
 ## Building location and footpring
 
 The building locations and the footprint was expanded based upon a configurable setting for the target footprint for each level.  Buildings
