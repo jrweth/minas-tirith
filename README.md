@@ -1,128 +1,66 @@
 # CIS 566 Homework 6: City Generation
 J. Reuben Wetherbee (wetherbe)
 ## Objective
-- Use procedurally generated techniques to create the terrain, highways, streets and buildings of a comletely generated city
+- Use procedurally generated techniques to create a configurable version of the fortress of Minas Tirith
 
 ## Demo
-WebGL demo can be found at (https://jrweth.github.io/procedural-city-terrain)
+WebGL demo can be found at (https://jrweth.github.io/minas-tirith)
 
-![](img/final.png)
+![](img/white-city.png)
+
+
+## Configurable levels
+Each level can be configured separately from each other level for attributes such as width / wall width / elevation rise / building grid width etc
+
+![](img/configuration.png)
+
+- most recent push has some errors here that are still being worked on 
 
 ## Basic Terrain with FBM 
-The first step in the city creation was to create a basic terrain height map using [Factianal Brownian Motion](https://en.wikipedia.org/wiki/Fractional_Brownian_motion).
+
+Ground plane terrain was taken from previous assignment and uses a height map using [Factianal Brownian Motion](https://en.wikipedia.org/wiki/Fractional_Brownian_motion).
 - Water: Any heights below 0.4 were designated as water.
 - Coast: Height between 0.4 and 0.43
 - Land: Heights above 0.43
 
-![](img/1_elevation.png)
+- still have bit of work to do here -  probably wiil get rid of water unless I make a river
 
-## Population Distribution with Worley Noise
-The population distribution was created procedurally using [Worley Noise](https://en.wikipedia.org/wiki/Worley_noise).
-The areas of higher population density are designated in the image below by the darker shades.
 
-![](img/2_population.png)
 
-## Highway Creation using Context Sensitive L-System
+## Fortress Ground Plane
 
-### Sensitivity to Population Density
-Once the population centers were created, an L-System was used to create roads to connect the population centers.
-The L-system was context sensitive, so that whenever a road segment was added, a check was performed
-to determine the direction of the highest population density.  The road segment was then
-altered so that it would tend toward the higher population density areas.  This required a bit of parameter tuning since 
-if the roads were influenced too greatly by population density they wouldn't achieve escape velocity from the centers
-of population density and would circle the population density centers.  The basis for the techinique was taken from 
-[Procedulal Modeling of Cities](docs/procedualCityGeneragion.pdf).
+Since the gates alternate from one side of the fotress to the other, the fortress ground plane was configured 
+to automatically gradually rise to match the elevation change in the next level as the levels were changing.
 
-### Sensitivity to Water Terrain
-The roads were also context aware of the elevation.  Since bridges do not generally curve, once a road segment was
-over the water portions of the terrain, there was no branching or change of direction of the road.  A future enhancement
-would be to make sure that there are no intersections of roads over the water.  This would entail checking ahead for an eventual
-intersection when the road reaches the coast.
+![](img/level_elevation_rise.png)
 
-![](img/3_highways.png)
+## Radial road system
 
-## Street Creation using Context Sensitive L-System
-Using the location of the Highways and the population density, random locations for neighborhood block structures of 
-streets were created.  This secondary street l-system was also context sensitive.  If the end point of a road segment ended 
-close to the endpoint of another segment, the end points were coordinated and the l-system branch was terminated.
+A randomized road system was created in order to create spacing between building groups.
 
-![](img/4_streets.png)
+![](img/fortress_roads.png)
 
-## Determining Building Site Suitability by rasterizing terrain
-In order to place the buildings in our street system, the currently generated roads and environmnet was rasterized
-into a grid format.  Each grid part was then evaluated for suitability for a building using the following criteria.
-- On Land
-- Distance from a street is within a 1/2 street block radius
-- Is at least 2 grid units away from a highway or a street
+## Building location and footpring
 
-The locations suitable for building location are colored in grey in the image below.
+The building locations and the footprint was expanded based upon a configurable setting for the target footprint for each level.  Buildings
+are placed in the blocks defined by the roads and then expanded to reach the target footprint. 
 
-![](img/5_building_sites.png)
+![](img/fortress_buildings.png)
 
-## Placement, Height and Footprint of Buildings using Population Density
-Once the building sites were determined, buildings were randomly placed on the building sites.  Their initial 
-height and footprint were randomized and then scaled according to the population density at the location.
-The higher the population density, the larger the maximum height and footprint.
 
-![](img/6_buildings.png)
-
-## Shape Grammars and instanced rendering for generating buildings
-
-The Buildings were created by using shape grammars. (see [Procedural Moedling of Buildings](docs/ProceduralModelingOfBuildings.pdf)). 
-To speed up rendering, the different shapes were constructed
-by deforming a simple cube. This way they could be rendered by the Shader and the only geometry that was necessary
-was the simple cube.  
-
-The following standard base deformations were defined.  These deformations could then be combined together create
-more complex shapes.
-
-![](img/cube_deformations.png)
-
-## Sample building generations
-The shape grammar defined for the buildings was organized so that for each replacement rule, the new shape(s) would 
-fit into the footprint of the previous shapes.  This "subtractive" methodology ensured that the building would
-not exceed the original building footprint.
+## Building shape grammar
+Buildings are constructed from various deformations of the cube according to a shape grammar where each shape in 
+the grammar has a number of shapes which upon each iteration can replace them.  
 
 ![](img/buildings.png)
 
+## Still coming
 
-## Themed Shaders
-
-To add a bit of pizzaz to the visual 2 different themes were implemented using the vertex and fragment WebGL shaders.
-- Map: Simple shading using flat colors
-- Electric Night: stylized futuristic shading for the night scene
-
-### Building Shading - Night
-The Shading of the buildings was accomplished by highlighting the underlying geometry using a luminosity that falls
-off the further the distance from the original edges of the geometry.
-
-![](img/building_shading.png)
+- a bunch of texturing work
+- quite a few more shape grammar elements for replacement
+- some more decoration of buildings (windows/arches/doors etc)
+- mountain geometry surrounding fortess
+- advanced lighting
+- mountain spur extending through fortress dividing each level in half with tunnels at each level
 
 
-### Road Shading - Night
-
-Shading for the roads was accomplished by using worley noise to simulate the blacktop. Stripes and dashes were 
-also added to the middle of the roads to simulate lane markers
-
-![](img/road_shading.png)
-
-### Land Shading - Night
-
-Land Shading was accomplished by utilizing the original height map for the terrain created using Fractional Brownian
- Motion and mixing several colors based upon the height at the given point.
-
-![](img/night_terrain.png)
-
-
-### Water Shading - Night
-
-Water Shading was accomplished by creating FBM in the fragment shader and applying color based upon the height
-map.  The tips of the water were then given greater luminosity to simulate white caps.
-
-![](img/water.png)
-
-#Future Enhancements
-
-- Add time to the shader to enhance water effects and building lighting effects
-- Create much more surface detail for the buildings
-- Actually change the height of the land instead of keeping it flat 
