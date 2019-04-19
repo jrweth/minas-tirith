@@ -13,6 +13,7 @@ import Roads from "./generated-elements/road/roads";
 import RoadSegments from "./geometry/RoadSegments";
 import {City} from "./generated-elements/city/city";
 import {getDefaultLevelOptions, LevelOptions} from "./generated-elements/city/city-level";
+import Texture from "./texture/texture";
 
 function initLevels(): LevelOptions[] {
   let levels: LevelOptions[] = [];
@@ -65,6 +66,8 @@ let dPressed: boolean;
 let planePos: vec2;
 let city: City;
 
+let pavementTexture: Texture;
+
 function initTerrain() {
   //initialize terrain
   terrain = new Terrain();
@@ -86,6 +89,8 @@ function loadScene() {
   //create the plane geometry
   plane = new TerrainPlane(terrain);
   plane.create();
+
+  pavementTexture = new Texture('src/texture/pavement.jpg', 0);
 
   //create the road geometry
   // roadSegments = new RoadSegments({
@@ -394,6 +399,9 @@ function main() {
   //addRoadControls();
   //addBuildingControls();
   addLevelControls();
+
+
+  buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture,0);
 
 
   /**
