@@ -35,7 +35,7 @@ const controls = {
   'Show Build Sites': false,
   'Show Walls': true,
 
-  'Elevation Seed': 89.3943,
+  'Elevation Seed': 8,
   'Population Seed': 1.234,
 
   'Road Seed': 5.43,
@@ -121,10 +121,10 @@ function loadScene() {
  */
 function addTerrainControls() {
   let terrainFolder = gui.addFolder('terrain');
-  let eSeed = terrainFolder.add(controls, 'Elevation Seed', {'seed 1': 89.3943, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 1.234}).listen();
-  eSeed.onChange(loadScene);
-  let pSeed = terrainFolder.add(controls, 'Population Seed', {'seed 1': 1.234, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 43.343}).listen();
-  pSeed.onChange(loadScene);
+  let eSeed = terrainFolder.add(controls, 'Elevation Seed', {'seed 1': 8, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 1.234}).listen();
+  eSeed.onChange(() => {initTerrain(); loadScene()});
+  // let pSeed = terrainFolder.add(controls, 'Population Seed', {'seed 1': 1.234, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 43.343}).listen();
+  // pSeed.onChange(loadScene);
 
   // mapType.onChange();
 }
@@ -358,7 +358,7 @@ function main() {
   // Initial call to load scene
   loadScene();
 
-  const camera = new Camera(vec3.fromValues(-12, 10, 7), vec3.fromValues(0, 5, -3));
+  const camera = new Camera(vec3.fromValues(-50, 40, 30), vec3.fromValues(0, 5, -3));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -390,7 +390,7 @@ function main() {
     roadShader: roadShader,
     renderer: renderer
   });
-  //addTerrainControls();
+  addTerrainControls();
   //addRoadControls();
   //addBuildingControls();
   addLevelControls();

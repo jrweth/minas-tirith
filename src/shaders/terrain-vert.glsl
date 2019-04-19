@@ -28,11 +28,9 @@ vec2 random2( vec2 p , vec2 seed) {
   return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);
 }
 
+
 void main()
 {
-  float cityRadius = 10.0;
-  float cityHeight = 10.0;
-  float maxElevation = cityHeight + 30.0;
   fs_Pos = vs_Pos.xyz;
   fs_Col = vs_Col;
   fs_Nor = vs_Nor;
@@ -52,30 +50,35 @@ void main()
      modelposition.y = -0.001;
   }
 
-  //determine the mountain height along the plane at the back of the fortress
-  float baseMtHeight =  maxElevation * 0.5;
+
+  float cityRadius = 10.0;
+  float cityHeight = 10.0;
+  float maxElevation = 30.0;
+  float baseMtHeight =  cityHeight;
   float baseZ = -10.0;
+  float baseToMaxWidth = 10.0;
   //wall behind city
   if(abs(vs_Pos.x) < cityRadius) {
     baseMtHeight= cityHeight * (1.0 - abs(vs_Pos.x)/cityRadius);
   }
   //wall moving out fromthe city
   else  {
-    baseMtHeight = cityHeight * min(2.0, (abs(vs_Pos.x) - cityRadius)/cityRadius);
+    baseMtHeight = cityHeight * min(1.0, (abs(vs_Pos.x) - cityRadius)/cityRadius);
   }
 
 
   //standard mountaints 10 clicks back from back of fortress
-  if(vs_Pos.z < baseZ - 10.0) {
-    modelposition.y = vs_Pos.y * maxElevation;
+  if(vs_Pos.z < baseZ - baseToMaxWidth) {
+    modelposition.y = cityHeight + vs_Pos.y * maxElevation;
   }
   //ramp up from mountain height at back of fortress
   else if (vs_Pos.z < baseZ) {
+    float scale = (baseZ - vs_Pos.z) / baseToMaxWidth;
     //ramp up to ultimate height
-    modelposition.y = baseMtHeight + (baseZ - vs_Pos.z) * 0.1  *  vs_Pos.y*(maxElevation - baseMtHeight);
+    modelposition.y = mix( baseMtHeight, cityHeight + vs_Pos.y * maxElevation, scale);
   }
   //mountain start radiates out from fortress
-  else if (abs(vs_Pos.x) > cityRadius) {
+  else if (abs(vs_Pos.x) >= cityRadius) {
     float mtStart = (abs(vs_Pos.x) - cityRadius) * 0.5;
     float distToBase = vs_Pos.z - baseZ;
     if(vs_Pos.z < mtStart) {

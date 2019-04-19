@@ -138,13 +138,13 @@ vec3 getDazzleThemeColor() {
             groundColor = mix(waterColor * fbm, highlightColor, (fbm - hBreak) / (1.0 - hBreak));//);
         }
     }
-    if(type == COAST) {
+    else if(type == COAST) {
        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.1, 0.1, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);
     }
     if(type == LAND) {
         groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
-
     }
+    groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
     if(u_DisplayOptions.r > 0.0) {
         groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));
     }
