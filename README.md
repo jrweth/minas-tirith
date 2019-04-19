@@ -53,7 +53,7 @@ are placed in the blocks defined by the roads and then expanded to reach the tar
 Buildings are constructed from various deformations of the cube according to a shape grammar where each shape in 
 the grammar has a number of shapes which upon each iteration can replace them.  
 
-![](img/buildings.png)
+![](img/buildings_shape.png)
 
 ## Still coming
 
