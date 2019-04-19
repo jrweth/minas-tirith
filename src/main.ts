@@ -426,6 +426,8 @@ function main() {
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
     processKeyPresses();
+    //figure out the ratio
+    terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*1.5});
     renderer.render(camera, terrainShader, [
       plane
     ]);

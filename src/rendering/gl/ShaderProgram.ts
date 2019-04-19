@@ -35,6 +35,7 @@ class ShaderProgram {
   unifModelInvTr: WebGLUniformLocation;
   unifViewProj: WebGLUniformLocation;
   unifDisplayOptions: WebGLUniformLocation;
+  unifCityInfo: WebGLUniformLocation;
   unifPlanePos: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
@@ -63,6 +64,7 @@ class ShaderProgram {
     this.unifViewProj   = gl.getUniformLocation(this.prog, "u_ViewProj");
     this.unifPlanePos   = gl.getUniformLocation(this.prog, "u_PlanePos");
     this.unifDisplayOptions = gl.getUniformLocation(this.prog, "u_DisplayOptions");
+    this.unifCityInfo = gl.getUniformLocation(this.prog, "u_CityInfo");
 
   }
 
@@ -106,6 +108,14 @@ class ShaderProgram {
     if(this.unifDisplayOptions !== -1) {
       gl.uniform4fv(this.unifDisplayOptions, options);
     }
+  }
+
+  setCityInfo(options: {cityHeight: number; cityRadius: number}) {
+    this.use();
+    if(this.unifCityInfo !== -1) {
+      gl.uniform4fv(this.unifCityInfo, vec4.fromValues(options.cityRadius, options.cityHeight, 0,0));
+    }
+
   }
 
   draw(d: Drawable) {

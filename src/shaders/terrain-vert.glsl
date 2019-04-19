@@ -5,6 +5,7 @@ uniform mat4 u_Model;
 uniform mat4 u_ModelInvTr;
 uniform mat4 u_ViewProj;
 uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane
+uniform vec4 u_CityInfo; //[0] = city radius [1] = cityHeight
 
 in vec4 vs_Pos;
 in vec4 vs_Nor;
@@ -15,6 +16,7 @@ out vec3 fs_Pos;
 out vec4 fs_Nor;
 out vec4 fs_Col;
 out vec4 fs_Info;
+
 
 float random1( vec2 p , vec2 seed) {
   return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
@@ -51,12 +53,12 @@ void main()
   }
 
 
-  float cityRadius = 10.0;
-  float cityHeight = 10.0;
+  float cityRadius = u_CityInfo[0];
+  float cityHeight = u_CityInfo[1];
   float maxElevation = 30.0;
   float baseMtHeight =  cityHeight;
   float baseZ = -10.0;
-  float baseToMaxWidth = 10.0;
+  float baseToMaxWidth = u_CityInfo[1];
   //wall behind city
   if(abs(vs_Pos.x) < cityRadius) {
     baseMtHeight= cityHeight * (1.0 - abs(vs_Pos.x)/cityRadius);

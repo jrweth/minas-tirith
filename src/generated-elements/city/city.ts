@@ -71,6 +71,15 @@ export class City {
     return blocks;
   }
 
+  getHeight(): number {
+    let topLevel = this.levels[this.levels.length -1];
+    return topLevel.getLevelHeight();
+  }
+
+  getRadius(): number {
+    let topLevel = this.levels[this.levels.length -1];
+    return topLevel.getLevelRadius();
+  }
 
 
 }
