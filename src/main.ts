@@ -67,6 +67,7 @@ let planePos: vec2;
 let city: City;
 
 let pavementTexture: Texture;
+let whiteStoneTexture: Texture;
 
 function initTerrain() {
   //initialize terrain
@@ -89,8 +90,6 @@ function loadScene() {
   //create the plane geometry
   plane = new TerrainPlane(terrain);
   plane.create();
-
-  pavementTexture = new Texture('src/texture/pavement.jpg', 0);
 
   //create the road geometry
   // roadSegments = new RoadSegments({
@@ -360,10 +359,8 @@ function main() {
   // Later, we can import `gl` from `globals.ts` to access it
   setGL(gl);
 
-  // Initial call to load scene
-  loadScene();
 
-  const camera = new Camera(vec3.fromValues(-50, 40, 30), vec3.fromValues(0, 5, -3));
+  const camera = new Camera(vec3.fromValues(-12, 10, 8), vec3.fromValues(0, 5, -3));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -388,6 +385,15 @@ function main() {
   roadShader.setDisplayOptions(getDisplayOptions());
   buildingShader.setDisplayOptions(getDisplayOptions());
 
+  whiteStoneTexture= new Texture('src/texture/white-stone.jpg', 0);
+  pavementTexture = new Texture('src/texture/pavement.jpg', 0);
+
+  buildingShader.bindTexToUnit(buildingShader.unifWhiteStoneSampler, whiteStoneTexture,0);
+  buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture,1);
+  console.log(buildingShader.unifWhiteStoneSampler);
+  console.log(buildingShader.unifPavementSampler);
+  // Initial call to load scene
+  loadScene();
   //add all the controls
   addDisplayControls({
     terrainShader: terrainShader,
@@ -401,7 +407,6 @@ function main() {
   addLevelControls();
 
 
-  buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture,0);
 
 
   /**

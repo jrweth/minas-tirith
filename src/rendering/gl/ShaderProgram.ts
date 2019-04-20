@@ -38,6 +38,7 @@ class ShaderProgram {
   unifDisplayOptions: WebGLUniformLocation;
   unifCityInfo: WebGLUniformLocation;
   unifPlanePos: WebGLUniformLocation;
+  unifWhiteStoneSampler: WebGLUniformLocation;
   unifPavementSampler: WebGLUniformLocation;
 
   constructor(shaders: Array<Shader>) {
@@ -67,6 +68,7 @@ class ShaderProgram {
     this.unifPlanePos   = gl.getUniformLocation(this.prog, "u_PlanePos");
     this.unifDisplayOptions = gl.getUniformLocation(this.prog, "u_DisplayOptions");
     this.unifCityInfo = gl.getUniformLocation(this.prog, "u_CityInfo");
+    this.unifWhiteStoneSampler = gl.getUniformLocation(this.prog, "u_WhiteStoneSampler");
     this.unifPavementSampler = gl.getUniformLocation(this.prog, "u_PavementSampler");
 
   }
@@ -87,26 +89,6 @@ class ShaderProgram {
     gl.uniform1i(handleName, unit);
   }
 
-  setPavementTexture() {
-    this.use();
-    const texture = gl.createTexture();
-
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-      new Uint8Array([122, 255, 122, 255]))
-    ;
-    //gl.generateMipmap(gl.TEXTURE_2D);
-    // Tell WebGL we want to affect texture unit 0
-    gl.activeTexture(gl.TEXTURE0);
-
-    // Bind the texture to texture unit 0
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    // Tell the shader we bound the texture to texture unit 0
-    gl.uniform1i(this.unifPavementSampler, 0);
-
-
-  }
 
   setModelMatrix(model: mat4) {
     this.use();
@@ -154,7 +136,7 @@ class ShaderProgram {
   draw(d: Drawable) {
     this.use();
 
-    this.setPavementTexture();
+    //this.setPavementTexture();
     if (this.attrPos != -1 && d.bindPos()) {
       gl.enableVertexAttribArray(this.attrPos);
       gl.vertexAttribPointer(this.attrPos, 4, gl.FLOAT, false, 0, 0);

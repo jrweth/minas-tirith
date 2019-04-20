@@ -55,7 +55,7 @@ void main()
 
   float cityRadius = u_CityInfo[0];
   float cityHeight = u_CityInfo[1];
-  float maxElevation = 30.0;
+  float maxElevation = 15.0;
   float baseMtHeight =  cityHeight;
   float baseZ = -10.0;
   float baseToMaxWidth = u_CityInfo[1];

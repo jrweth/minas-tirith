@@ -51,9 +51,9 @@ export class GridInfo {
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
   return {
     wallHeight : 1,
-    elevationRise: 6,
-    levelWidth : 4,
-    wallWidth : 2,
+    elevationRise: 9,
+    levelWidth : 5,
+    wallWidth : 3,
     gridWidth: 6,
     seed: 1.34 * levelNum,
     buildingFootprintTarget: Math.pow(levelNum + 1.3, 1.7)
@@ -232,6 +232,7 @@ export class CityLevel {
 
   setGridWidth(width: number) {
     this.gridWidth = width;
+    this.gridLength = this.getGridLength();
     //initialize shapes for all levels here and below
     this.rescaleLevel();
   }

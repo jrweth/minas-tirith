@@ -3,7 +3,8 @@ precision highp float;
 
 uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane
 uniform vec4 u_DisplayOptions; //
-uniform sampler2D u_PavementTexture;
+uniform sampler2D u_PavementSampler;
+uniform sampler2D u_WhiteStoneSampler;
 
 in vec3 fs_Pos;
 in vec4 fs_Nor;
@@ -86,15 +87,12 @@ void main()
     }
 
     if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {
-        buildingColor = vec3(0.4, 0.4, 0.4);
-        vec4 mySample;
-        mySample = texture(u_PavementTexture, fs_Pos.xz);
-
-        buildingColor = mySample.xyz;
+        buildingColor = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;
         //buildingColor = mySample.xyz;
     }
 
     if(fs_BlockInfo[1] == TEXTURE_WALL) {
+        buildingColor = texture(u_WhiteStoneSampler, fs_Pos.xz * 3.0).xyz;
         //buildingColor = vec3(0.9, 0.9, 0.9);
     }
 
