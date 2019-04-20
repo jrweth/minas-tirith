@@ -15,6 +15,7 @@ out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 const float MAP_THEME = 1.0;
 const float DAZZLE_THEME = 2.0;
+const float TEXTURE_THEME = 3.0;
 
 const float WATER_LINE = 0.4;
 const float COAST_LINE = 0.43;
@@ -165,6 +166,10 @@ void main()
         backgroundColor = getMapThemeBackground();
     }
     else if(u_DisplayOptions[2] == DAZZLE_THEME) {
+        groundColor = getDazzleThemeColor();
+        backgroundColor = getDazzleThemeBackground();
+    }
+    else if(u_DisplayOptions[2] == TEXTURE_THEME) {
         groundColor = getDazzleThemeColor();
         backgroundColor = getDazzleThemeBackground();
     }

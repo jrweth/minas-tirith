@@ -127,6 +127,7 @@ class Cube extends Drawable {
 
     this.generateIdx();
     this.generatePos();
+    this.generateNor();
 
     this.count = this.indices.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.bufIdx);
@@ -134,6 +135,10 @@ class Cube extends Drawable {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufNor);
+    gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
+
 
     console.log(`Created Cube`);
   }

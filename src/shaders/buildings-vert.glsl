@@ -16,6 +16,7 @@ in vec4 vs_Translate;
 in vec4 vs_BlockInfo;
 in vec4 vs_Adjustment;
 
+flat out int fs_Face;
 out vec3 fs_Pos;   //position on unit cube (0 or 1)
 out vec4 fs_Nor;
 out vec4 fs_Col;   //scale
@@ -57,6 +58,25 @@ float getVertexNum() {
    }
 
    return 0.0;
+}
+
+/**
+* Get the face number of the block
+* 0 - Front
+* 1 - Back
+* 2 - Left
+* 3 - Right
+* 4 - Bottom
+* 5 - Top
+*/
+int getFaceNum() {
+    if     (vs_Nor.z == -1.0) { return 0; }
+    else if(vs_Nor.z ==  1.0) { return 1; }
+    else if(vs_Nor.x == -1.0) { return 2; }
+    else if(vs_Nor.x ==  1.0) { return 3; }
+    else if(vs_Nor.y == -1.0) { return 4; }
+    else if(vs_Nor.y ==  1.0) { return 5; }
+    return 0;
 }
 
 vec3 getCubeVertexPosition() {
@@ -221,6 +241,7 @@ void main()
     fs_Pos = vs_Pos.xyz;
     fs_Translate = vs_Translate;
     fs_BlockInfo = vs_BlockInfo;
+    fs_Face = getFaceNum();
     adjust1 = vs_Adjustment[0];
     adjust2 = vs_Adjustment[1];
     adjust3 = vs_Adjustment[2];

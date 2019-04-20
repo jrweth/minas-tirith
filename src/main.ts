@@ -28,7 +28,7 @@ function initLevels(): LevelOptions[] {
 const controls = {
   'Levels': initLevels(),
   'AllLevels': getDefaultLevelOptions(0),
-  'Theme': 2,
+  'Theme': 3,
   'Show Highways': true,
   'Show Streets' : false,
   'Show Population Density': true,
@@ -156,6 +156,9 @@ function getBackgroundColor(): vec3 {
   else if(controls.Theme == 2) {
     return vec3.fromValues(0,0,0);
   }
+  else if(controls.Theme == 3) {
+    return vec3.fromValues(0,0,0);
+  }
 }
 
 /**
@@ -169,7 +172,7 @@ function addDisplayControls(options: {
   renderer: OpenGLRenderer
 }) {
   let displayFolder = gui.addFolder('display');
-  let theme = displayFolder.add(controls, 'Theme', {'Map': 1, 'White City': 2}).listen();
+  let theme = displayFolder.add(controls, 'Theme', {'Textured': 3, 'Map': 1, 'White City': 2}).listen();
   //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
   let showStreets = displayFolder.add(controls, 'Show Streets').listen();
   //let showPop = displayFolder.add(controls, 'Show Population Density').listen();

@@ -11,6 +11,7 @@ in vec4 fs_Nor;
 in vec4 fs_Col;
 in vec4 fs_Translate;
 in vec4 fs_BlockInfo;
+flat in int fs_Face;
 
 //in float fs_Sine;
 
@@ -19,6 +20,7 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 float MAP_THEME = 1.0;
 float DAZZLE_THEME = 2.0;
+float TEXTURED_THEME = 3.0;
 
 float TEXTURE_WALL     = 0.0;
 float TEXTURE_ROAD     = 1.0;
@@ -43,6 +45,17 @@ vec3 getMapThemeColor() {
 
     }
 
+
+    if(fs_BlockInfo[1] == TEXTURE_ROAD) {
+        buildingColor = vec3(0.9, 0.4, 0.4);
+    }
+
+    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {
+        buildingColor = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;
+        //buildingColor = mySample.xyz;
+    }
+
+
     return buildingColor;
 }
 
@@ -61,11 +74,47 @@ vec3 getDazzleThemeColor() {
     return color;
 }
 
+vec3 getTexturedThemeColor() {
+    vec3 color = vec3(1.0, 1.0, 1.0);
+
+    //highlight the edges
+    float lum = 500.0 * (
+    max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.z - 0.5, 4.0),
+    max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0),
+    pow(fs_Pos.z -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0)))
+    );
+    //lum = smoothstep(0.9999, 1.0, lum);
+    color = (1.0-lum) * color;
+
+    if(fs_BlockInfo[1] == TEXTURE_ROAD) {
+        color = vec3(0.9, 0.4, 0.4);
+    }
+
+    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {
+        color = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;
+        //buildingColor = mySample.xyz;
+    }
+
+    if(fs_BlockInfo[1] == TEXTURE_WALL) {
+        vec2 uv = vec2(0.0,0.0);
+        if(fs_Face == 0 || fs_Face == 1) uv = fs_Pos.xy; //gate opening
+        if(fs_Face == 2 || fs_Face == 3) uv = fs_Pos.zy; //sides
+        if(fs_Face == 4 || fs_Face == 5) uv = fs_Pos.zx; //tops
+        color = texture(u_WhiteStoneSampler, uv * 3.0).xyz;
+        //buildingColor = vec3(0.9, 0.9, 0.9);
+    }
+
+    return color;
+}
+
 vec3 getDazzleThemeBackground() {
     return vec3(0.0, 0.0, 0.0);
 }
 vec3 getMapThemeBackground() {
     return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);
+}
+vec3 getTexturedThemeBackground() {
+    return vec3(0.0, 0.0, 0.0);
 }
 
 void main()
@@ -81,20 +130,11 @@ void main()
         buildingColor = getDazzleThemeColor();
         backgroundColor = getDazzleThemeBackground();
     }
-
-    if(fs_BlockInfo[1] == TEXTURE_ROAD) {
-        buildingColor = vec3(0.9, 0.4, 0.4);
+    else if(u_DisplayOptions[2] == TEXTURED_THEME) {
+        buildingColor = getTexturedThemeColor();
+        backgroundColor = getTexturedThemeBackground();
     }
 
-    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {
-        buildingColor = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;
-        //buildingColor = mySample.xyz;
-    }
-
-    if(fs_BlockInfo[1] == TEXTURE_WALL) {
-        buildingColor = texture(u_WhiteStoneSampler, fs_Pos.xz * 3.0).xyz;
-        //buildingColor = vec3(0.9, 0.9, 0.9);
-    }
 
 
     float t = clamp(smoothstep(40.0, 50.0, length(fs_Translate.xz)), 0.0, 1.0); // Distance fog
