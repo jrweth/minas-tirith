@@ -198,14 +198,14 @@ mat3 rotationMatrix(int axis, float angle) {
     return rot;
 }
 
-vec3 rotate(vec3 pos) {
+vec3 rotate(vec3 pos, vec3 rotation) {
     mat3 rot;
     if(vs_Rotate.x > 0.0) {
-        mat3 rot = rotationMatrix(0, vs_Rotate.x);
+        mat3 rot = rotationMatrix(0, rotation.x);
         pos = rot * pos;
     }
     if(vs_Rotate.y > 0.0) {
-        mat3 rot = rotationMatrix(1, vs_Rotate.y);
+        mat3 rot = rotationMatrix(1, rotation.y);
         pos = rot * pos;
     }
     return pos;
@@ -231,8 +231,35 @@ vec3 getVertexPosition() {
     shapePos.x = shapePos.x * scaleX;
     shapePos.y = shapePos.y * scaleY;
     shapePos.z = shapePos.z * scaleZ;
-    shapePos = rotate(shapePos);
+    shapePos = rotate(shapePos, vs_Rotate.xyz);
     return shapePos;
+}
+
+vec3 getWedgeNormal() {
+    float vertexNum = getVertexNum();
+
+    //get the angle which the wedge causes the vertex to adjust
+    float angle = atan(scaleZ * 0.5 * (1.0 - adjust1) / scaleX);
+    if(vertexNum == 0.0 || vertexNum == 1.0 || vertexNum == 4.0 || vertexNum == 5.0) {
+        return rotate(vs_Nor.xyz, vec3(0.0, -angle, 0.0));
+    }
+    else {
+        return rotate(vs_Nor.xyz, vec3(0.0, angle, 0.0));
+    }
+}
+
+vec4 getVertexNormal() {
+    vec3 normal = vs_Nor.xyz;
+    if(vs_BlockInfo[0] == CUBE)  normal = normal;
+//    else if(vs_BlockInfo[0] == PYRAMID) { }
+//    else if (vs_BlockInfo[0] == TENT) normal = getTentVertexPosition();
+//    else if (vs_BlockInfo[0] == TRI_TUBE) normal = getTriTubeVertexPosition();
+//    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) normal = getQuarterPyramidVertexPosition();
+//    else if (vs_BlockInfo[0] == SLANT) normal = getSlantVertexPosition();
+    else if (vs_BlockInfo[0] == WEDGE) normal = getWedgeNormal();
+
+    return vec4(rotate(normal.xyz, vs_Rotate.xyz), 1.0);
+
 }
 
 
@@ -248,6 +275,7 @@ void main()
     scaleX = vs_Scale[0];
     scaleY = vs_Scale[1];
     scaleZ = vs_Scale[2];
+    fs_Nor = getVertexNormal();
     scaleFromCenter = (vs_Scale[3] == 1.0);
 
     vec4 modelposition = vec4(getVertexPosition(), 1.0);
