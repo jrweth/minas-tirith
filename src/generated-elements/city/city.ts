@@ -4,6 +4,7 @@ import {Wall} from "../building/shape/wall";
 import {Block} from "../building/shape/block";
 import {Shape} from "../building/shape/shape";
 import {CityLevel} from "./city-level";
+import {Building} from "../building/building";
 
 
 
@@ -15,6 +16,8 @@ export class City {
   showBuildings: boolean = true;
   showRoads: boolean = false;
   showWalls: boolean = true;
+  showSampleBuildings: boolean = true;
+  sampleBuildings: Building[] = [];
 
 
   constructor(options: {
@@ -64,12 +67,65 @@ export class City {
   }
 
   getBlocks(): Block[] {
+    if(this.showSampleBuildings) return this.getSampleBlocks();
     let blocks: Block[] = [];
     for(let i = 0; i < this.levels.length; i++) {
       blocks = blocks.concat(this.levels[i].getBlocks());
     }
     return blocks;
   }
+
+  getSampleBlocks(): Block[] {
+    let blocks: Block[] = [];
+    this.getSampleBuildings();
+    for(let i = 0; i < this.sampleBuildings.length; i++) {
+      blocks = blocks.concat(this.sampleBuildings[i].getBlocks());
+    }
+    console.log(blocks);
+    return blocks;
+  }
+
+  getSampleBuildings(): Building[] {
+    if(this.sampleBuildings.length > 0) return this.sampleBuildings;
+
+
+    let footprints: vec3[] = [
+      vec3.fromValues( 1, 1, 1),
+      vec3.fromValues( 2, 3, 2),
+      vec3.fromValues( 3, 7, 6),
+      vec3.fromValues( 4, 4, 5),
+      vec3.fromValues( 5, 8, 8),
+      vec3.fromValues( 6, 6, 3),
+      vec3.fromValues( 7, 7, 5),
+      vec3.fromValues( 8, 8, 8),
+      vec3.fromValues( 9, 9, 2),
+      vec3.fromValues( 10, 10, 7),
+      vec3.fromValues( 11, 11, 11),
+    ];
+
+    let xPos = 200;
+    for(let i = 0; i < footprints.length; i++) {
+      let foot = footprints[i];
+      let pos: vec3 = vec3.fromValues(xPos, 2, 210);
+      let seed: number = Math.pow(1.232, i);
+
+      let b =new Building({
+        pos: pos,
+        footprint: foot,
+        rotation: vec3.fromValues(0,0,0),
+        seed: seed
+      });
+      b.runReplacements();
+      this.sampleBuildings.push(b);
+      xPos = xPos + foot[0] + 3
+      ;
+
+    }
+
+    return this.sampleBuildings;
+  }
+
+
 
   getHeight(): number {
     let topLevel = this.levels[this.levels.length -1];

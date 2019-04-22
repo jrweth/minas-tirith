@@ -35,6 +35,7 @@ const controls = {
   'Show Buildings': true,
   'Show Build Sites': false,
   'Show Walls': true,
+  'Sample Buildings': false,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,
@@ -175,14 +176,15 @@ function addDisplayControls(options: {
   let theme = displayFolder.add(controls, 'Theme', {'Textured': 3, 'Map': 1, 'White City': 2}).listen();
   //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
   let showStreets = displayFolder.add(controls, 'Show Streets').listen();
-  //let showPop = displayFolder.add(controls, 'Show Population Density').listen();
   let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();
-  //let showBuildSites = displayFolder.add(controls, 'Show Build Sites').listen();
   let showWalls = displayFolder.add(controls, 'Show Walls');
+  let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
+
 
   showBuildings.onChange(() => {city.showBuildings = controls["Show Buildings"]; loadScene()});
   showStreets.onChange(() => {city.showRoads = controls["Show Streets"]; loadScene()});
   showWalls.onChange(() => {city.showWalls = controls["Show Walls"]; loadScene()});
+  sampleBuildings.onChange(() => {city.showSampleBuildings = controls["Sample Buildings"]; loadScene()});
   theme.onChange(() => {
     options.terrainShader.setDisplayOptions(getDisplayOptions());
     options.roadShader.setDisplayOptions(getDisplayOptions());

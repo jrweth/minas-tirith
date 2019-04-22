@@ -4,6 +4,7 @@ import {Block, BlockType} from "./shape/block";
 import Random from "../../noise/random";
 import {StandardRoof} from "./shape/standardRoof";
 import {Box} from "./shape/box";
+import {Foundation} from "./shape/foundation";
 
 
 export class Building {
@@ -25,7 +26,7 @@ export class Building {
     this.rotation = options.rotation;
     this.seed = options.seed;
     this.shapes = [
-      new Box({
+      new Foundation({
         footprint: this.footprint,
         pos: this.pos,
         rotation: this.rotation,

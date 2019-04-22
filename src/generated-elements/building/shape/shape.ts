@@ -42,6 +42,25 @@ export abstract class Shape {
   abstract getBlocks(): Block[];
 
 
+  getSplitFootprints(axis: Axis, offset: number, footprint1: vec3, footprint2: vec3): void {
+
+    footprint1 = vec3.fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
+    footprint2 = vec3.fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
+
+    footprint1[axis] = offset;
+    footprint2[axis] = this.footprint[axis] - offset;
+
+    console.log(footprint1);
+  }
+
+  getSplitPositions(axis: Axis, offset: number, position1: vec3, position2: vec3) {
+    position1 = vec3.fromValues(this.pos[0], this.pos[1], this.pos[2]);
+    position2 = vec3.fromValues(this.pos[0], this.pos[1], this.pos[2]);
+
+    position1[axis] - this.footprint[axis]/2 + 0.5* offset;
+    position2[axis] = this.pos[axis] + 0.5 * offset;
+  }
+
 
   /**
    * Shrink shape from the center inward
