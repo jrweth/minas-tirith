@@ -53,7 +53,7 @@ export class Wall extends Shape{
         adjustScale1: scaleBottom,
         adjustScale2: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
         adjustScale3: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
-        adjustScale4: 0, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
+        adjustScale4: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true,
         textureType: TextureType.WALL

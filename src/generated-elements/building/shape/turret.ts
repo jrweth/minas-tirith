@@ -25,8 +25,10 @@ export class Turret extends Shape{
     corners?: boolean
   }) {
     super(options);
-    this.radius =  0;
     this.width = Math.min(this.footprint[0], this.footprint[2]);
+    this.footprint[0] = this.width;
+    this.footprint[2] = this.width;
+    this.radius =  0;
     this.sweep = options.sweep ? options.sweep :  Math.PI;
     this.numSegments = options.numSegments ? options.numSegments: 20;
     this.corners = options.corners ? options.corners: false;
@@ -73,7 +75,7 @@ export class Turret extends Shape{
     let posY = this.pos[1] + 0.5 * this.footprint[1] + 0.5 * height;
     let roof = new TurretRoof({
       pos: vec3.fromValues(this.pos[0], posY, this.pos[2]),
-      footprint: vec3.fromValues(this.footprint[0]*1.2, height, this.footprint[2]),
+      footprint: vec3.fromValues(this.footprint[0]*1.2, height, this.footprint[0]*1.2),
       rotation: this.rotation,
       numSegments: this.numSegments
     });

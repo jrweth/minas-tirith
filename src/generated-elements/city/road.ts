@@ -56,6 +56,7 @@ export class Road extends Shape{
         adjustScale1: scaleBottom,
         adjustScale2: this.getLeftScale(angle),
         adjustScale3: this.getRightScale(angle),
+        adjustScale4: 1,
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true,
         textureType: TextureType.LEVEL_GROUND
