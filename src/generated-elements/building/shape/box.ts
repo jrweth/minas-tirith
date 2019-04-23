@@ -5,6 +5,8 @@ import Random from "../../../noise/random";
 import {Axis} from "../../../geometry/Axis"
 import {StandardRoof} from "./standardRoof";
 import {TextureType} from "../../../texture/texture-type";
+import {Turret} from "./turret";
+import {StandardBlock} from "./standardBlock";
 
 export class Box extends Shape{
 
@@ -28,7 +30,7 @@ export class Box extends Shape{
   }
 
   runReplacement(seed: number): Shape[] {
-    let type = Random.randomInt(12, seed);
+    let type = Random.randomInt(13, seed);
     switch(type) {
       case 0: return this.splitX({percentage: 0.5});
       case 1: return this.splitY({percentage: 0.5});
@@ -42,7 +44,7 @@ export class Box extends Shape{
       case 9: return this.taperZ({percentage: 0.25})
       case 10: this.terminal = true; return [this];
       default:
-          return this.addRoof(BlockType.CUBE);
+        return this.toTurret();
 
     }
   }
@@ -84,6 +86,45 @@ export class Box extends Shape{
       newBoxes[1].shrinkZ(shrinkBy);
     }
     return newBoxes;
+  }
+
+  toTurret(): Shape[] {
+
+    let newShapes7= this.splitShape(8,Axis.Y, this.pos, this.footprint, this.rotation);
+
+
+    //create a base 1/4 the size of the current box
+    let base = new Box({
+      pos: newShapes7[0].pos,
+      footprint: newShapes7[0].footprint,
+      rotation: this.rotation
+    });
+    base.terminal = true;
+
+    let rot: vec3 = vec3.create();
+    vec3.copy(rot, this.rotation);
+    if(this.footprint[0] < this.footprint[2]) {
+      newShapes7[1].footprint[0] = this.footprint[2];
+      newShapes7[1].footprint[2] = this.footprint[0];
+      rot[1] += Math.PI / 2;
+    }
+    let transition = new StandardBlock({
+      pos: newShapes7[1].pos,
+      footprint: newShapes7[1].footprint,
+      rotation: rot,
+      blockType: BlockType.TENT,
+      adjustScale1: 0.5,
+      adjustScale2: 1
+    });
+
+
+    let turret = new Turret({
+      pos: newShapes7[4].pos,
+      footprint: vec3.fromValues(this.footprint[0], this.footprint[1]*5/7, this.footprint[2]),
+      rotation: this.rotation
+    });
+
+    return [base, transition, turret];
   }
 
 

@@ -110,11 +110,11 @@ vec3 getTentVertexPosition() {
     float vertexNum = getVertexNum();
     //scale bottom toward middle
     if(vertexNum < 4.0) {
-        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, vs_BlockInfo[2]);
+        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, adjust2);
     }
     //scale top toward middle
     else {
-        return mix(vec3(0.5, vs_Pos[1], vs_Pos[2]), vs_Pos.xyz, vs_BlockInfo[3]);
+        return mix(vec3(0.5, vs_Pos[1], vs_Pos[2]), vs_Pos.xyz, adjust1);
     }
 }
 
