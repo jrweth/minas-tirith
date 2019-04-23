@@ -34,6 +34,7 @@ const float WEDGE = 7.0;
 float adjust1; //contained in vs_BlockInfo[3]
 float adjust2;  //contained in vs_BlockInfo[2]
 float adjust3; //contained in vs_BlockInfo[3]
+float adjust4; //contained in vs_BlockInfo[3]
 float scaleX;  //contained in vs_Col[0];
 float scaleY; //contained in vs_Col[1];
 float scaleZ; //contained in vs_Col[2];
@@ -165,6 +166,14 @@ vec3 getWedgeVertexPosition() {
         pos.y = pos.y * adjust3;
     }
 
+    //slope toward the center
+    if(vertexNum == 5.0 || vertexNum == 7.0) {
+        //adjust4 = 0.0;
+        float innerZ = mix(0.5, vs_Pos.z, adjust1);
+        pos.x = mix(-0.0, pos.x, adjust4);
+        pos.z = mix(innerZ, pos.z, adjust4);
+    }
+
     return pos;
 }
 
@@ -272,6 +281,7 @@ void main()
     adjust1 = vs_Adjustment[0];
     adjust2 = vs_Adjustment[1];
     adjust3 = vs_Adjustment[2];
+    adjust4 = vs_Adjustment[3];
     scaleX = vs_Scale[0];
     scaleY = vs_Scale[1];
     scaleZ = vs_Scale[2];
