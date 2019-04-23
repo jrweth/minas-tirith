@@ -35,7 +35,7 @@ const controls = {
   'Show Buildings': true,
   'Show Build Sites': false,
   'Show Walls': true,
-  'Sample Buildings': false,
+  'Sample Buildings': true,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,

@@ -32,7 +32,7 @@ export class Building {
         rotation: this.rotation,
       })
     ];
-    this.runReplacements();
+    this.runReplacement();
   }
 
   getBlocks(): Block[] {

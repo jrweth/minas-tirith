@@ -35,9 +35,8 @@ export class Foundation extends Shape{
     vec3.copy(pos, this.pos);
     vec3.copy(rot, this.rotation);
     vec3.copy(footprint, this.footprint);
-    pos[1] = this.pos[1] - 1;
+    pos[1] = this.pos[1] - this.footprint[1]/2 - 0.5;
     footprint[1] = 1;
-    footprint[2] = 20;
 
     let foundation = new Foundation({
       pos: pos,
@@ -53,22 +52,20 @@ export class Foundation extends Shape{
   runReplacement(seed: number): Shape[] {
 
 
-    let type = Random.randomInt(12, seed);
 
     //get the ratio of x,z dimension
-    let ratio = Math.min(this.footprint[0], this.footprint[1])  / Math.max(this.footprint[0], this.footprint[1]);
+    let ratio = Math.min(this.footprint[0], this.footprint[2])  / Math.max(this.footprint[0], this.footprint[2]);
 
 
     //really skinny buildings
-    if(ratio < 20202) {
-      let shapes = this.getSkinnyBuildingShapes();
-      console.log(shapes);
-      //split into three sections
+    if(ratio < 0.33) {
+      let shapes = this.getSkinnyBuildingShapes(seed);
+      return shapes;
     }
 
 
-    else if(ratio < 0.75) {
-
+    else if(ratio < 0.66) {
+      let shapes = this.getRectangularBuildingShapes(seed);
     }
 
     else {
@@ -91,35 +88,59 @@ export class Foundation extends Shape{
     ];
   }
 
-  getSkinnyBuildingShapes(): Shape[] {
-    console.log('got here');
+  getSkinnyBuildingShapes(seed: number): Shape[] {
     let axis = Axis.X;
-    if(this.footprint[2] > this.footprint[1]) {
+    if(this.footprint[2] > this.footprint[0]) {
       axis = Axis.Z;
     }
-    let f1: vec3 = vec3.create();
-    let f2: vec3 = vec3.create();
-    let p1: vec3 = vec3.create();
-    let p2: vec3 = vec3.create();
 
-    this.getSplitFootprints(axis, this.footprint[axis], f1, f2);
-    this.getSplitPositions(axis, this.footprint[axis], p1, p2);
-    console.log(p1);
+    let newShapes = this.splitShape(3,axis, this.pos, this.footprint, this.rotation);
+
+
+    let lowerHeight = this.footprint[1] * 0.666;
+    let raiseHeight = this.footprint[1] * 1.5;
+    let type = Random.randomInt(3, seed);
+    switch (type) {
+      case 0: //raise up the selected
+      case 1:
+      case 2:
+        newShapes[type].footprint[1] = raiseHeight;
+        newShapes[type].pos[1] = raiseHeight /2;
+        break;
+      case 3:
+        newShapes[1].footprint[1] = lowerHeight;
+        newShapes[1].pos[1] = lowerHeight /2;
+        break;
+
+    }
+
 
     return [
       new Box({
-        pos: p1,
+        pos: newShapes[0].pos,
         rotation: this.rotation,
-        footprint: f1
+        footprint: newShapes[0].footprint
       }),
       new Box({
-        pos: p2,
+        pos: newShapes[1].pos,
         rotation: this.rotation,
-        footprint: f2
+        footprint: newShapes[1].footprint
+      }),
+      new Box({
+        pos: newShapes[2].pos,
+        rotation: this.rotation,
+        footprint: newShapes[2].footprint
       }),
       this.getBase()
     ];
 
+  }
+
+
+  getRectangularBuildingShapes(seed: number): Shape[] {
+    let shapes: Shape[] = [];
+
+    return shapes;
   }
 
 

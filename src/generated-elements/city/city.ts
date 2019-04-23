@@ -81,7 +81,6 @@ export class City {
     for(let i = 0; i < this.sampleBuildings.length; i++) {
       blocks = blocks.concat(this.sampleBuildings[i].getBlocks());
     }
-    console.log(blocks);
     return blocks;
   }
 
@@ -90,8 +89,8 @@ export class City {
 
 
     let footprints: vec3[] = [
-      vec3.fromValues( 1, 1, 1),
-      vec3.fromValues( 2, 3, 2),
+      vec3.fromValues( 1, 1, 4),
+      vec3.fromValues( 8, 3, 2),
       vec3.fromValues( 3, 7, 6),
       vec3.fromValues( 4, 4, 5),
       vec3.fromValues( 5, 8, 8),
@@ -106,19 +105,20 @@ export class City {
     let xPos = 200;
     for(let i = 0; i < footprints.length; i++) {
       let foot = footprints[i];
-      let pos: vec3 = vec3.fromValues(xPos, 2, 210);
+      xPos = xPos + foot[0]/2;
+      let pos: vec3 = vec3.fromValues(xPos, foot[1] / 2, 210);
       let seed: number = Math.pow(1.232, i);
 
       let b =new Building({
         pos: pos,
         footprint: foot,
-        rotation: vec3.fromValues(0,0,0),
+        rotation: vec3.fromValues(0,i * Math.PI/10,0),
         seed: seed
       });
       b.runReplacements();
       this.sampleBuildings.push(b);
-      xPos = xPos + foot[0] + 3
-      ;
+      xPos = xPos + foot[0]/2+ 3;
+
 
     }
 

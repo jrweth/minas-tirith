@@ -739,6 +739,7 @@ export class CityLevel {
       seed:  Math.pow(this.seed[1],this.buildings.length + 1),
       footprint: foot
     }));
+    this.buildings[this.buildings.length - 1].runReplacements();
   }
 
   getBuildingPosition(gridI: number, gridJ: number, buildingHeight: number): vec3 {
