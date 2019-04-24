@@ -188,7 +188,7 @@ export class CityLevel {
   setElevationRise(rise: number) {
     this.elevationRise = rise;
     //initialize shapes for all levels here and below
-    for(let i = this.levelNum; i >= 0; i--) {
+    for(let i = this.levelNum; i < this.city.levels.length; i++) {
       this.city.levels[i].rescaleLevel();
     }
   }
