@@ -28,14 +28,14 @@ function initLevels(): LevelOptions[] {
 const controls = {
   'Levels': initLevels(),
   'AllLevels': getDefaultLevelOptions(0),
-  'Theme': 3,
+  'Theme': 1,
   'Show Highways': true,
   'Show Streets' : false,
   'Show Population Density': true,
   'Show Buildings': true,
   'Show Build Sites': false,
-  'Show Walls': true,
-  'Sample Buildings': true,
+  'Show Walls': false,
+  'Sample Buildings': false,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,
@@ -109,6 +109,7 @@ function loadScene() {
     scale: plane.scale
   });
   cube.create();
+  console.log(city);
   cube.setInstanceVBOs(city);
 
   square = new Square(vec3.fromValues(0, 0, 0));
@@ -365,7 +366,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(-12, 10, 8), vec3.fromValues(0, 5, -3));
+  const camera = new Camera(vec3.fromValues(-25, 20, 16), vec3.fromValues(0, 5, -3));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -447,7 +448,7 @@ function main() {
     //figure out the ratio
     terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*1.5});
     renderer.render(camera, terrainShader, [
-      plane
+      //plane
     ]);
     if(controls["Show Highways"] || controls["Show Streets"]) {
     //  renderer.render(camera, roadShader, [roadSegments]);

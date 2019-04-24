@@ -34,6 +34,9 @@ export class Road extends Shape{
     this.numSegments = options.numSegments ? options.numSegments: 20;
     this.terminal = true;
     this.cityLevel = options.cityLevel;
+    console.log(this.radius);
+    console.log(this.cityLevel.getInnerRadius());
+    console.log(this.cityLevel.getOuterRadius());
   }
 
   getBlocks(): Block[] {

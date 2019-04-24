@@ -122,6 +122,17 @@ export class CityLevel {
     return height;
   }
 
+  getInnerRadius(): number {
+    let radius = 0;
+    for(let i = this.levelNum + 1; i < 7; i++) {
+      radius += this.city.levels[i].levelWidth + this.city.levels[i].wallWidth;
+    }
+    return radius;
+  }
+
+  getOuterRadius(): number {
+    return this.wallWidth + this.levelWidth + this.getInnerRadius();
+  }
 
   getLevelRadius(): number {
     let radius: number = this.wallWidth + this.levelWidth;
@@ -151,7 +162,7 @@ export class CityLevel {
       }
     }
 
-    if(this.city.showRoads) blocks = blocks.concat(this.getRoadBlocks());
+    if(this.city.showRoads) blocks = blocks.concat(this.getStreetBlocks());
     if(this.city.showBuildings) blocks = blocks.concat(this.getBuildingBlocks());
 
     return blocks;
@@ -160,7 +171,7 @@ export class CityLevel {
 
 
   getGridLength(): number {
-    let radius = this.getLevelRadius();
+    let radius = this.getInnerRadius();
     let gridLength = radius * this.city.sweep * this.gridWidth  / this.levelWidth;
     return Math.floor(gridLength);
   }
@@ -183,7 +194,6 @@ export class CityLevel {
   }
 
   setBuildingFootprintTarget(footprint: number) {
-    console.log('here');
     this.buildingFootprintTarget = footprint;
     this.rescaleLevel();
   }
@@ -238,7 +248,7 @@ export class CityLevel {
   }
 
   getPosFromGridPos(i:number, j:number): vec3 {
-    let radius = this.getLevelRadius() - this.wallWidth/2  - this.levelWidth + (i * this.levelWidth / this.gridWidth);
+    let radius = this.getInnerRadius() + (i + 0.5) * (this.levelWidth / this.gridWidth);
     let angle = this.getRotFromGridPos(i,j);
     let x = this.city.pos[0] + Math.cos(angle[1]) * radius;
     let y = this.getHeightFromGridPos(i, j);
@@ -338,7 +348,7 @@ export class CityLevel {
     if(this.levelNum > 0) {
       wallBase -= this.city.levels[this.levelNum - 1].elevationRise;
     }
-    let levelRadius = this.getLevelRadius();
+    let levelRadius = this.getOuterRadius() - this.wallWidth/2;
     let numSegments = this.getNumWallSegments();
 
     this.wall = new Wall({
@@ -412,7 +422,7 @@ export class CityLevel {
     if(this.levelNum > 0) {
       roadBase -= this.city.levels[this.levelNum - 1].elevationRise;
     }
-    let roadRadius = this.getLevelRadius() - 0.51 * (this.levelWidth);
+    let roadRadius = (this.getOuterRadius() + this.getInnerRadius()) / 2.01;
     let numSegments = this.getNumWallSegments();
 
     this.road = new Road({
@@ -528,7 +538,7 @@ export class CityLevel {
 
 
 
-  getRoadBlocks(): Block[] {
+  getStreetBlocks(): Block[] {
     let blocks: Block[] = [];
     let gridSize = this.levelWidth / this.gridWidth;
     let footprint: vec3 = vec3.fromValues(gridSize, 1, gridSize);
@@ -538,12 +548,12 @@ export class CityLevel {
           let pos = this.gridInfo[i][j].pos;
           blocks.push({
             blockType: BlockType.CUBE,
-            pos: vec3.fromValues(pos[0], pos[1] -0.35, pos[2]),
+            pos: vec3.fromValues(pos[0], pos[1] + 0.35, pos[2]),
             footprint: footprint,
             adjustScale1: 1,
             adjustScale2: 1,
             rotation: this.gridInfo[i][j].rotation,
-            scaleFromCenter: false,
+            scaleFromCenter: true,
             textureType: TextureType.ROAD
           })
         }
@@ -731,8 +741,9 @@ export class CityLevel {
   initBuilding(location:vec2, footprint:vec2) {
     let centerGridPosI = location[0] + footprint[0]/2;
     let centerGridPosJ = location[1] + footprint[1]/2;
-    let height = Math.min(footprint[0], footprint[1]);
-    let foot: vec3 = vec3.fromValues(footprint[0] * 0.5, height, footprint[1] * 0.5);
+    let scale = this.levelWidth / this.gridWidth;
+    let height = Math.min(footprint[0], footprint[1]) * scale;
+    let foot: vec3 = vec3.fromValues(footprint[0] * scale * 0.75, height, footprint[1] * scale *  0.75);
     this.buildings.push(new Building({
       pos: this.getBuildingPosition(centerGridPosI,centerGridPosJ, foot[1]),
       rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
@@ -743,7 +754,7 @@ export class CityLevel {
   }
 
   getBuildingPosition(gridI: number, gridJ: number, buildingHeight: number): vec3 {
-    let pos: vec3 = this.getPosFromGridPos(gridI, gridJ);
+    let pos: vec3 = this.getPosFromGridPos(gridI-0.5, gridJ-0.5);
     pos[1] = pos[1] + buildingHeight / 2;
     return pos;
   }

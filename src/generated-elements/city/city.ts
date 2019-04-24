@@ -16,7 +16,7 @@ export class City {
   showBuildings: boolean = true;
   showRoads: boolean = false;
   showWalls: boolean = true;
-  showSampleBuildings: boolean = true;
+  showSampleBuildings: boolean = false;
   sampleBuildings: Building[] = [];
 
 
