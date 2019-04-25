@@ -14,6 +14,7 @@ import RoadSegments from "./geometry/RoadSegments";
 import {City} from "./generated-elements/city/city";
 import {getDefaultLevelOptions, LevelOptions} from "./generated-elements/city/city-level";
 import Texture from "./texture/texture";
+import SpurGeometry from "./geometry/SpurGeometry";
 
 function initLevels(): LevelOptions[] {
   let levels: LevelOptions[] = [];
@@ -28,7 +29,7 @@ function initLevels(): LevelOptions[] {
 const controls = {
   'Levels': initLevels(),
   'AllLevels': getDefaultLevelOptions(0),
-  'Theme': 1,
+  'Theme': 3,
   'Show Highways': true,
   'Show Streets' : false,
   'Show Population Density': true,
@@ -59,6 +60,12 @@ let terrain: Terrain;
 let square: Square;
 let cube: Cube;
 let plane : TerrainPlane;
+let spur1 : SpurGeometry;
+let spur2 : SpurGeometry;
+let spur3 : SpurGeometry;
+let spur4 : SpurGeometry;
+let spur5 : SpurGeometry;
+let spur6 : SpurGeometry;
 let roadSegments: RoadSegments;
 let wPressed: boolean;
 let aPressed: boolean;
@@ -92,6 +99,13 @@ function loadScene() {
   plane = new TerrainPlane(terrain);
   plane.create();
 
+  spur1 = new SpurGeometry(city, 1); spur1.create();
+  spur2 = new SpurGeometry(city, 2); spur2.create();
+  spur3 = new SpurGeometry(city, 3); spur3.create();
+  spur4 = new SpurGeometry(city, 4); spur4.create();
+  spur5 = new SpurGeometry(city, 5); spur5.create();
+  spur6 = new SpurGeometry(city, 6); spur6.create();
+  console.log('redid');
   //create the road geometry
   // roadSegments = new RoadSegments({
   //   gridSize: terrain.gridSize,
@@ -448,7 +462,12 @@ function main() {
     //figure out the ratio
     terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*1.5});
     renderer.render(camera, terrainShader, [
-      //plane
+      plane,
+      spur1,
+      spur2,
+      spur3,
+      spur4,
+      spur5
     ]);
     if(controls["Show Highways"] || controls["Show Streets"]) {
     //  renderer.render(camera, roadShader, [roadSegments]);

@@ -34,9 +34,6 @@ export class Road extends Shape{
     this.numSegments = options.numSegments ? options.numSegments: 20;
     this.terminal = true;
     this.cityLevel = options.cityLevel;
-    console.log(this.radius);
-    console.log(this.cityLevel.getInnerRadius());
-    console.log(this.cityLevel.getOuterRadius());
   }
 
   getBlocks(): Block[] {
@@ -82,9 +79,6 @@ export class Road extends Shape{
   getRightScale(rotation: number) {
     let el1 = this.getBlockElevation(rotation);
     let el2 = this.getBlockElevation(rotation + this.segmentAngle);
-    if(this.cityLevel.levelNum == 0) {
-      console.log(rotation + '-' + el1 + '-' + el2);
-    }
     if(el1 >= el2) return 1;
 
     let scale = 1 + (el2 - el1);

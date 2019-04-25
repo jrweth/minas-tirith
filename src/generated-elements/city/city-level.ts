@@ -122,6 +122,23 @@ export class CityLevel {
     return height;
   }
 
+  getNextLevelHeight(): number {
+    let nextLevelHeight = this.getLevelHeight();
+    if(this.levelNum < this.city.levels.length -1) {
+      nextLevelHeight = this.city.levels[this.levelNum + 1].getLevelHeight();
+    }
+    else {
+      nextLevelHeight += this.elevationRise;
+    }
+    return nextLevelHeight;
+  }
+
+  getNextLevelElevationRise(): number {
+    if(this.levelNum < this.city.levels.length -1) {
+      return this.city.levels[this.levelNum + 1].elevationRise;
+    }
+    return this.wallHeight;
+  }
   getInnerRadius(): number {
     let radius = 0;
     for(let i = this.levelNum + 1; i < 7; i++) {
