@@ -144,18 +144,6 @@ float calcSpurZOffset(float x, float y) {
 }
 
 
-vec4 calcSpurNormal(float x, float y, float z) {
-  //get the four surrounding points
-  float sampleDistance = 0.1;
-  vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);
-  vec3 y2 = vec3(x + calcSpurXOffset(y, z - sampleDistance), y, z - sampleDistance);
-
-  vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);
-  vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);
-
-  return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
-}
-
 void main()
 {
   fs_Pos = vs_Pos.xyz;
@@ -170,7 +158,6 @@ void main()
     //float adjustment = fbm2to1(vs_Pos.yz, vec2(3.34, 4343.2));
     modelposition.x = vs_Pos.x + calcSpurXOffset(vs_Pos.y, vs_Pos.z);
     modelposition.z = vs_Pos.z - calcSpurZOffset(vs_Pos.x, vs_Pos.y);
-    fs_Nor = calcSpurNormal(vs_Pos.x, vs_Pos.y, vs_Pos.z);
   }
 
   if(vs_Pos.y <= 1.0) {

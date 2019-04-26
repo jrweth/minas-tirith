@@ -106,11 +106,19 @@ vec4 calcSpurNormal(float x, float y, float z) {
     vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);
     vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);
 
-    return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
+    //right side
+    if(fs_Nor.x == 1.0) {
+        return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
+    }
+    //left side
+    else if(fs_Nor.x == -1.0) {
+        return vec4(normalize(cross(y1-y2, z2-z1)), 1.0);
+    }
+    else return vec4(0.0, 1.0, 0.0, 1.0);
 }
 
 vec3 adjustColorForSun(vec3 color, vec4 normal) {
-    fs_LightVector = vec3(-10, -10, -10);
+    fs_LightVector = vec3(-10, 10, 10);
 
     vec3 diffuseColor;
 
@@ -146,7 +154,10 @@ vec3 getMapThemeColor() {
             groundColor = groundColor * (1.0 - fs_Nor.a*2.0);
         }
     }
-
+    else if(type == SPUR) {
+        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);
+        return adjustColorForSun(vec3(1.0, 1.0, 1.0), normal);
+    }
 
     //building possibility
     if(fs_Info.x == 1.0 && u_DisplayOptions.g > 0.0) {
@@ -178,6 +189,10 @@ vec3 getDazzleThemeColor() {
     else if(type == COAST) {
        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.1, 0.1, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);
     }
+    else if(type == SPUR) {
+        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);
+        return adjustColorForSun(vec3(1.0, 1.0, 1.0), normal);
+    }
     if(type == LAND) {
         groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
     }
@@ -194,13 +209,33 @@ vec3 getDazzleThemeBackground() {
     return vec3(0.0, 0.0, 0.0);
 }
 
+
+vec3 getTopPlazaColor(float x, float z) {
+    return vec3(0.0,0.5,0.0);
+}
+
 vec3 getTextureThemeColor() {
     int type = getTerrainType();
+    vec3 groundColor;
+
     if(type == SPUR) {
         vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);
+        //signifies we are on the top
+        if (fs_Nor.a == 1.0) {
+            return getTopPlazaColor(fs_Pos.x, fs_Pos.z);
+        }
         return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
     }
-    return getDazzleThemeColor();
+    if(type == LAND) {
+        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
+    }
+    groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
+    if(u_DisplayOptions.r > 0.0) {
+        groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));
+    }
+
+    return groundColor;
+
 }
 
 vec3 getTextureThemeBackground() {
