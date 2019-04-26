@@ -193,7 +193,6 @@ class SpurGeometry extends Drawable {
 
     if(i > this.gridSectionsPerLevel * 0.4) return false;
 
-    if(i < this.gridSectionsPerLevel * 0.1) return false;
 
 
     return true;

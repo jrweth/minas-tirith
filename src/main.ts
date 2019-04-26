@@ -35,8 +35,9 @@ const controls = {
   'Show Population Density': true,
   'Show Buildings': true,
   'Show Build Sites': false,
-  'Show Walls': false,
-  'Sample Buildings': false,
+  'Show Walls': true,
+  'Sample Buildings': true,
+  'Show Spur': true,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,
@@ -192,7 +193,9 @@ function addDisplayControls(options: {
   let showStreets = displayFolder.add(controls, 'Show Streets').listen();
   let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();
   let showWalls = displayFolder.add(controls, 'Show Walls');
+  let showSpur = displayFolder.add(controls, 'Show Spur');
   let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
+
 
 
   showBuildings.onChange(() => {city.showBuildings = controls["Show Buildings"]; loadScene()});
@@ -322,6 +325,7 @@ function main() {
     seed: 12345,
   });
   city.initBuildings();
+  city.showSampleBuildings = controls["Sample Buildings"];
 
   window.addEventListener('keypress', function (e) {
     // console.log(e.key);
@@ -379,7 +383,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(-25, 20, 16), vec3.fromValues(0, 5, -3));
+  const camera = new Camera(vec3.fromValues(0, 10, 8), vec3.fromValues(0, 5, -3));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -459,16 +463,12 @@ function main() {
     renderer.clear();
     processKeyPresses();
     //figure out the ratio
+
+    let terrainDrawables = [plane, spur1, spur2, spur3, spur4, spur5, spur6];
+    if(controls["Sample Buildings"] || !controls["Show Spur"]) terrainDrawables = [plane];
     terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*1.5});
-    renderer.render(camera, terrainShader, [
-      plane,
-      spur1,
-      spur2,
-      spur3,
-      spur4,
-      spur5,
-      spur6
-    ]);
+    renderer.render(camera, terrainShader, terrainDrawables);
+
     if(controls["Show Highways"] || controls["Show Streets"]) {
     //  renderer.render(camera, roadShader, [roadSegments]);
     }
