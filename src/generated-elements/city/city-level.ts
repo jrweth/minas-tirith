@@ -341,6 +341,14 @@ export class CityLevel {
     return this.elevationRise + this.wallHeight + this.city.levels[this.levelNum - 1].elevationRise;
   }
 
+  getWallBase(): number {
+    let wallBase = this.getLevelHeight();
+    if(this.levelNum > 0) {
+      wallBase -= this.city.levels[this.levelNum - 1].elevationRise;
+    }
+    return wallBase;
+  }
+
   setWallHeight(height: number) {
     this.wallHeight = height;
     //initialize shapes for all levels here and above
@@ -358,18 +366,19 @@ export class CityLevel {
     }
   }
 
+  getWallTopElevation() {
+    return this.getWallBase() + this.getTotalWallHeight();
+  }
+
 
   initWall() {
     //initialize the wall
-    let wallBase = this.getLevelHeight();
-    if(this.levelNum > 0) {
-      wallBase -= this.city.levels[this.levelNum - 1].elevationRise;
-    }
+
     let levelRadius = this.getOuterRadius() - this.wallWidth/2;
     let numSegments = this.getNumWallSegments();
 
     this.wall = new Wall({
-      pos: vec3.fromValues(this.city.pos[0], wallBase, this.city.pos[2]),
+      pos: vec3.fromValues(this.city.pos[0], this.getWallBase(), this.city.pos[2]),
       footprint: vec3.fromValues(levelRadius, this.getTotalWallHeight(), this.wallWidth),
       rotation: vec3.fromValues(0, 0,0),
       sweep: Math.PI,

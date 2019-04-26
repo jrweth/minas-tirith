@@ -11,7 +11,7 @@ class SpurGeometry extends Drawable {
   positions: Float32Array;
   normals: Float32Array;
   gridSectionsPerLevel = 2;
-  numLevels = 5;
+  numLevels = 6;
   level: number;
   city: City;
   gridSize:vec2 = vec2.fromValues(500,500);
@@ -137,6 +137,19 @@ class SpurGeometry extends Drawable {
     let outerRadius = this.city.levels[levelWidth].getOuterRadius();
     let startElevation = this.city.levels[levelHeight].getLevelHeight() + this.city.levels[levelHeight].elevationRise / 2;
     let endElevation = this.city.levels[levelHeight].getNextLevelHeight() + this.city.levels[levelHeight].getNextLevelElevationRise();
+    // let cityLevel = this.city.levels[levelHeight];
+    // let levelElevation = cityLevel.getLevelHeight();
+    // let innerRadius = cityLevel.getInnerRadius();
+    // let outerRadius = cityLevel.getOuterRadius();
+    // let startElevation = levelElevation + cityLevel.elevationRise / 2;
+    // let endElevation = cityLevel.getNextLevelHeight() + cityLevel.getNextLevelElevationRise();
+
+    if(levelHeight == 5) {
+      innerRadius = 0;
+      endElevation = this.city.levels[levelHeight + 1].getWallTopElevation();
+    }
+
+
 
     //get the start, end and increments for the z coordinate
     let startZ = this.city.pos[2] + this.getSpurRadiusZIntersection(innerRadius);
