@@ -123,10 +123,10 @@ vec2 getBuildingFloorSegmentPosition() {
 }
 
 bool posInWindow(vec2 pos) {
-    return (pos.x > 0.33
-        && pos.x < 0.66
+    return (true
         && pos.y > 0.33
-        && pos.y < 0.66
+        && pos.x * 4.0 - 1.5 > smoothstep(0.0, 1.0, pos.y * 2.0 - 1.0)
+        && pos.x * 4.0 - 1.5 < smoothstep(0.0, 1.0, 1.0 -  pos.y * 2.0  + 1.0)
     );
 }
 
