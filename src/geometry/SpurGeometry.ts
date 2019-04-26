@@ -69,47 +69,12 @@ class SpurGeometry extends Drawable {
     let numPoints: number = this.getNumPoints();
 
     this.normals   = new Float32Array(numPoints * 4);
-    //
-    // this.positions[0] = 0;
-    // this.positions[1] = 0;
-    // this.positions[2] = 0;
-    // this.positions[3] = 0;
-    //
-    // this.positions[4] = 50;
-    // this.positions[5] = 0;
-    // this.positions[6] = 0;
-    // this.positions[7] = 0;
-    //
-    // this.positions[8] = 50;
-    // this.positions[9] = 50;
-    // this.positions[10] = 0;
-    // this.positions[11] = 0;
-    //
-    // indicies.push(0,1,2);
-
 
     let indicies: number[] = [];
     let positions: number[] = [];
     for (let widthLevel = this.level; widthLevel >= 1; widthLevel--) {
         this.initGridSection(this.level, widthLevel, indicies, positions)
     }
-
-    //this.initGridSection(1, 1, indicies, positions);
-    // this.initGridSection(2, 1, indicies, positions);
-    // this.initGridSection(2, 2, indicies, positions);
-    // this.initGridSection(3, 1, indicies, positions);
-    // this.initGridSection(3, 2, indicies, positions);
-    // this.initGridSection(3, 3, indicies, positions);
-    // this.initGridSection(4, 1, indicies, positions);
-    // this.initGridSection(4, 2, indicies, positions);
-    // this.initGridSection(4, 3, indicies, positions);
-    // this.initGridSection(4, 4, indicies, positions);
-    // this.initGridSection(5, 1, indicies, positions);
-    // this.initGridSection(5, 2, indicies, positions);
-    // this.initGridSection(5, 3, indicies, positions);
-    //this.initGridSection(5, 4, indicies, positions);
-    //this.initGridSection(5, 5, indicies, positions);
-    //indicies = [0,1,3];
 
 
     this.positions = new Float32Array(positions);
@@ -133,16 +98,11 @@ class SpurGeometry extends Drawable {
   }
 
   initGridSection(levelHeight: number, levelWidth: number, indicies: number[], positions: number[]) {
+    let heightLevel = this.city.levels[levelHeight];
     let innerRadius = this.city.levels[levelWidth].getInnerRadius();
     let outerRadius = this.city.levels[levelWidth].getOuterRadius();
-    let startElevation = this.city.levels[levelHeight].getLevelHeight() + this.city.levels[levelHeight].elevationRise / 2;
-    let endElevation = this.city.levels[levelHeight].getNextLevelHeight() + this.city.levels[levelHeight].getNextLevelElevationRise();
-    // let cityLevel = this.city.levels[levelHeight];
-    // let levelElevation = cityLevel.getLevelHeight();
-    // let innerRadius = cityLevel.getInnerRadius();
-    // let outerRadius = cityLevel.getOuterRadius();
-    // let startElevation = levelElevation + cityLevel.elevationRise / 2;
-    // let endElevation = cityLevel.getNextLevelHeight() + cityLevel.getNextLevelElevationRise();
+    let startElevation = heightLevel.getLevelHeight() + heightLevel.elevationRise / 2;
+    let endElevation = heightLevel.getNextLevelHeight() + heightLevel.getNextLevelElevationRise();
 
     if(levelHeight == 5) {
       innerRadius = 0;
@@ -161,6 +121,7 @@ class SpurGeometry extends Drawable {
     let endY   = endElevation;
     let incY   = (endY - startY) / (this.gridSectionsPerLevel);
 
+    //get the x offset
     let lev7radius = this.city.levels[this.city.levels.length - 1].getOuterRadius();
     let lev2radius = this.city.levels[1].getOuterRadius();
     let spurDeltaZ = lev2radius;
@@ -169,12 +130,6 @@ class SpurGeometry extends Drawable {
     let endOffsetX   = spurDeltaX * (spurDeltaZ - outerRadius) / spurDeltaZ;
     let incOffsetX   =  (startOffsetX - endOffsetX) / (this.gridSectionsPerLevel);
 
-    // console.log('start: ' + startOffsetX);
-    // console.log('end ' + endOffsetX);
-    // console.log('inc ' + incOffsetX);
-    // console.log('spurDeltaZ: ' + spurDeltaZ);
-    // console.log('innder radius: ' + innerRadius);
-    // console.log('outer radius: ' + outerRadius);
 
 
     for (let i = 0; i <= this.gridSectionsPerLevel; ++i) {
@@ -201,6 +156,13 @@ class SpurGeometry extends Drawable {
 
           indicies.push(posIndex + 1, posIndex + 3, posIndex + this.gridSectionsPerLevel*2 + 3);
           indicies.push(posIndex + 3, posIndex + this.gridSectionsPerLevel * 2 + 3, posIndex + this.gridSectionsPerLevel * 2 + 5);
+        }
+
+
+        //if this is the top then make roof of triangles
+        if(this.level == 5 && i < this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
+          indicies.push(posIndex, posIndex + 1, posIndex + this.gridSectionsPerLevel*2 + 2);
+          indicies.push(posIndex + 1, posIndex + this.gridSectionsPerLevel*2 + 2, posIndex + this.gridSectionsPerLevel * 2 + 3);
         }
       }
     }
