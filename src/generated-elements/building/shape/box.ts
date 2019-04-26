@@ -10,10 +10,13 @@ import {StandardBlock} from "./standardBlock";
 
 export class Box extends Shape{
 
-  constructor(options: {pos: vec3, footprint: vec3, rotation: vec3}) {
+  textureType: TextureType;
+
+  constructor(options: {pos: vec3, footprint: vec3, rotation: vec3, textureType?: TextureType}) {
     super(options);
     this.symbol = 'B';
     this.terminal = false;
+    this.textureType = (typeof options.textureType == 'undefined') ? TextureType.BUILDING : options.textureType;
   }
 
   getBlocks() {
@@ -25,7 +28,7 @@ export class Box extends Shape{
       adjustScale2: 1,
       rotation: this.rotation,
       scaleFromCenter: true,
-      textureType: TextureType.BUILDING
+      textureType: this.textureType
     }];
   }
 

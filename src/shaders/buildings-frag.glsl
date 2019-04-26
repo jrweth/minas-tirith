@@ -28,6 +28,8 @@ float TEXTURE_ROAD     = 1.0;
 float TEXTURE_ROOF     = 2.0;
 float TEXTURE_BUILDING = 3.0;
 float TEXTURE_LEVEL_GROUND = 4.0;
+float TEXTURE_TURRET = 5.0;
+float TEXTURE_FOUNDATION = 6.0;
 
 vec3 sunPosition = vec3(12000.0, 10000.0, 8000.0);
 
@@ -98,7 +100,7 @@ vec3 getRoofColor() {
 /**
 * Divid the geometry into segments based on scale and send back where this point falls in its segment
 **/
-vec2 getBuildingFloorSegmentPosition() {
+vec2 getBuildingFloorWallPosition() {
     vec2 floorSegmentPos = vec2(0.0, 0.0);
 
     //handle the case for top and bottom faces
@@ -110,8 +112,7 @@ vec2 getBuildingFloorSegmentPosition() {
 
 
     //handle front and back faces
-    if(fs_Face == FACE_FRONT || fs_Face == FACE_BACK) {
-        float numSegments = ceil(fs_Scale.x);
+    if(fs_Face == FACE_FRONT || fs_Face == FACE_BACK) { float numSegments = ceil(fs_Scale.x);
         floorSegmentPos.x = fs_Pos.x * numSegments - floor(fs_Pos.x * numSegments);
         return floorSegmentPos;
     }
@@ -131,16 +132,37 @@ bool posInWindow(vec2 pos) {
 }
 
 vec3 getBuildingCubeColor() {
-    vec2 wallPos = getBuildingFloorSegmentPosition();
+    vec2 wallPos = getBuildingFloorWallPosition();
     if(posInWindow(wallPos)) {
         return vec3(0.0);
     }
-
     return vec3(0.5, 0.5, 0.5);
 }
 
+vec3 getLedgeNormal() {
+    vec2 wallPos = getBuildingFloorWallPosition();
+    if(wallPos.y > 0.95) {
+        return mix(fs_Nor.xyz, vec3(0.0, 1.0, 0.0), (wallPos.y - 0.95) * 20.0);
+    }
+    else if(wallPos.y > 0.90) {
+        return mix(vec3(0.0, -1.0, 0.0), fs_Nor.xyz, (1.0 - wallPos.y) * 20.0);
+    }
+    return fs_Nor.xyz;
+}
+
+
+vec3 getTexturedNormal() {
+    if (
+        fs_BlockInfo[1] == TEXTURE_BUILDING
+        || fs_BlockInfo[1] == TEXTURE_TURRET
+    ) {
+        return  getLedgeNormal();
+    }
+    return fs_Nor.xyz;
+}
+
 vec3 getBuildingColor() {
-    if(fs_BlockInfo[0] == CUBE) return getBuildingCubeColor();
+    if(fs_BlockInfo[0] == CUBE || fs_BlockInfo[0] == WEDGE) return getBuildingCubeColor();
     return vec3(0.5, 0.5, 0.5);
 }
 
@@ -176,7 +198,9 @@ vec3 getTexturedThemeColor() {
     if(fs_BlockInfo[1] == TEXTURE_ROOF) {
         color = getRoofColor();
     }
-    if(fs_BlockInfo[1] == TEXTURE_BUILDING) {
+    if(fs_BlockInfo[1] == TEXTURE_BUILDING
+       || fs_BlockInfo[1] == TEXTURE_TURRET
+       || fs_BlockInfo[1] == TEXTURE_FOUNDATION) {
         color = getBuildingColor();
     }
     return color;
@@ -191,7 +215,6 @@ vec3 getMapThemeBackground() {
 vec3 getTexturedThemeBackground() {
     return vec3(0.0, 0.0, 0.0);
 }
-
 
 
 void adjustColorForLights(inout vec3 color, vec3 normal, vec3 point) {
@@ -275,7 +298,7 @@ void main()
     else if(u_DisplayOptions[2] == TEXTURED_THEME) {
         buildingColor = getTexturedThemeColor();
         backgroundColor = getTexturedThemeBackground();
-        adjustColorForLights(buildingColor, fs_Nor.xyz, fs_Pos.xyz);
+        adjustColorForLights(buildingColor, getTexturedNormal(), fs_Pos.xyz);
     }
 
 

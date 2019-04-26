@@ -1,4 +1,4 @@
-import {NumOptions, Shape} from './shape'
+import {Shape} from './shape'
 import {BlockType} from './block';
 import {vec3} from "gl-matrix";
 import Random from "../../../noise/random";
@@ -38,10 +38,11 @@ export class Foundation extends Shape{
     pos[1] = this.pos[1] - this.footprint[1]/2 - 0.5;
     footprint[1] = 1;
 
-    let foundation = new Foundation({
+    let foundation = new Box({
       pos: pos,
       footprint: footprint,
-      rotation: rot
+      rotation: rot,
+      textureType: TextureType.FOUNDATION
     });
 
     foundation.terminal = true;

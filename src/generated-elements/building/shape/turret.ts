@@ -30,11 +30,12 @@ export class Turret extends Shape{
     this.footprint[2] = this.width;
     this.radius =  0;
     this.sweep = options.sweep ? options.sweep :  Math.PI;
-    this.numSegments = options.numSegments ? options.numSegments: 20;
+    this.numSegments = options.numSegments ? options.numSegments: 8;
     this.corners = options.corners ? options.corners: false;
   }
 
   getBlocks(): Block[] {
+    console.log(this.numSegments);
     let segmentAngle = this.sweep / (this.numSegments - 1);
     let blockZ = 2 * (this.radius + this.width/2) * Math.tan(segmentAngle / 2);
     let blockZ2 = 2 * (this.radius - this.width/2) * Math.tan(segmentAngle / 2);
@@ -60,7 +61,7 @@ export class Turret extends Shape{
         adjustScale4: 1, //this.width * Math.sin(segmentAngle), / /1 + (this.width + this.radius) / this.radius,
         rotation: vec3.fromValues(0 , angle, 0),
         scaleFromCenter: true,
-        textureType: TextureType.BUILDING
+        textureType: TextureType.TURRET
       });
     }
     return blocks;
