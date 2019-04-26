@@ -114,7 +114,8 @@ export class Box extends Shape{
       rotation: rot,
       blockType: BlockType.TENT,
       adjustScale1: 0.5,
-      adjustScale2: 1
+      adjustScale2: 1,
+      textureType: TextureType.BUILDING
     });
 
 

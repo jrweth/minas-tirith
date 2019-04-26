@@ -11,6 +11,7 @@ in vec4 fs_Nor;
 in vec4 fs_Col;
 in vec4 fs_Translate;
 in vec4 fs_BlockInfo;
+in vec4 fs_Scale;
 flat in int fs_Face;
 
 //in float fs_Sine;
@@ -30,6 +31,20 @@ float TEXTURE_LEVEL_GROUND = 4.0;
 
 vec3 sunPosition = vec3(12000.0, 10000.0, 8000.0);
 
+const float CUBE = 1.0;
+const float PYRAMID = 2.0;
+const float TENT = 3.0;
+const float TRI_TUBE = 4.0;
+const float QUARTER_PYRAMID = 5.0;
+const float SLANT = 6.0;
+const float WEDGE = 7.0;
+
+const int FACE_BACK = 0;
+const int FACE_FRONT = 1;
+const int FACE_LEFT = 2;
+const int FACE_RIGHT = 3;
+const int FACE_BOTTOM = 4;
+const int FACE_TOP = 5;
 
 vec3 getMapThemeColor() {
     vec3 buildingColor = vec3(0.0, 0.0, 0.0);
@@ -76,6 +91,59 @@ vec3 getDazzleThemeColor() {
     return color;
 }
 
+vec3 getRoofColor() {
+    return vec3(0.0, 0.0, 0.5);
+}
+
+/**
+* Divid the geometry into segments based on scale and send back where this point falls in its segment
+**/
+vec2 getBuildingFloorSegmentPosition() {
+    vec2 floorSegmentPos = vec2(0.0, 0.0);
+
+    //handle the case for top and bottom faces
+    if(fs_Face == FACE_BOTTOM || fs_Face == FACE_TOP) {
+        return vec2(0.0, 0.0);
+    }
+    float numFloors = ceil(fs_Scale.y);
+    floorSegmentPos.y = fs_Pos.y * numFloors - floor(fs_Pos.y * numFloors);
+
+
+    //handle front and back faces
+    if(fs_Face == FACE_FRONT || fs_Face == FACE_BACK) {
+        float numSegments = ceil(fs_Scale.x);
+        floorSegmentPos.x = fs_Pos.x * numSegments - floor(fs_Pos.x * numSegments);
+        return floorSegmentPos;
+    }
+
+    //handle front and back faces
+    float numSegments = ceil(fs_Scale.z);
+    floorSegmentPos.x = fs_Pos.z * numSegments - floor(fs_Pos.z * numSegments);
+    return floorSegmentPos;
+}
+
+bool posInWindow(vec2 pos) {
+    return (pos.x > 0.33
+        && pos.x < 0.66
+        && pos.y > 0.33
+        && pos.y < 0.66
+    );
+}
+
+vec3 getBuildingCubeColor() {
+    vec2 wallPos = getBuildingFloorSegmentPosition();
+    if(posInWindow(wallPos)) {
+        return vec3(0.0);
+    }
+
+    return vec3(0.5, 0.5, 0.5);
+}
+
+vec3 getBuildingColor() {
+    if(fs_BlockInfo[0] == CUBE) return getBuildingCubeColor();
+    return vec3(0.5, 0.5, 0.5);
+}
+
 vec3 getTexturedThemeColor() {
     vec3 color = vec3(1.0, 1.0, 1.0);
 
@@ -105,7 +173,12 @@ vec3 getTexturedThemeColor() {
         color = texture(u_WhiteStoneSampler, uv).xyz;
         //buildingColor = vec3(0.9, 0.9, 0.9);
     }
-
+    if(fs_BlockInfo[1] == TEXTURE_ROOF) {
+        color = getRoofColor();
+    }
+    if(fs_BlockInfo[1] == TEXTURE_BUILDING) {
+        color = getBuildingColor();
+    }
     return color;
 }
 

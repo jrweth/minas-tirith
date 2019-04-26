@@ -22,6 +22,7 @@ out vec4 fs_Nor;
 out vec4 fs_Col;   //scale
 out vec4 fs_Translate;
 out vec4 fs_BlockInfo;
+out vec4 fs_Scale;
 
 const float CUBE = 1.0;
 const float PYRAMID = 2.0;
@@ -30,6 +31,13 @@ const float TRI_TUBE = 4.0;
 const float QUARTER_PYRAMID = 5.0;
 const float SLANT = 6.0;
 const float WEDGE = 7.0;
+
+const int FACE_BACK = 0;
+const int FACE_FRONT = 1;
+const int FACE_LEFT = 2;
+const int FACE_RIGHT = 3;
+const int FACE_BOTTOM = 4;
+const int FACE_TOP = 5;
 
 float adjust1; //contained in vs_BlockInfo[3]
 float adjust2;  //contained in vs_BlockInfo[2]
@@ -71,12 +79,12 @@ float getVertexNum() {
 * 5 - Top
 */
 int getFaceNum() {
-    if     (vs_Nor.z == -1.0) { return 0; }
-    else if(vs_Nor.z ==  1.0) { return 1; }
-    else if(vs_Nor.x == -1.0) { return 2; }
-    else if(vs_Nor.x ==  1.0) { return 3; }
-    else if(vs_Nor.y == -1.0) { return 4; }
-    else if(vs_Nor.y ==  1.0) { return 5; }
+    if     (vs_Nor.z == -1.0) { return FACE_BACK; }
+    else if(vs_Nor.z ==  1.0) { return FACE_FRONT; }
+    else if(vs_Nor.x == -1.0) { return FACE_LEFT; }
+    else if(vs_Nor.x ==  1.0) { return FACE_RIGHT; }
+    else if(vs_Nor.y == -1.0) { return FACE_BOTTOM; }
+    else if(vs_Nor.y ==  1.0) { return FACE_TOP; }
     return 0;
 }
 
@@ -278,6 +286,7 @@ void main()
     fs_Translate = vs_Translate;
     fs_BlockInfo = vs_BlockInfo;
     fs_Face = getFaceNum();
+    fs_Scale = vs_Scale;
     adjust1 = vs_Adjustment[0];
     adjust2 = vs_Adjustment[1];
     adjust3 = vs_Adjustment[2];

@@ -1,6 +1,7 @@
 import {Shape} from './shape'
 import {BlockType} from './block';
 import {vec3} from "gl-matrix";
+import {TextureType} from "../../../texture/texture-type";
 
 export class StandardBlock extends Shape{
   blockType: BlockType;
@@ -8,6 +9,7 @@ export class StandardBlock extends Shape{
   adjustScale2: number;
   adjustScale3: number;
   adjustScale4: number;
+  textureType: TextureType;
 
 
   constructor(options: {
@@ -19,6 +21,7 @@ export class StandardBlock extends Shape{
     adjustScale2?: number,
     adjustScale3?: number,
     adjustScale4?: number
+    textureType?: TextureType
   }) {
     super(options);
     this.blockType = options.blockType;
@@ -28,6 +31,7 @@ export class StandardBlock extends Shape{
     this.adjustScale2 = (typeof options.adjustScale2 == 'undefined') ? 1 : options.adjustScale2;
     this.adjustScale3 = (typeof options.adjustScale3 == 'undefined') ? 1 : options.adjustScale3;
     this.adjustScale4 = (typeof options.adjustScale4 == 'undefined') ? 1 : options.adjustScale4;
+    this.textureType = (typeof options.textureType == 'undefined') ? TextureType.BUILDING : options.textureType;
 
   }
 
@@ -40,7 +44,8 @@ export class StandardBlock extends Shape{
         adjustScale1: this.adjustScale1,
         adjustScale2: this.adjustScale2,
         rotation: this.rotation,
-        scaleFromCenter: true
+        scaleFromCenter: true,
+        textureType: this.textureType
       },
     ];
   }
