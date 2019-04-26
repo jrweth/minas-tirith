@@ -10,11 +10,12 @@ class SpurGeometry extends Drawable {
   indices: Uint32Array;
   positions: Float32Array;
   normals: Float32Array;
-  gridSectionsPerLevel = 2;
+  gridSectionsPerLevel = 10;
   numLevels = 6;
   level: number;
   city: City;
   gridSize:vec2 = vec2.fromValues(500,500);
+  info: Float32Array;
 
   constructor(city: City, level: number) {
     super(); // Call the constructor of the super class. This is required.
@@ -30,7 +31,7 @@ class SpurGeometry extends Drawable {
     this.generateIdx();
     this.generatePos();
     this.generateNor();
-    //this.generateInfo();
+    this.generateInfo();
     //this.generateCol();
 
     this.count = this.indices.length;
@@ -43,8 +44,8 @@ class SpurGeometry extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufPos);
     gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
 
-    // gl.bindBuffer(gl.ARRAY_BUFFER, this.bufInfo);
-    // gl.bufferData(gl.ARRAY_BUFFER, this.info, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.bufInfo);
+    gl.bufferData(gl.ARRAY_BUFFER, this.info, gl.STATIC_DRAW);
 
 
     // gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
@@ -72,12 +73,16 @@ class SpurGeometry extends Drawable {
 
     let indicies: number[] = [];
     let positions: number[] = [];
+    let info: number[] = [];
+    let normals: number[] = [];
     for (let widthLevel = this.level; widthLevel >= 1; widthLevel--) {
-        this.initGridSection(this.level, widthLevel, indicies, positions)
+        this.initGridSection(this.level, widthLevel, indicies, positions, info, normals);
     }
 
 
     this.positions = new Float32Array(positions);
+    this.info      = new Float32Array(info);
+    this.normals   = new Float32Array(normals);
     this.indices   = new Uint32Array(indicies); // NxN squares, each square is two triangles, each triangle is three indices
 
   }
@@ -97,16 +102,16 @@ class SpurGeometry extends Drawable {
     return z;
   }
 
-  initGridSection(levelHeight: number, levelWidth: number, indicies: number[], positions: number[]) {
+  initGridSection(levelHeight: number, levelWidth: number, indicies: number[], positions: number[], info: number[], normals: number[]) {
     let heightLevel = this.city.levels[levelHeight];
     let innerRadius = this.city.levels[levelWidth].getInnerRadius();
     let outerRadius = this.city.levels[levelWidth].getOuterRadius();
-    let startElevation = heightLevel.getLevelHeight() + heightLevel.elevationRise / 2;
-    let endElevation = heightLevel.getNextLevelHeight() + heightLevel.getNextLevelElevationRise();
+    let startElevation = heightLevel.getLevelHeight();
+    let endElevation = heightLevel.getNextLevelHeight();
 
-    if(levelHeight == 5) {
-      innerRadius = 0;
-      endElevation = this.city.levels[levelHeight + 1].getWallTopElevation();
+    if(levelHeight == 6) {
+      if(levelWidth == 5) innerRadius = 0;
+      endElevation = heightLevel.getWallTopElevation()+ 0.1;
     }
 
 
@@ -148,7 +153,7 @@ class SpurGeometry extends Drawable {
         positions.push(0);
 
         //make the triangles
-        if (i < this.gridSectionsPerLevel && j < this.gridSectionsPerLevel) {
+        if (i < this.gridSectionsPerLevel && j < this.gridSectionsPerLevel && !this.checkForTunnel(i, j, levelHeight,levelWidth)) {
           //triangles for first
           indicies.push(posIndex, posIndex + 2, posIndex + this.gridSectionsPerLevel*2 + 2);
           indicies.push(posIndex + 2, posIndex + this.gridSectionsPerLevel * 2 + 2, posIndex + this.gridSectionsPerLevel * 2 + 4);
@@ -160,13 +165,35 @@ class SpurGeometry extends Drawable {
 
 
         //if this is the top then make roof of triangles
-        if(this.level == 5 && i < this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
+        if(this.level == 6 && i < this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
           indicies.push(posIndex, posIndex + 1, posIndex + this.gridSectionsPerLevel*2 + 2);
           indicies.push(posIndex + 1, posIndex + this.gridSectionsPerLevel*2 + 2, posIndex + this.gridSectionsPerLevel * 2 + 3);
         }
+
+        //add normals
+        normals.push(1,0, 0 ,0);
+        normals.push(-1,0, 0 ,0);
+
+        //add info
+        info.push(0,0,0,0);
+        info.push(1,1,1,1);
+
       }
     }
   }
+
+  checkForTunnel(i: number, j: number, levelHeight: number, levelWidth: number): boolean {
+    if(levelHeight != levelWidth) return false;
+
+    if(i > this.gridSectionsPerLevel * 0.4) return false;
+
+    if(i < this.gridSectionsPerLevel * 0.1) return false;
+
+
+    return true;
+  }
+
+
 };
 
 export default SpurGeometry;

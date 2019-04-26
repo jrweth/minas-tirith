@@ -23,7 +23,10 @@ const float COAST_LINE = 0.43;
 const int WATER = 0;
 const int LAND = 1;
 const int COAST = 2;
+const int MOUNTAIN = 3;
+const int SPUR = 4;
 
+vec3 fs_LightVector;
 
 float random1( vec2 p , vec2 seed) {
     return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
@@ -76,6 +79,9 @@ float fbm2to1(vec2 p, vec2 seed) {
 
 int getTerrainType() {
     //check for water
+    if(fs_Pos.y > 1.0) {
+        return SPUR;
+    }
     if(fs_Pos.y <= WATER_LINE) {
         return WATER;
     }
@@ -84,6 +90,36 @@ int getTerrainType() {
         return COAST;
     }
     return LAND;
+}
+
+float calcSpurXOffset(float y, float z) {
+    return fbm2to1(vec2(y,z), vec2(3.34, 4343.2)) - 0.5;
+}
+
+
+vec4 calcSpurNormal(float x, float y, float z) {
+    //get the four surrounding points
+    float sampleDistance = 0.001;
+    vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);
+    vec3 y2 = vec3(x + calcSpurXOffset(y, z - sampleDistance), y, z - sampleDistance);
+
+    vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);
+    vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);
+
+    return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
+}
+
+vec3 adjustColorForSun(vec3 color, vec4 normal) {
+    fs_LightVector = vec3(-10, -10, -10);
+
+    vec3 diffuseColor;
+
+    // Calculate the diffuse term for Lambert shading
+    float sunDiffuseTerm = dot(normalize(normal.xyz), normalize(fs_LightVector.xyz));
+    float ambientTerm = 0.1;
+    float sunIntensity = clamp(0.1, 1.0, sunDiffuseTerm + ambientTerm);//Add a small float value to the color multiplier
+    diffuseColor = vec3(color.rgb * sunIntensity);
+    return diffuseColor;
 }
 
 vec3 getMapThemeBackground() {
@@ -157,6 +193,21 @@ vec3 getDazzleThemeColor() {
 vec3 getDazzleThemeBackground() {
     return vec3(0.0, 0.0, 0.0);
 }
+
+vec3 getTextureThemeColor() {
+    int type = getTerrainType();
+    if(type == SPUR) {
+        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);
+        return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
+    }
+    return getDazzleThemeColor();
+}
+
+vec3 getTextureThemeBackground() {
+    return getDazzleThemeBackground();
+}
+
+
 void main()
 {
     vec3 groundColor = vec3(.0, 1, 0);
@@ -170,8 +221,8 @@ void main()
         backgroundColor = getDazzleThemeBackground();
     }
     else if(u_DisplayOptions[2] == TEXTURE_THEME) {
-        groundColor = getDazzleThemeColor();
-        backgroundColor = getDazzleThemeBackground();
+        groundColor = getTextureThemeColor();
+        backgroundColor = getTextureThemeBackground();
     }
 
     float t = clamp(smoothstep(40.0, 50.0, length(fs_Pos)), 0.0, 1.0); // Distance fog

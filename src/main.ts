@@ -104,6 +104,7 @@ function loadScene() {
   spur3 = new SpurGeometry(city, 3); spur3.create();
   spur4 = new SpurGeometry(city, 4); spur4.create();
   spur5 = new SpurGeometry(city, 5); spur5.create();
+  spur6 = new SpurGeometry(city, 6); spur6.create();
   //create the road geometry
   // roadSegments = new RoadSegments({
   //   gridSize: terrain.gridSize,
@@ -465,7 +466,8 @@ function main() {
       spur2,
       spur3,
       spur4,
-      spur5
+      spur5,
+      spur6
     ]);
     if(controls["Show Highways"] || controls["Show Streets"]) {
     //  renderer.render(camera, roadShader, [roadSegments]);

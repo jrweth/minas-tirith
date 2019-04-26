@@ -52,7 +52,7 @@ export function getDefaultLevelOptions(levelNum: number): LevelOptions {
   return {
     wallHeight : 1,
     elevationRise: 9,
-    levelWidth : 5,
+    levelWidth : (levelNum == 6) ? 16 : 5,
     wallWidth : 3,
     gridWidth: 6,
     seed: 1.34 * levelNum,

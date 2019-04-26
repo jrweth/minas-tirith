@@ -10,7 +10,9 @@ import Random from "../noise/random";
 export enum TerrainType {
   WATER = 0,
   LAND = 1,
-  COAST = 2
+  COAST = 2,
+  MOUNTAIN = 3,
+  SPUR = 4
 }
 
 export class GridPart {
