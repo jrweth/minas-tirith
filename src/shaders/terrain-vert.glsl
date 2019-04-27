@@ -173,7 +173,6 @@ void main()
 
   if(vs_Pos2.y <= 1.0) {
     modelposition.y = calcMountainHeight(modelposition.x, modelposition.y, modelposition.z);
-
   }
 
   modelposition = u_Model * modelposition;

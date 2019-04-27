@@ -3,6 +3,7 @@ precision highp float;
 
 uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane
 uniform vec4 u_DisplayOptions;
+uniform vec4 u_CityInfo; //[0] = city radius [1] = cityHeight
 
 in vec3 fs_Pos;
 in vec4 fs_Nor;
@@ -246,14 +247,21 @@ vec3 getTextureThemeColor() {
         }
         return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
     }
-    if(type == LAND) {
+    //the band along the transition from land to mountain
+    if(
+      (abs(abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) < 5.0
+      || (abs(fs_Pos.x) - 1.0 < u_CityInfo[0] && fs_Pos.z < 0.5)
+      )
+      && fs_Pos.z > -10.0
+    ) {
+        //float percent =
+
+    }
+    else if(type == LAND) {
         groundColor = mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), fs_Pos.y);
     }
-    if(type == MOUNTAIN) {
+    else if(type == MOUNTAIN) {
         groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.0, 0.0, .0), fs_Pos.y);
-    }
-    if(u_DisplayOptions.r > 0.0) {
-        groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));
     }
 
     return groundColor;
@@ -269,15 +277,6 @@ void main()
 {
     vec3 groundColor = vec3(.0, 0.5, 0);
     vec3 backgroundColor = vec3(1.0, 1.0, 1.0);
-    if(getTerrainType() == SPUR) {
-        groundColor = vec3(1.0, 0.0, 0.0);
-    }
-    else if(getTerrainType() == LAND) {
-        groundColor = vec3(0.0, 1.0, 0.0);
-    }
-    else if(getTerrainType() == MOUNTAIN) {
-        groundColor = vec3(0.0, 0.0, 1.0);
-    }
 
 
     if(u_DisplayOptions[2] == MAP_THEME) {
