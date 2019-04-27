@@ -269,6 +269,8 @@ vec3 getTextureThemeColor() {
     }
 
     vec3 color = mix(landColor, mountainColor,  percentMountain);
+    //hack for back of caslte
+    if(abs(fs_Pos.x) + 0.5 < u_CityInfo[0] && fs_Pos.z <= -9.0) color = mountainColor;
     return adjustColorForSun(color, fs_LandNormal).xyz;
 
 }

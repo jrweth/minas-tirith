@@ -326,7 +326,7 @@ function addLevelControls() {
 function main() {
   initTerrain();
   city = new City({
-    pos: vec3.fromValues(250, 0, 200),
+    pos: vec3.fromValues(250, 0.1, 200),
     seed: 12345,
     palaceSeed: controls["Palace Seed"],
     towerSeed: controls["Tower Seed"]
