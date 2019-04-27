@@ -36,8 +36,10 @@ const controls = {
   'Show Buildings': true,
   'Show Build Sites': false,
   'Show Walls': true,
-  'Sample Buildings': true,
+  'Sample Buildings': false,
   'Show Spur': true,
+  'Palace Seed': 0.6,
+  'Tower Seed': 0.2,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,
@@ -123,7 +125,6 @@ function loadScene() {
     scale: plane.scale
   });
   cube.create();
-  console.log(city);
   cube.setInstanceVBOs(city);
 
   square = new Square(vec3.fromValues(0, 0, 0));
@@ -195,6 +196,8 @@ function addDisplayControls(options: {
   let showWalls = displayFolder.add(controls, 'Show Walls');
   let showSpur = displayFolder.add(controls, 'Show Spur');
   let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
+  let palaceSeed = displayFolder.add(controls, 'Palace Seed').min(0).max(1.0).step(0.05).listen();
+  let towerSeed = displayFolder.add(controls, 'Tower Seed').min(0).max(1.0).step(0.05).listen();
 
 
 
@@ -202,6 +205,8 @@ function addDisplayControls(options: {
   showStreets.onChange(() => {city.showRoads = controls["Show Streets"]; loadScene()});
   showWalls.onChange(() => {city.showWalls = controls["Show Walls"]; loadScene()});
   sampleBuildings.onChange(() => {city.showSampleBuildings = controls["Sample Buildings"]; loadScene()});
+  towerSeed.onChange(() => {city.towerSeed = controls["Tower Seed"]; city.initPalace(); loadScene()});
+  palaceSeed.onChange(() => {city.palaceSeed = controls["Palace Seed"]; city.initPalace(); loadScene()});
   theme.onChange(() => {
     options.terrainShader.setDisplayOptions(getDisplayOptions());
     options.roadShader.setDisplayOptions(getDisplayOptions());
@@ -323,6 +328,8 @@ function main() {
   city = new City({
     pos: vec3.fromValues(250, 0, 200),
     seed: 12345,
+    palaceSeed: controls["Palace Seed"],
+    towerSeed: controls["Tower Seed"]
   });
   city.initBuildings();
   city.showSampleBuildings = controls["Sample Buildings"];
@@ -383,7 +390,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(0, 10, 8), vec3.fromValues(0, 5, -3));
+  const camera = new Camera(vec3.fromValues(-1.5, 16.5, 1), vec3.fromValues(-1, 16, -1));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -391,7 +398,7 @@ function main() {
 
   const terrainShader = new ShaderProgram([
     new Shader(gl.VERTEX_SHADER, require('./shaders/terrain-vert.glsl')),
-    new Shader(gl.FRAGMENT_SHADER, require('./shaders/terrain-frag.glsl')),
+    new Shader(gl.FRAGMENT_SHADER, require('./shaders/terrain\-frag.glsl')),
   ]);
 
   const roadShader = new ShaderProgram([
@@ -413,8 +420,6 @@ function main() {
 
   buildingShader.bindTexToUnit(buildingShader.unifWhiteStoneSampler, whiteStoneTexture,0);
   buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture,1);
-  console.log(buildingShader.unifWhiteStoneSampler);
-  console.log(buildingShader.unifPavementSampler);
   // Initial call to load scene
   loadScene();
   //add all the controls

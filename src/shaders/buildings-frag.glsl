@@ -124,6 +124,9 @@ vec2 getBuildingFloorWallPosition() {
 }
 
 bool posInWindow(vec2 pos) {
+    //make sure this piece isn't too skinny
+    if(fs_Scale.y < 0.5 && fs_Scale.z > 1.5) return false;
+    if(fs_Scale.y < 0.5 && fs_Scale.x > 1.5) return false;
     return (true
         && pos.y > 0.33
         && pos.x * 4.0 - 1.5 > smoothstep(0.0, 1.0, pos.y * 2.0 - 1.0)
@@ -133,7 +136,7 @@ bool posInWindow(vec2 pos) {
 
 vec3 getBuildingCubeColor() {
     vec2 wallPos = getBuildingFloorWallPosition();
-    if(posInWindow(wallPos)) {
+    if(posInWindow(wallPos) ) {
         return vec3(0.0);
     }
     return vec3(0.5, 0.5, 0.5);

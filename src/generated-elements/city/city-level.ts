@@ -594,29 +594,57 @@ export class CityLevel {
 
   initBuildings() {
     this.buildings = [];
-    for(let k = 0; k < this.outSpokes.length; k++) {
-      let startI = this.boulevardStartIndex + this.boulevardWidth;
-      let startJ = this.outSpokes[k] + 1;
-      let endI = this.gridWidth - 1;
-      let endJ = this.gridLength - 1;
-      if(k < this.outSpokes.length -1) {
-        endJ = this.outSpokes[k+1] - 1;
+    if(this.levelNum == 6) {
+      this.initPalace();
+    }
+    else {
+      for(let k = 0; k < this.outSpokes.length; k++) {
+        let startI = this.boulevardStartIndex + this.boulevardWidth;
+        let startJ = this.outSpokes[k] + 1;
+        let endI = this.gridWidth - 1;
+        let endJ = this.gridLength - 1;
+        if(k < this.outSpokes.length -1) {
+          endJ = this.outSpokes[k+1] - 1;
+        }
+
+        this.initBlockBuildings(startI, startJ, endI, endJ);
       }
 
-      this.initBlockBuildings(startI, startJ, endI, endJ);
-    }
+      for(let k = 0; k < this.inSpokes.length; k++) {
+        let startI = 0;
+        let startJ = this.inSpokes[k] + 1;
+        let endI = this.boulevardStartIndex - 1;
+        let endJ = this.gridLength - 1;
+        if(k < this.inSpokes.length -1) {
+          endJ = this.inSpokes[k+1] - 1;
+        }
 
-    for(let k = 0; k < this.inSpokes.length; k++) {
-      let startI = 0;
-      let startJ = this.inSpokes[k] + 1;
-      let endI = this.boulevardStartIndex - 1;
-      let endJ = this.gridLength - 1;
-      if(k < this.inSpokes.length -1) {
-        endJ = this.inSpokes[k+1] - 1;
+        this.initBlockBuildings(startI, startJ, endI, endJ);
       }
 
-      this.initBlockBuildings(startI, startJ, endI, endJ);
     }
+  }
+
+  initPalace() {
+    this.buildings = [];
+    let size = this.getOuterRadius() * 1.4;
+    let palace = new Building({
+      pos: vec3.fromValues(this.city.pos[0], this.getWallTopElevation() + size /4, this.city.pos[2] + size /6.2),
+      rotation: vec3.fromValues(0,0,0),
+      seed:  Math.pow(this.seed[1], this.city.palaceSeed),
+      footprint: vec3.fromValues(size,size/2, size/3.1)
+    });
+    palace.runReplacements();
+    this.buildings.push(palace);
+
+    let tower = new Building({
+      pos: vec3.fromValues(this.city.pos[0] - size/2 - 1.1, this.getWallTopElevation() + size*1.2/2, this.city.pos[2] + 0.5 ),
+      rotation: vec3.fromValues(0,0,0),
+      seed:  Math.pow(this.seed[1], this.city.towerSeed),
+      footprint: vec3.fromValues(2,size * 1.2, 2)
+    });
+    tower.runReplacements();
+    this.buildings.push(tower);
   }
 
   initBlockBuildings(startI: number, startJ: number, endI: number, endJ: number) {

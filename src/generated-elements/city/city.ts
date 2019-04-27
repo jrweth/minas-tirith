@@ -18,14 +18,20 @@ export class City {
   showWalls: boolean = true;
   showSampleBuildings: boolean = false;
   sampleBuildings: Building[] = [];
+  towerSeed: number;
+  palaceSeed: number;
 
 
   constructor(options: {
     pos: vec3,
-    seed: number
+    seed: number,
+    towerSeed: number,
+    palaceSeed: number
   }) {
     this.pos = options.pos;
     this.seed = options.seed;
+    this.towerSeed = options.towerSeed;
+    this.palaceSeed = options.palaceSeed;
     this.levels = [];
     for(let i = 0; i < 7; i++) {
       this.levels.push(new CityLevel(i, this, {}));
@@ -123,6 +129,10 @@ export class City {
     }
 
     return this.sampleBuildings;
+  }
+
+  initPalace(): void {
+    this.levels[this.levels.length -1].initPalace();
   }
 
 

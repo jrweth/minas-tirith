@@ -35,7 +35,6 @@ export class Turret extends Shape{
   }
 
   getBlocks(): Block[] {
-    console.log(this.numSegments);
     let segmentAngle = this.sweep / (this.numSegments - 1);
     let blockZ = 2 * (this.radius + this.width/2) * Math.tan(segmentAngle / 2);
     let blockZ2 = 2 * (this.radius - this.width/2) * Math.tan(segmentAngle / 2);

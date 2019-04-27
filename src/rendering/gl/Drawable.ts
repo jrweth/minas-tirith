@@ -98,7 +98,6 @@ abstract class Drawable {
   }
 
   generateScale() {
-    console.log('genscale');
     this.scaleBound = true;
     this.bufScale = gl.createBuffer();
   }

@@ -139,8 +139,6 @@ class Cube extends Drawable {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.bufNor);
     gl.bufferData(gl.ARRAY_BUFFER, this.normals, gl.STATIC_DRAW);
 
-
-    console.log(`Created Cube`);
   }
 
   gridPosToScreenPos(gridPos: vec3): vec3 {
