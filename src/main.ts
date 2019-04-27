@@ -38,7 +38,7 @@ const controls = {
   'Show Walls': true,
   'Sample Buildings': false,
   'Show Spur': true,
-  'Palace Seed': 0.6,
+  'Palace Seed': 0.95,
   'Tower Seed': 0.2,
 
   'Elevation Seed': 8,
