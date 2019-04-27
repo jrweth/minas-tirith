@@ -9,8 +9,8 @@ in vec3 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_Col;
 in vec4 fs_Info;
-
-//in float fs_Sine;
+in vec4 fs_RealPos;
+in vec4 fs_LandNormal;
 
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
@@ -118,28 +118,24 @@ vec4 calcSpurNormal(float x, float y, float z) {
     else return vec4(0.0, 1.0, 0.0, 1.0);
 }
 
-vec4 calcLandNormal(float x, float y, float z) {
+float calcMountainOffset(float x, float z) {
+   return fbm2to1(vec2(x, z), vec2(4.43, 4343.4));
+}
+
+vec4 calcMountainNormal(float x, float y, float z) {
     //get the four surrounding points
     float sampleDistance = 0.001;
-    vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);
-    vec3 y2 = vec3(x + calcSpurXOffset(y, z - sampleDistance), y, z - sampleDistance);
+    vec3 x1 = vec3(x + calcMountainOffset(x, z + sampleDistance), y, z + sampleDistance);
+    vec3 x2 = vec3(x + calcMountainOffset(x, z - sampleDistance), y, z - sampleDistance);
 
     vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);
     vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);
 
-    //right side
-    if(fs_Nor.x == 1.0) {
-        return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
-    }
-    //left side
-    else if(fs_Nor.x == -1.0) {
-        return vec4(normalize(cross(y1-y2, z2-z1)), 1.0);
-    }
-    else return vec4(0.0, 1.0, 0.0, 1.0);
+    return vec4(normalize(cross(x1-x2, z1-z2)), 1.0);
 }
 
 vec3 adjustColorForSun(vec3 color, vec4 normal) {
-    fs_LightVector = vec3(-10, 10, 10);
+    fs_LightVector = vec3(10, 10, 10);
 
     vec3 diffuseColor;
 
@@ -247,29 +243,38 @@ vec3 getTextureThemeColor() {
         }
         return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
     }
-    //the band along the transition from land to mountain
+
+
+    vec3 landColor = mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), fs_Pos.y);
+    vec3 mountainColor = mix(vec3(0.4, 0.4, 0.4), vec3(0.0, 0.0, .0), fs_Pos.y);
+
+    float percentMountain = 0.0;
+    if(type == MOUNTAIN) {
+        groundColor = mix(vec3(0.5, 0.5, 0.5), vec3(0.0, 0.4, 0.2), fs_Pos.y);
+        percentMountain = 1.0;
+    }
+    //the baVnd along the transition from land to mountain
     if(
-      (abs(abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) < 5.0
-      || (abs(fs_Pos.x) - 1.0 < u_CityInfo[0] && fs_Pos.z < 0.5)
-      )
-      && fs_Pos.z > -10.0
+    (
+        abs(abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) < 10.0
+        || (abs(fs_Pos.x) - 1.0 < u_CityInfo[0] && fs_Pos.z < 0.5)
+        )
+        && fs_Pos.z > -10.0
     ) {
-        //float percent =
+        float percentByXY = (abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) / 10.0;
+        float percentByElevation =  fs_RealPos.y / 2.0;
+
+        percentMountain = clamp(0.0, 1.0, percentByXY);
 
     }
-    else if(type == LAND) {
-        groundColor = mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), fs_Pos.y);
-    }
-    else if(type == MOUNTAIN) {
-        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.0, 0.0, .0), fs_Pos.y);
-    }
 
-    return groundColor;
+    vec3 color = mix(landColor, mountainColor,  percentMountain);
+    return adjustColorForSun(color, fs_LandNormal).xyz;
 
 }
 
 vec3 getTextureThemeBackground() {
-    return getDazzleThemeBackground();
+    return vec3(0.65, .91, 1.0);
 }
 
 

@@ -16,6 +16,8 @@ out vec3 fs_Pos;
 out vec4 fs_Nor;
 out vec4 fs_Col;
 out vec4 fs_Info;
+out vec4 fs_RealPos;
+out vec4 fs_LandNormal;
 
 const float WATER = 0.0;
 const float LAND = 1.0;
@@ -96,14 +98,14 @@ float calcMountainHeight(float x, float y, float z) {
 
   //standard mountaints 10 clicks back from back of fortress
   if (z < baseZ - baseToMaxWidth) {
-    yNew = cityHeight + vs_Pos.y * maxElevation;
+    yNew = cityHeight + vs_Pos2.y * maxElevation;
     fs_Col.r = MOUNTAIN;
   }
   //ramp up from mountain height at back of fortress
   else if (z <= baseZ) {
     float scale = (baseZ - z) / baseToMaxWidth;
     //ramp up to ultimate height
-    yNew = mix(baseMtHeight, cityHeight + vs_Pos.y * maxElevation, scale);
+    yNew = mix(baseMtHeight, cityHeight + vs_Pos2.y * maxElevation, scale);
     fs_Col.r = MOUNTAIN;
   }
   //mountain start radiates out from fortress
@@ -174,6 +176,9 @@ void main()
   if(vs_Pos2.y <= 1.0) {
     modelposition.y = calcMountainHeight(modelposition.x, modelposition.y, modelposition.z);
   }
+
+  fs_LandNormal = calcMountainNormal(modelposition.x, modelposition.y, modelposition.z);
+  fs_RealPos = modelposition.xyzw;
 
   modelposition = u_Model * modelposition;
   gl_Position = u_ViewProj * modelposition;

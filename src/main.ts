@@ -38,7 +38,7 @@ const controls = {
   'Show Walls': true,
   'Sample Buildings': false,
   'Show Spur': true,
-  'Palace Seed': 0.95,
+  'Palace Seed': 0.4,//0.95,
   'Tower Seed': 0.2,
 
   'Elevation Seed': 8,
@@ -168,13 +168,13 @@ function redoRoads() {
 
 function getBackgroundColor(): vec3 {
   if(controls.Theme == 1) {
-    return vec3.fromValues(164.0 / 255.0, 233.0 / 255.0, 1.0);
+    return vec3.fromValues(0.65, .91, 1.0);
   }
   else if(controls.Theme == 2) {
     return vec3.fromValues(0,0,0);
   }
   else if(controls.Theme == 3) {
-    return vec3.fromValues(0,0,0);
+    return vec3.fromValues(0.65, .91, 1.0);
   }
 }
 
@@ -390,7 +390,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(-40, 20, 30), vec3.fromValues(-1, 0, -1));
+  const camera = new Camera(vec3.fromValues(20, 10, 15), vec3.fromValues(-1, 5, -1));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());

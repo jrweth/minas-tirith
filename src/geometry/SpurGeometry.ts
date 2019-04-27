@@ -172,12 +172,12 @@ class SpurGeometry extends Drawable {
 
         //add normals
         if(j == this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
-          normals.push(1, 0, 0 ,1);
-          normals.push(-1,0, 0 ,1);
+          normals.push(-1, 0, 0 ,1);
+          normals.push(1,0, 0 ,1);
         }
         else {
-          normals.push(1,0, 0 ,0);
           normals.push(-1,0, 0 ,0);
+          normals.push(1,0, 0 ,0);
         }
 
         //add info
