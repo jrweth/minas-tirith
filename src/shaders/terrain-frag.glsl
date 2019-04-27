@@ -79,14 +79,14 @@ float fbm2to1(vec2 p, vec2 seed) {
 
 int getTerrainType() {
     //check for water
-    if(fs_Pos.y > 1.0) {
+    if(fs_Col.r == 4.0) {
         return SPUR;
     }
-    if(fs_Pos.y <= WATER_LINE) {
-        return WATER;
+    if(fs_Col.r == 3.0) {
+        return MOUNTAIN;
     }
     //check for sand
-    else if(fs_Pos.y < COAST_LINE) {
+    else if(fs_Col.r == 2.0) {
         return COAST;
     }
     return LAND;
@@ -98,6 +98,26 @@ float calcSpurXOffset(float y, float z) {
 
 
 vec4 calcSpurNormal(float x, float y, float z) {
+    //get the four surrounding points
+    float sampleDistance = 0.001;
+    vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);
+    vec3 y2 = vec3(x + calcSpurXOffset(y, z - sampleDistance), y, z - sampleDistance);
+
+    vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);
+    vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);
+
+    //right side
+    if(fs_Nor.x == 1.0) {
+        return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);
+    }
+    //left side
+    else if(fs_Nor.x == -1.0) {
+        return vec4(normalize(cross(y1-y2, z2-z1)), 1.0);
+    }
+    else return vec4(0.0, 1.0, 0.0, 1.0);
+}
+
+vec4 calcLandNormal(float x, float y, float z) {
     //get the four surrounding points
     float sampleDistance = 0.001;
     vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);
@@ -227,9 +247,11 @@ vec3 getTextureThemeColor() {
         return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
     }
     if(type == LAND) {
-        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
+        groundColor = mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), fs_Pos.y);
     }
-    groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);
+    if(type == MOUNTAIN) {
+        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.0, 0.0, .0), fs_Pos.y);
+    }
     if(u_DisplayOptions.r > 0.0) {
         groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));
     }
@@ -245,8 +267,19 @@ vec3 getTextureThemeBackground() {
 
 void main()
 {
-    vec3 groundColor = vec3(.0, 1, 0);
+    vec3 groundColor = vec3(.0, 0.5, 0);
     vec3 backgroundColor = vec3(1.0, 1.0, 1.0);
+    if(getTerrainType() == SPUR) {
+        groundColor = vec3(1.0, 0.0, 0.0);
+    }
+    else if(getTerrainType() == LAND) {
+        groundColor = vec3(0.0, 1.0, 0.0);
+    }
+    else if(getTerrainType() == MOUNTAIN) {
+        groundColor = vec3(0.0, 0.0, 1.0);
+    }
+
+
     if(u_DisplayOptions[2] == MAP_THEME) {
         groundColor = getMapThemeColor();
         backgroundColor = getMapThemeBackground();

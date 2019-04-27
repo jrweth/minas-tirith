@@ -14,14 +14,14 @@ class TerrainPlane extends Drawable {
   scale: vec2;
   gridSize: vec2;
   subdivs: number; // 2^subdivs is how many squares will compose the plane; must be even.
-  terrain: Terrain;
+  //terrain: Terrain;
 
-  constructor(terrain: Terrain) {
+  constructor() {
     super(); // Call the constructor of the super class. This is required.
     this.scale = vec2.fromValues(100, 100);
-    this.gridSize = terrain.gridSize;
+    this.gridSize = vec2.fromValues(100, 100);
     this.subdivs =20;
-    this.terrain = terrain;
+    //this.terrain = terrain;
   }
 
   create() {
@@ -78,7 +78,7 @@ class TerrainPlane extends Drawable {
         this.normals[posIdx] = 1;
         this.info     [posIdx] = 0;//this.terrain.gridParts[x % this.gridSize[0]][z % this.gridSize[1]].hasBuilding ? 1: 0;
         this.colors[posIdx] = 0;
-        this.positions[posIdx++] = this.terrain.elevations[x][z];
+        this.positions[posIdx++] = 0;//this.terrain.elevations[x][z];
 
         this.normals[posIdx] = 0;
         this.info     [posIdx] = 0;

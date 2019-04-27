@@ -99,7 +99,7 @@ function loadScene() {
 
 
   //create the plane geometry
-  plane = new TerrainPlane(terrain);
+  plane = new TerrainPlane();
   plane.create();
 
   spur1 = new SpurGeometry(city, 1); spur1.create();
@@ -390,7 +390,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(-1.5, 16.5, 1), vec3.fromValues(-1, 16, -1));
+  const camera = new Camera(vec3.fromValues(-40, 20, 30), vec3.fromValues(-1, 0, -1));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -471,7 +471,7 @@ function main() {
 
     let terrainDrawables = [plane, spur1, spur2, spur3, spur4, spur5, spur6];
     if(controls["Sample Buildings"] || !controls["Show Spur"]) terrainDrawables = [plane];
-    terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*1.5});
+    terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*0.75});
     renderer.render(camera, terrainShader, terrainDrawables);
 
     if(controls["Show Highways"] || controls["Show Streets"]) {

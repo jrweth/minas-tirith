@@ -100,8 +100,8 @@ export class Terrain {
     for(let x = 0; x <= this.gridSize[0]; x++) {
       this.elevations.push([]);
       for(let z = 0; z <= this.gridSize[1]; z++) {
-        let y = Noise.fbm2to1(vec2.fromValues(x * 5 / this.gridSize[0], z * 5/ this.gridSize[1]), this.elevationSeed);
-        this.elevations[x].push(y);
+        //let y = Noise.fbm2to1(vec2.fromValues(x * 5 / this.gridSize[0], z * 5/ this.gridSize[1]), this.elevationSeed);
+        this.elevations[x].push(0);
       }
     }
   }

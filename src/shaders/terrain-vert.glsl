@@ -17,11 +17,13 @@ out vec4 fs_Nor;
 out vec4 fs_Col;
 out vec4 fs_Info;
 
-const int WATER = 0;
-const int LAND = 1;
-const int COAST = 2;
-const int MOUNTAIN = 3;
-const int SPUR = 4;
+const float WATER = 0.0;
+const float LAND = 1.0;
+const float COAST = 2.0;
+const float MOUNTAIN = 3.0;
+const float SPUR = 4.0;
+
+vec4 vs_Pos2;
 
 float random1( vec2 p , vec2 seed) {
   return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
@@ -95,12 +97,14 @@ float calcMountainHeight(float x, float y, float z) {
   //standard mountaints 10 clicks back from back of fortress
   if (z < baseZ - baseToMaxWidth) {
     yNew = cityHeight + vs_Pos.y * maxElevation;
+    fs_Col.r = MOUNTAIN;
   }
   //ramp up from mountain height at back of fortress
-  else if (z < baseZ) {
+  else if (z <= baseZ) {
     float scale = (baseZ - z) / baseToMaxWidth;
     //ramp up to ultimate height
     yNew = mix(baseMtHeight, cityHeight + vs_Pos.y * maxElevation, scale);
+    fs_Col.r = MOUNTAIN;
   }
   //mountain start radiates out from fortress
   else if (abs(x) >= cityRadius) {
@@ -111,6 +115,7 @@ float calcMountainHeight(float x, float y, float z) {
       if (scale < 0.5) scale = smoothstep(0.0, 1.0, scale);
       //modelposition.y = baseMtHeight + (baseZ - z) * 0.1  *  vs_Pos.y*(maxElevation - baseMtHeight);
       yNew = vs_Pos.y * scale + baseMtHeight * scale;
+      fs_Col.r = MOUNTAIN;
     }
   }
   return yNew;
@@ -146,77 +151,29 @@ float calcSpurZOffset(float x, float y) {
 
 void main()
 {
-  fs_Pos = vs_Pos.xyz;
+  vs_Pos2 = vs_Pos;
   fs_Col = vs_Col;
+  if(vs_Pos.y == 0.0) {
+    vs_Pos2.y = fbm2to1(vec2(vs_Pos2.x/10.0, vs_Pos2.z/10.0), vec2(3.43, 4.43));
+    fs_Col.r = LAND;
+  }
+  fs_Pos = vs_Pos2.xyz;
   fs_Nor = vs_Nor;
   fs_Info = vs_Info;
-  vec4 modelposition = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z, 1.0);
+  vec4 modelposition = vec4(vs_Pos2.x, vs_Pos2.y, vs_Pos2.z, 1.0);
 
   //this must be our spur stuff
-  if(vs_Pos.y > 1.0) {
+  if(vs_Pos2.y > 1.0) {
+      fs_Col.r = SPUR;
     //adjust the x position
-    //float adjustment = fbm2to1(vs_Pos.yz, vec2(3.34, 4343.2));
-    modelposition.x = vs_Pos.x + calcSpurXOffset(vs_Pos.y, vs_Pos.z);
-    modelposition.z = vs_Pos.z - calcSpurZOffset(vs_Pos.x, vs_Pos.y);
+    //float adjustment = fbm2to1(vs_Pos2.yz, vec2(3.34, 4343.2));
+    modelposition.x = vs_Pos2.x + calcSpurXOffset(vs_Pos2.y, vs_Pos2.z);
+    modelposition.z = vs_Pos2.z - calcSpurZOffset(vs_Pos2.x, vs_Pos2.y);
   }
 
-  if(vs_Pos.y <= 1.0) {
-
-    //water
-    if (vs_Pos.y < 0.4) {
-      modelposition.y = -0.5;
-      fs_Pos.y = 0.4;
-    }
-    //sand
-    else if (vs_Pos.y < 0.5) {
-      modelposition.y = vs_Pos.y - 0.5;
-    }
-    //land
-    else {
-      modelposition.y = -0.001;
-    }
-
+  if(vs_Pos2.y <= 1.0) {
     modelposition.y = calcMountainHeight(modelposition.x, modelposition.y, modelposition.z);
 
-
-
-    float cityRadius = u_CityInfo[0];
-    float cityHeight = u_CityInfo[1];
-    float maxElevation = 15.0;
-    float baseMtHeight =  cityHeight;
-    float baseZ = -10.0;
-    float baseToMaxWidth = u_CityInfo[1];
-    //wall behind city
-    if (abs(vs_Pos.x) < cityRadius) {
-      baseMtHeight= cityHeight * (1.0 - abs(vs_Pos.x)/cityRadius);
-    }
-    //wall moving out fromthe city
-    else {
-      baseMtHeight = cityHeight * min(1.0, (abs(vs_Pos.x) - cityRadius)/cityRadius);
-    }
-
-
-    //standard mountaints 10 clicks back from back of fortress
-    if (vs_Pos.z < baseZ - baseToMaxWidth) {
-      modelposition.y = cityHeight + vs_Pos.y * maxElevation;
-    }
-    //ramp up from mountain height at back of fortress
-    else if (vs_Pos.z < baseZ) {
-      float scale = (baseZ - vs_Pos.z) / baseToMaxWidth;
-      //ramp up to ultimate height
-      modelposition.y = mix(baseMtHeight, cityHeight + vs_Pos.y * maxElevation, scale);
-    }
-    //mountain start radiates out from fortress
-    else if (abs(vs_Pos.x) >= cityRadius) {
-      float mtStart = (abs(vs_Pos.x) - cityRadius) * 0.5;
-      float distToBase = vs_Pos.z - baseZ;
-      if (vs_Pos.z < mtStart) {
-        float scale = (mtStart - vs_Pos.z) / (mtStart - baseZ);
-        if (scale < 0.5) scale = smoothstep(0.0, 1.0, scale);
-        //modelposition.y = baseMtHeight + (baseZ - vs_Pos.z) * 0.1  *  vs_Pos.y*(maxElevation - baseMtHeight);
-        modelposition.y = vs_Pos.y * scale + baseMtHeight * scale;
-      }
-    }
   }
 
   modelposition = u_Model * modelposition;
