@@ -627,6 +627,8 @@ export class CityLevel {
 
   initPalace() {
     this.buildings = [];
+    console.log('palace');
+
     let size = this.getOuterRadius() * 1.4;
     let palace = new Building({
       pos: vec3.fromValues(this.city.pos[0], this.getWallTopElevation() + size /4, this.city.pos[2] + size /6.2),

@@ -98,19 +98,18 @@ export class Foundation extends Shape{
     let newShapes = this.splitShape(3,axis, this.pos, this.footprint, this.rotation);
 
 
-    let lowerHeight = this.footprint[1] * 0.666;
-    let raiseHeight = this.footprint[1] * 1.5;
+    let adjustHeight = this.footprint[1] * 0.3;
     let type = Random.randomInt(3, seed);
     switch (type) {
       case 0: //raise up the selected
       case 1:
       case 2:
-        newShapes[type].footprint[1] = raiseHeight;
-        newShapes[type].pos[1] = raiseHeight /2;
+        newShapes[type].footprint[1] = newShapes[type].footprint[1] + adjustHeight;
+        newShapes[type].pos[1] = newShapes[type].pos[1] + adjustHeight /2;
         break;
       case 3:
-        newShapes[1].footprint[1] = lowerHeight;
-        newShapes[1].pos[1] = lowerHeight /2;
+        newShapes[1].footprint[1] = newShapes[1].footprint[1] - adjustHeight;
+        newShapes[1].pos[1] = newShapes[1].pos[1] - adjustHeight /2;
         break;
 
     }
