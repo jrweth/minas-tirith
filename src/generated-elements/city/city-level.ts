@@ -427,19 +427,22 @@ export class CityLevel {
   getSpurBlocks() {
     let blocks: Block[] = [];
     if(this.levelNum == 6) {
-      let posX = this.city.pos[0] + 1.0 + this.getOuterRadius() / 2.0;
-      let posX2 = this.city.pos[0] - 1.0 - this.getOuterRadius() / 2.0;
+      let posX = this.city.pos[0] + 1.5 + this.getOuterRadius() / 2.0;
+      let posX2 = this.city.pos[0] - 1.5 - this.getOuterRadius() / 2.0;
       let posY = this.getWallTopElevation() + 1;
       let posZ = this.city.pos[2] - 5.0 + this.city.levels[1].getOuterRadius() / 2.0;
       let rot = Math.atan((this.getOuterRadius()) / this.city.levels[1].getOuterRadius());
+      let length = Math.sqrt(this.getOuterRadius() * this.getOuterRadius() + this.city.levels[1].getOuterRadius()*this.city.levels[1].getOuterRadius())
+      length = length -5.0;
+
       let battlement1 = new Battlement({
         pos: vec3.fromValues(posX, posY, posZ),
-        footprint: vec3.fromValues(2, 2, 55),
+        footprint: vec3.fromValues(3, 2, length),
         rotation: vec3.fromValues(0, rot,0)
       });
       let battlement2 = new Battlement({
         pos: vec3.fromValues(posX2, posY, posZ),
-        footprint: vec3.fromValues(2, 2, 55),
+        footprint: vec3.fromValues(3, 2, length),
         rotation: vec3.fromValues(0, Math.PI * 2 -rot,0)
       });
       blocks = battlement1.getBlocks();

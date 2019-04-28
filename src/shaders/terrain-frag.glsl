@@ -4,6 +4,8 @@ precision highp float;
 uniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane
 uniform vec4 u_DisplayOptions;
 uniform vec4 u_CityInfo; //[0] = city radius [1] = cityHeight
+uniform sampler2D u_PavementSampler;
+uniform sampler2D u_WhiteStoneSampler;
 
 in vec3 fs_Pos;
 in vec4 fs_Nor;
@@ -228,6 +230,9 @@ vec3 getDazzleThemeBackground() {
 
 
 vec3 getTopPlazaColor(float x, float z) {
+    if(abs(fs_Pos.x) < 0.2) {
+        return texture(u_PavementSampler, fs_Pos.xz).xyz;
+    }
     float elevation = fbm2to1(vec2(fs_RealPos.x*0.1, fs_RealPos.z * 0.1), vec2(3.43, 5.454));
     return mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), elevation);
 }

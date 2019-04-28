@@ -420,6 +420,9 @@ function main() {
 
   buildingShader.bindTexToUnit(buildingShader.unifWhiteStoneSampler, whiteStoneTexture,0);
   buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture,1);
+
+  terrainShader.bindTexToUnit(terrainShader.unifWhiteStoneSampler, whiteStoneTexture,0);
+  terrainShader.bindTexToUnit(terrainShader.unifPavementSampler, pavementTexture,1);
   // Initial call to load scene
   loadScene();
   //add all the controls
