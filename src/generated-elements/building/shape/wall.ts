@@ -62,6 +62,7 @@ export class Wall extends Shape{
     return blocks;
   }
 
+
   runReplacement() {
     return [this];
   }

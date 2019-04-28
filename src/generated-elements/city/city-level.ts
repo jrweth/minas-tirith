@@ -6,6 +6,8 @@ import Random from "../../noise/random";
 import {Building} from "../building/building";
 import {TextureType} from "../../texture/texture-type";
 import {Road} from "./road";
+import {Shape} from "../building/shape/shape";
+import {Battlement} from "../building/shape/battlement";
 
 
 export class LevelOptions {
@@ -166,19 +168,10 @@ export class CityLevel {
   getBlocks(): Block[] {
     if(!this.wall) this.initWall();
     let blocks: Block[] = [];
-    let wallBlocks = this.wall.getBlocks();
-    let gateIndex = this.getGateWallBlockIndex();
 
     blocks = blocks.concat(this.road.getBlocks());
 
-    if(this.city.showWalls) {
-      for(let i = 0; i < wallBlocks.length; i++) {
-        if(i !== gateIndex) {
-          blocks.push(wallBlocks[i]);
-        }
-      }
-    }
-
+    if(this.city.showWalls) blocks = blocks.concat(this.getWallBlocks());
     if(this.city.showRoads) blocks = blocks.concat(this.getStreetBlocks());
     if(this.city.showBuildings) blocks = blocks.concat(this.getBuildingBlocks());
 
@@ -431,6 +424,38 @@ export class CityLevel {
     }
   }
 
+  getSpurBlocks() {
+    let blocks: Block[] = [];
+    if(this.levelNum == 6) {
+      let posX = this.city.pos[0] + this.getOuterRadius() / 2.0;
+      let posY = this.getWallTopElevation() + 2;
+      let posZ = this.city.pos[2] + this.getOuterRadius() / 2.0;
+      let battlement = new Battlement({
+        pos: vec3.fromValues(posX, posY, posZ),
+        footprint: vec3.fromValues(20, 20, 50),
+        rotation: vec3.fromValues(0,0,0)
+      })
+      blocks = battlement.getBlocks();
+      console.log(blocks);
+
+    }
+    return blocks;
+  }
+
+  getWallBlocks() {
+    let blocks = [];
+    let wallBlocks = this.wall.getBlocks();
+    let gateIndex = this.getGateWallBlockIndex();
+    for(let i = 0; i < wallBlocks.length; i++) {
+      if(i !== gateIndex) {
+        blocks.push(wallBlocks[i]);
+      }
+    }
+    blocks = blocks.concat(this.getSpurBlocks());
+    return blocks;
+  }
+
+
   /******************************************************************************************************/
   /******************************************ROADS*******************************************************/
   /******************************************************************************************************/
@@ -647,6 +672,10 @@ export class CityLevel {
     });
     tower.runReplacements();
     this.buildings.push(tower);
+
+    //add a wall at the top of the spur
+
+
   }
 
   initBlockBuildings(startI: number, startJ: number, endI: number, endJ: number) {
@@ -816,20 +845,10 @@ export class CityLevel {
   }
 
 
-
   getBuildingBlocks(): Block[] {
 
-    // let building = new Building({
-    //     pos: vec3.fromValues(250, 20, 250),
-    //     rotation: vec3.fromValues(0,0,0),
-    //     seed: 1,
-    //     footprint: vec3.fromValues(20, 20, 20)
-    //   }
-    // );
-    // return building.getBlocks();
-
-
     let blocks: Block[] = [];
+
     for(let i =0; i < this.buildings.length; i++) {
       blocks = blocks.concat(this.buildings[i].getBlocks());
     }

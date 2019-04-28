@@ -1,5 +1,5 @@
 import {NumOptions, Shape} from './shape'
-import {BlockType} from './block';
+import {Block, BlockType} from './block';
 import {vec3} from "gl-matrix";
 import Random from "../../../noise/random";
 import {Axis} from "../../../geometry/Axis"
@@ -19,7 +19,7 @@ export class Box extends Shape{
     this.textureType = (typeof options.textureType == 'undefined') ? TextureType.BUILDING : options.textureType;
   }
 
-  getBlocks() {
+  getBlocks(): Block[] {
     return [{
       blockType: BlockType.CUBE,
       footprint: this.footprint,

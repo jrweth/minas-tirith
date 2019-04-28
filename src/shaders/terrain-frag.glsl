@@ -228,7 +228,8 @@ vec3 getDazzleThemeBackground() {
 
 
 vec3 getTopPlazaColor(float x, float z) {
-    return vec3(0.0,0.5,0.0);
+    float elevation = fbm2to1(vec2(fs_RealPos.x*0.1, fs_RealPos.z * 0.1), vec2(3.43, 5.454));
+    return mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), elevation);
 }
 
 vec3 getTextureThemeColor() {
