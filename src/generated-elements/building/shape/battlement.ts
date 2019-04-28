@@ -63,7 +63,6 @@ export class Battlement extends Box{
     }];
 
     blocks = blocks.concat(this.getMerlons());
-    console.log(blocks);
     return blocks;
 
   }
@@ -94,7 +93,7 @@ export class Battlement extends Box{
         pos: pos[i],
         footprint: vec3.fromValues(size, size, size),
         rotation: this.rotation,
-        blockType: BlockType.WEDGE,
+        blockType: BlockType.CUBE,
         adjustScale1: this.scaleInner,
         adjustScale2: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
         adjustScale3: 1, //this.width * Math.sin(segmentAngle), //1 + (this.width + this.radius) / this.radius,
@@ -155,8 +154,8 @@ export class Battlement extends Box{
     }
     else if(merlonPlacement == MerlonPlacement.DOUBLE_GAP) {
       numMerlons = numMerlons - 2;
-      startZ = startZ + size * 2.5;
-      endZ = endZ - size * 2.5;
+      startZ = startZ + size * 2.0;
+      endZ = endZ - size * 2.0;
 
     }
     let incZ = (endZ - startZ) / (numMerlons - 1);

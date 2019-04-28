@@ -54,7 +54,6 @@ export class City {
         level.setWallHeight(value);
         break;
       case 'wallWidth':
-        console.log('setting wall width');
         level.setWallWidth(value);
         break;
       case 'levelWidth':

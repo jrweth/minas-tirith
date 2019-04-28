@@ -70,10 +70,12 @@ export class Building {
     //pick a random shape to replace
     let replaceIndex = nonTerminal[Random.randomInt(nonTerminal.length - 1, this.seed)];
 
-    let newShapes = this.shapes[replaceIndex].runReplacement(this.seed);
-    this.shapes[replaceIndex] = newShapes[0];
-    for(let i = 1; i < newShapes.length; i++) {
-      this.shapes.push(newShapes[i]);
+    if(this.shapes[replaceIndex]) {
+      let newShapes = this.shapes[replaceIndex].runReplacement(this.seed);
+      this.shapes[replaceIndex] = newShapes[0];
+      for(let i = 1; i < newShapes.length; i++) {
+        this.shapes.push(newShapes[i]);
+      }
     }
 
   }

@@ -447,7 +447,6 @@ export class CityLevel {
       });
       blocks = battlement1.getBlocks();
       blocks = blocks.concat(battlement2.getBlocks());
-      console.log(blocks);
 
     }
     return blocks;

@@ -30,6 +30,7 @@ const int MOUNTAIN = 3;
 const int SPUR = 4;
 
 vec3 fs_LightVector;
+vec3 sunPosition = vec3(12000.0, 10000.0, 8000.0);
 
 float random1( vec2 p , vec2 seed) {
     return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
@@ -147,6 +148,72 @@ vec3 adjustColorForSun(vec3 color, vec4 normal) {
     float sunIntensity = clamp(0.1, 1.0, sunDiffuseTerm + ambientTerm);//Add a small float value to the color multiplier
     diffuseColor = vec3(color.rgb * sunIntensity);
     return diffuseColor;
+}
+
+vec3 adjustColorForLights(vec3 color, vec3 normal, vec3 point) {
+    vec3 direction;
+    vec3 lightColor;
+    vec3 sunDirection = normalize(sunPosition - point);
+    vec3 sunColor = vec3(1.5, 1.25, 1.0);
+    vec3 skyColor = vec3(0.08,0.10,0.14);
+    vec3 indirectColor = vec3(0.04, 0.028, 0.020);
+    vec3 fireFlyColor = vec3(0.698, 0.956, 0.145);
+    float hour = 15.0;
+    float night = 0.0;
+    float dawn = 0.0;
+    float sunset = 0.1;
+
+
+
+    //get the soft shadow and subsurface amounts
+    //float shadow = sunShadow(point, 3.0, sdfIndex);
+    float sunIntensity;
+
+
+    if(dot(normal, sunDirection) >= 0.0) {
+        sunIntensity = clamp(dot(normal, sunDirection), 0.0, 1.0);// * shadow;
+    }
+    else {
+        sunIntensity = 0.0;
+    }
+
+
+    //make sun brighter at noon
+    sunIntensity = sunIntensity * clamp(sunPosition.y/80.0, 0.0, 1.0);
+
+    float skyIntensity = clamp(0.5 + 0.5*normal.y, 0.0, 1.0);
+
+    //decrease skyintesity at night
+    if(hour > 17.0) {
+        skyIntensity = clamp(pow((1.0 - (hour - 17.0)/7.0), 4.0), 0.1, 1.0)  * skyIntensity;
+    }
+    if(hour < 6.0) {
+        skyIntensity = clamp(pow((1.0 - (6.0-hour)/6.0), 4.0), 0.1, 1.0)  * skyIntensity;
+    }
+
+    vec3 indirectDirection = normalize(sunDirection * vec3(-1.0, 0.0, -1.0));
+    //vec3 indirectDirection = normalize(vec3(0.2, 0.0, 1.0));
+    float indirectIntensity = clamp(dot(normal, indirectDirection), 0.0, 1.0);
+
+    //tone down indirect at night
+    //indirectIntensity = indirectIntensity * (1.0 - night);
+
+    //make sun redder at sunrise/sunset
+    sunColor.r = max(sunColor.r * 3.0 * (dawn*0.8 + sunset), sunColor.r);
+    if(hour < 5.0) {
+        sunIntensity = 0.0;
+    }
+
+
+
+    vec3 intensity = sunIntensity*sunColor
+    + skyIntensity * skyColor
+    + indirectIntensity * indirectColor;
+
+
+    color = color * intensity;
+    return color;
+
 }
 
 vec3 getMapThemeBackground() {
