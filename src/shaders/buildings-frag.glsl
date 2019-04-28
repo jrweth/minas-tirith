@@ -48,6 +48,55 @@ const int FACE_RIGHT = 3;
 const int FACE_BOTTOM = 4;
 const int FACE_TOP = 5;
 
+
+vec3 fs_LightVector;
+
+float random1( vec2 p , vec2 seed) {
+    return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float random1( vec3 p , vec3 seed) {
+    return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);
+}
+
+vec2 random2( vec2 p , vec2 seed) {
+    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);
+}
+float interpNoiseRandom2to1(vec2 p, vec2 seed) {
+    float fractX = fract(p.x);
+    float x1 = floor(p.x);
+    float x2 = x1 + 1.0;
+
+    float fractY = fract(p.y);
+    float y1 = floor(p.y);
+    float y2 = y1 + 1.0;
+
+    float v1 = random1(vec2(x1, y1), seed);
+    float v2 = random1(vec2(x2, y1), seed);
+    float v3 = random1(vec2(x1, y2), seed);
+    float v4 = random1(vec2(x2, y2), seed);
+
+    float i1 = mix(v1, v2, fractX);
+    float i2 = mix(v3, v4, fractX);
+
+    //    return smoothstep(i1, i2, fractY);
+    return mix(i1, i2, fractY);
+
+}
+
+float fbm2to1(vec2 p, vec2 seed) {
+    float total  = 0.0;
+    float persistence = 0.5;
+    float octaves = 8.0;
+
+    for(float i = 0.0; i < octaves; i++) {
+        float freq = pow(2.0, i);
+        float amp = pow(persistence, i+1.0);
+        total = total + interpNoiseRandom2to1(p * freq, seed) * amp;
+    }
+    return total;
+}
+
 vec3 getMapThemeColor() {
     vec3 buildingColor = vec3(0.0, 0.0, 0.0);
     if(fs_Pos.x > 0.999999) {
@@ -134,22 +183,90 @@ bool posInWindow(vec2 pos) {
     );
 }
 
+
 vec3 getBuildingCubeColor() {
     vec2 wallPos = getBuildingFloorWallPosition();
     if(posInWindow(wallPos) ) {
         return vec3(0.0);
     }
-    return vec3(0.5, 0.5, 0.5);
+    float fbm = fbm2to1(vec2(fs_Pos.x + fs_Pos.y/2.0, fs_Pos.z + fs_Pos.y/2.0)*500.0, vec2(3.43, 43.23));
+    return vec3((fbm + 1.0) / 2.0);
 }
 
-vec3 getLedgeNormal() {
+
+float calcPlasterOffset(float x, float z) {
+    return fbm2to1(vec2(x,z), vec2(3.34, 4343.2)) - 0.5;
+}
+
+vec4 calcPlasterNormal(float x, float z) {
+    //get the four surrounding points
+    float sampleDistance = 0.001;
+    vec3 x1 = vec3(x, calcPlasterOffset(x, z + sampleDistance), z + sampleDistance);
+    vec3 x2 = vec3(x, calcPlasterOffset(x, z - sampleDistance), z - sampleDistance);
+
+    vec3 z1 = vec3(x + sampleDistance, calcPlasterOffset(x + sampleDistance, z), z);
+    vec3 z2 = vec3(x - sampleDistance, calcPlasterOffset(x - sampleDistance, z), z);
+
+    return vec4(normalize(cross(x1-x2, z1-z2)), 1.0);
+
+}
+
+vec3 getOrthogonal(vec3 nor) {
+
+    int imin = 0;
+    for(int i = 0; i < 3; ++i) {
+        if(abs(nor[i]) < abs(nor[imin])) imin = i;
+    }
+    vec3 orth = vec3(0.0, 0.0, 0.0);
+    float dt = nor[imin];
+    orth[imin] = 1.0;
+    for(int i = 0; i < 3; i++) {
+        orth[i] = dt*nor[i];
+    }
+    return orth;
+
+}
+
+mat4 getNormalTransform(vec3 nor) {
+    mat4 mat;
+    mat[0][0] = nor[0];
+    mat[0][1] = nor[1];
+    mat[0][2] = nor[2];
+    mat[0][3] = 0.0;
+
+    vec3 orth = getOrthogonal(nor);
+    mat[1][0] = orth[0];
+    mat[1][1] = orth[1];
+    mat[1][2] = orth[2];
+    mat[1][3] = 0.0;
+
+    vec3 orth2 = cross(nor, orth);
+    mat[2][0] = orth2[0];
+    mat[2][1] = orth2[1];
+    mat[2][2] = orth2[2];
+    mat[2][3] = 0.0;
+
+    mat[3][0] = 0.0;
+    mat[3][1] = 0.0;
+    mat[3][2] = 0.0;
+    mat[3][3] = 1.0;
+
+    return mat;
+}
+
+vec3 getPlasterNormal() {
+
+    //get the general normal for material
     vec2 wallPos = getBuildingFloorWallPosition();
+
+    //add a ledge
     if(wallPos.y > 0.95) {
         return mix(fs_Nor.xyz, vec3(0.0, 1.0, 0.0), (wallPos.y - 0.95) * 20.0);
     }
     else if(wallPos.y > 0.90) {
         return mix(vec3(0.0, -1.0, 0.0), fs_Nor.xyz, (1.0 - wallPos.y) * 20.0);
     }
+
     return fs_Nor.xyz;
 }
 
@@ -159,13 +276,14 @@ vec3 getTexturedNormal() {
         fs_BlockInfo[1] == TEXTURE_BUILDING
         || fs_BlockInfo[1] == TEXTURE_TURRET
     ) {
-        return  getLedgeNormal();
+        return  getPlasterNormal();
     }
     return fs_Nor.xyz;
 }
 
 vec3 getBuildingColor() {
     if(fs_BlockInfo[0] == CUBE || fs_BlockInfo[0] == WEDGE) return getBuildingCubeColor();
+
     return vec3(0.5, 0.5, 0.5);
 }
 

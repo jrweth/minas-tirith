@@ -36,7 +36,7 @@ const controls = {
   'Show Buildings': true,
   'Show Build Sites': false,
   'Show Walls': true,
-  'Sample Buildings': false,
+  'Sample Buildings': true,
   'Show Spur': true,
   'Palace Seed': 0.4,//0.95,
   'Tower Seed': 0.2,
@@ -390,7 +390,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(20, 10, 15), vec3.fromValues(-1, 5, -1));
+  const camera = new Camera(vec3.fromValues(1, 1, 1.5), vec3.fromValues(0, 1, -9));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
