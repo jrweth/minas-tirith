@@ -223,7 +223,14 @@ export class CityLevel {
   updateGridPositions() {
     for(let i =0; i < this.gridWidth; i++) {
       for(let j =0; j < this.gridLength; j++) {
-        this.gridInfo[i][j].pos = this.getPosFromGridPos(i,j);
+        try {
+          this.gridInfo[i][j].pos = this.getPosFromGridPos(i,j);
+        }
+        catch(e) {
+          console.log(e);
+          console.log('i: ' + i + ' j: ' + j);
+          console.log(this);
+        }
       }
     }
   }
@@ -252,7 +259,7 @@ export class CityLevel {
 
   setGridWidth(width: number) {
     this.gridWidth = width;
-    this.gridLength = this.getGridLength();
+    this.initGrid();
     //initialize shapes for all levels here and below
     this.rescaleLevel();
   }
