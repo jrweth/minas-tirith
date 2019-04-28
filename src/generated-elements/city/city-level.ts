@@ -433,7 +433,7 @@ export class CityLevel {
       let battlement = new Battlement({
         pos: vec3.fromValues(posX, posY, posZ),
         footprint: vec3.fromValues(20, 20, 50),
-        rotation: vec3.fromValues(0,0,0)
+        rotation: vec3.fromValues(0,Math.PI / 6.0,0)
       })
       blocks = battlement.getBlocks();
       console.log(blocks);
