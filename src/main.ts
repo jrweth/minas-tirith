@@ -189,7 +189,7 @@ function addDisplayControls(options: {
   renderer: OpenGLRenderer
 }) {
   let displayFolder = gui.addFolder('display');
-  let theme = displayFolder.add(controls, 'Theme', {'Textured': 3, 'Map': 1, 'White City': 2}).listen();
+  let theme = displayFolder.add(controls, 'Theme', {'Textured': 3, 'White City': 2}).listen();
   //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
   let showStreets = displayFolder.add(controls, 'Show Streets').listen();
   let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();

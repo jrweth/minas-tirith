@@ -155,8 +155,8 @@ vec3 adjustColorForLights(vec3 color, vec3 normal, vec3 point) {
     vec3 lightColor;
     vec3 sunDirection = normalize(sunPosition - point);
     vec3 sunColor = vec3(1.5, 1.25, 1.0);
-    vec3 skyColor = vec3(0.08,0.10,0.14);
-    vec3 indirectColor = vec3(0.04, 0.028, 0.020);
+    vec3 skyColor = vec3(0.16,0.20,0.28);
+    vec3 indirectColor = vec3(0.17, 0.14, 0.10);
     vec3 fireFlyColor = vec3(0.698, 0.956, 0.145);
     float hour = 15.0;
     float night = 0.0;
@@ -177,26 +177,14 @@ vec3 adjustColorForLights(vec3 color, vec3 normal, vec3 point) {
         sunIntensity = 0.0;
     }
 
-
     //make sun brighter at noon
     sunIntensity = sunIntensity * clamp(sunPosition.y/80.0, 0.0, 1.0);
-
     float skyIntensity = clamp(0.5 + 0.5*normal.y, 0.0, 1.0);
 
-    //decrease skyintesity at night
-    if(hour > 17.0) {
-        skyIntensity = clamp(pow((1.0 - (hour - 17.0)/7.0), 4.0), 0.1, 1.0)  * skyIntensity;
-    }
-    if(hour < 6.0) {
-        skyIntensity = clamp(pow((1.0 - (6.0-hour)/6.0), 4.0), 0.1, 1.0)  * skyIntensity;
-    }
 
-    vec3 indirectDirection = normalize(sunDirection * vec3(-1.0, 0.0, -1.0));
+    vec3 indirectDirection = vec3(-sunDirection[0], sunDirection[1], sunDirection[2]);
     //vec3 indirectDirection = normalize(vec3(0.2, 0.0, 1.0));
-    float indirectIntensity = clamp(dot(normal, indirectDirection), 0.0, 1.0);
-
-    //tone down indirect at night
-    //indirectIntensity = indirectIntensity * (1.0 - night);
+    float indirectIntensity = clamp(dot(normal, indirectDirection), 0.0, 1.0);// * shadow;
 
     //make sun redder at sunrise/sunset
     sunColor.r = max(sunColor.r * 3.0 * (dawn*0.8 + sunset), sunColor.r);
@@ -206,8 +194,8 @@ vec3 adjustColorForLights(vec3 color, vec3 normal, vec3 point) {
 
 
 
-    vec3 intensity = sunIntensity*sunColor
-    + skyIntensity * skyColor
+    vec3 intensity = sunIntensity*sunColor +
+     skyIntensity * skyColor
     + indirectIntensity * indirectColor;
 
 
@@ -314,7 +302,7 @@ vec3 getTextureThemeColor() {
         if (fs_Nor.a == 1.0) {
             return getTopPlazaColor(fs_Pos.x, fs_Pos.z);
         }
-        return adjustColorForSun(vec3(0.996, 0.905, 0.784), normal);
+        return adjustColorForLights(vec3(0.5, 0.5, 0.5), normal.xyz, fs_RealPos.xyz).xyz;
     }
 
 
@@ -344,7 +332,7 @@ vec3 getTextureThemeColor() {
     vec3 color = mix(landColor, mountainColor,  percentMountain);
     //hack for back of caslte
     if(abs(fs_Pos.x) + 0.5 < u_CityInfo[0] && fs_Pos.z <= -9.0) color = mountainColor;
-    return adjustColorForSun(color, fs_LandNormal).xyz;
+    return adjustColorForLights(color, fs_LandNormal.xyz, fs_RealPos.xyz).xyz;
 
 }
 
