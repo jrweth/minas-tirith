@@ -51,10 +51,12 @@ export class GridInfo {
  * @param levelNum
  */
 export function getDefaultLevelOptions(levelNum: number): LevelOptions {
+  let levelWidth  = 5 + 5 - levelNum;
+  if(levelNum == 6) levelWidth = 16;
   return {
     wallHeight : 1,
     elevationRise: 9,
-    levelWidth : (levelNum == 6) ? 16 : 5,
+    levelWidth : levelWidth,
     wallWidth : 3,
     gridWidth: 6,
     seed: 1.34 * levelNum,
@@ -879,7 +881,7 @@ export class CityLevel {
     this.buildings.push(new Building({
       pos: this.getBuildingPosition(centerGridPosI,centerGridPosJ, foot[1]),
       rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
-      seed:  Math.pow(this.seed[1] + 1,this.buildings.length + 1),
+      seed:  Math.pow(this.seed[1] + 1.3434,this.buildings.length + 1),
       footprint: foot
     }));
     this.buildings[this.buildings.length - 1].runReplacements();

@@ -297,7 +297,7 @@ vec3 getDazzleThemeBackground() {
 
 
 vec3 getTopPlazaColor(float x, float z) {
-    if(abs(fs_Pos.x) < 0.2) {
+    if(abs(fs_Pos.x) < 0.4) {
         return texture(u_PavementSampler, fs_Pos.xz).xyz;
     }
     float elevation = fbm2to1(vec2(fs_RealPos.x + 20.0, fs_RealPos.z), vec2(3.43, 5.454));
