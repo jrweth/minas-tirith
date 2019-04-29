@@ -484,6 +484,7 @@ export class CityLevel {
     this.initBoulevard();
     this.initGateEntranceRoads();
     this.initGateExitRoads();
+    this.initTunnelRoads();
     this.initSpokeRoads();
 
     let roadBase = this.getLevelHeight();
@@ -572,6 +573,27 @@ export class CityLevel {
         }
       }
     }
+  }
+
+  gridPosUnderSpur(i: number, j: number) : boolean {
+    let pos: vec3 = this.getPosFromGridPos(i, j);
+    //use z = mx + b formula
+    let b = this.city.levels[1].getOuterRadius();
+    let m = b / this.city.levels[6].getOuterRadius();
+    let z = pos[2] - this.city.pos[2];
+    let x = -Math.abs(pos[0] - this.city.pos[0])*1.2;
+    return z < m * x + b;
+  }
+
+  initTunnelRoads() {
+    for(let i = 0; i < this.getBoulevardStartIndex(); i++) {
+      for(let j = 0; j <  this.gridLength; j++)  {
+        if(this.gridPosUnderSpur(i, j)) {
+          this.gridInfo[i][j].gridType = GridType.ROAD;
+        }
+      }
+    }
+
   }
 
   /**
@@ -860,6 +882,8 @@ export class CityLevel {
     pos[1] = pos[1] + buildingHeight / 2;
     return pos;
   }
+
+
 
 
   getBuildingBlocks(): Block[] {
