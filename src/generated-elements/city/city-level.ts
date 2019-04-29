@@ -421,6 +421,14 @@ export class CityLevel {
       this.entranceGate = GatePosition.CENTER;
       this.exitGate = GatePosition.RIGHT;
     }
+    else if(levelNum == 5) {
+      this.entranceGate = GatePosition.RIGHT;
+      this.exitGate = GatePosition.CENTER;
+    }
+    else if(levelNum == 6) {
+      this.entranceGate = GatePosition.CENTER;
+      this.exitGate = GatePosition.CENTER;
+    }
     else if(levelNum % 2 == 1) {
       this.entranceGate = GatePosition.RIGHT;
       this.exitGate = GatePosition.LEFT;
@@ -581,7 +589,7 @@ export class CityLevel {
     let b = this.city.levels[1].getOuterRadius();
     let m = b / this.city.levels[6].getOuterRadius();
     let z = pos[2] - this.city.pos[2];
-    let x = -Math.abs(pos[0] - this.city.pos[0])*1.2;
+    let x = -Math.abs(pos[0] - this.city.pos[0])*0.95;
     return z < m * x + b;
   }
 
