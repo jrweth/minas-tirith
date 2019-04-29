@@ -390,7 +390,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(30, 25, 20  ), vec3.fromValues(0, 10, -9));
+  const camera = new Camera(vec3.fromValues(25, 21, 14  ), vec3.fromValues(0, 9, -9));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());

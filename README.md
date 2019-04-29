@@ -6,7 +6,7 @@ J. Reuben Wetherbee (wetherbe)
 ## Demo
 WebGL demo can be found at (https://jrweth.github.io/minas-tirith)
 
-![](img/white-city.png)
+![](img/final.png)
 
 
 ## Configurable levels
@@ -55,8 +55,30 @@ the grammar has a number of shapes which upon each iteration can replace them.
 
 ![](img/buildings_shape.png)
 
+![](img/buildings1.png)
+
+![](img/buildings2.png)
+
+![](img/buildings3.png)
+
+![](img/buildings4.png)
+
+![](img/buildings5.png)
+
+![](img/palace1.png)
+
+![](img/palace2.png)
+
 ## Still coming
 
+![](img/ascending_levels.png)
+
+
+![](img/mountains1.png)
+
+![](img/mountains2.png)
+
+![](img/ascending_levels.png)
 - a bunch of texturing work
 - quite a few more shape grammar elements for replacement
 - some more decoration of buildings (windows/arches/doors etc)
