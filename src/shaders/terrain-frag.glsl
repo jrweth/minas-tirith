@@ -300,8 +300,8 @@ vec3 getTopPlazaColor(float x, float z) {
     if(abs(fs_Pos.x) < 0.2) {
         return texture(u_PavementSampler, fs_Pos.xz).xyz;
     }
-    float elevation = fbm2to1(vec2(fs_RealPos.x*0.1, fs_RealPos.z * 0.1), vec2(3.43, 5.454));
-    return mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), elevation);
+    float elevation = fbm2to1(vec2(fs_RealPos.x + 20.0, fs_RealPos.z), vec2(3.43, 5.454));
+    return mix(vec3(0.0, 0.4, 0.2), vec3(0.5, 0.7, .3), elevation);
 }
 
 vec3 getTextureThemeColor() {

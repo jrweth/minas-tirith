@@ -170,7 +170,7 @@ void main()
     //adjust the x position
     //float adjustment = fbm2to1(vs_Pos2.yz, vec2(3.34, 4343.2));
     modelposition.x = vs_Pos2.x + calcSpurXOffset(vs_Pos2.y, vs_Pos2.z);
-    modelposition.z = vs_Pos2.z - calcSpurZOffset(vs_Pos2.x, vs_Pos2.y);
+    //modelposition.z = vs_Pos2.z - calcSpurZOffset(vs_Pos2.x, vs_Pos2.y);
   }
 
   if(vs_Pos2.y <= 1.0) {
