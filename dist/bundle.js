@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "dist/";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 34);
+/******/ 	return __webpack_require__(__webpack_require__.s = 36);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -69,15 +69,15 @@
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gl_matrix_common_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gl_matrix_mat2_js__ = __webpack_require__(35);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gl_matrix_mat2d_js__ = __webpack_require__(36);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_matrix_mat3_js__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_matrix_mat4_js__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_matrix_quat_js__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gl_matrix_quat2_js__ = __webpack_require__(37);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__gl_matrix_vec2_js__ = __webpack_require__(38);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__gl_matrix_vec3_js__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__gl_matrix_vec4_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gl_matrix_mat2_js__ = __webpack_require__(37);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gl_matrix_mat2d_js__ = __webpack_require__(38);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gl_matrix_mat3_js__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gl_matrix_mat4_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gl_matrix_quat_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gl_matrix_quat2_js__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__gl_matrix_vec2_js__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__gl_matrix_vec3_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__gl_matrix_vec4_js__ = __webpack_require__(21);
 /* unused harmony reexport glMatrix */
 /* unused harmony reexport mat2 */
 /* unused harmony reexport mat2d */
@@ -174,6 +174,24 @@ function equals(a, b) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TextureType; });
+var TextureType;
+(function (TextureType) {
+    TextureType[TextureType["WALL"] = 0] = "WALL";
+    TextureType[TextureType["ROAD"] = 1] = "ROAD";
+    TextureType[TextureType["ROOF"] = 2] = "ROOF";
+    TextureType[TextureType["BUILDING"] = 3] = "BUILDING";
+    TextureType[TextureType["LEVEL_GROUND"] = 4] = "LEVEL_GROUND";
+    TextureType[TextureType["TURRET"] = 5] = "TURRET";
+    TextureType[TextureType["FOUNDATION"] = 6] = "FOUNDATION";
+})(TextureType || (TextureType = {}));
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return gl; });
 /* harmony export (immutable) */ __webpack_exports__["b"] = setGL;
 var gl;
@@ -183,12 +201,12 @@ function setGL(_gl) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_vec_math__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_vec_math__ = __webpack_require__(12);
 
 
 /**
@@ -257,7 +275,127 @@ class Random {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__geometry_Axis__ = __webpack_require__(13);
+
+
+
+class NumOptions {
+    static getValue(options, maxValue, minValue) {
+        if (options.value)
+            return options.value;
+        if (options.percentage)
+            return maxValue * options.percentage;
+        if (!minValue)
+            minValue = 0;
+        let rand = __WEBPACK_IMPORTED_MODULE_1__noise_random__["a" /* default */].random1to1(1, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(options.seed, 4.2343));
+        return minValue + (maxValue - minValue) * rand;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = NumOptions;
+
+class Shape {
+    constructor(options) {
+        this.children = [];
+        this.pos = options.pos;
+        this.footprint = options.footprint;
+        this.rotation = options.rotation;
+    }
+    getSplitFootprints(options) {
+        options.footprint1 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
+        options.footprint2 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
+        options.footprint1[options.axis] = options.offset;
+        options.footprint2[options.axis] = this.footprint[options.axis] - options.offset;
+    }
+    getSplitPositions(params) {
+        params.position1 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], this.pos[1], this.pos[2]);
+        params.position2 = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], this.pos[1], this.pos[2]);
+        params.position1[params.axis] = this.pos[params.axis] - this.footprint[params.axis] / 2 + 0.5 * params.offset;
+        params.position2[params.axis] = this.pos[params.axis] + 0.5 * params.offset;
+    }
+    splitShape(numDivisions, axis, position, footprint, rotation) {
+        let shapeInfo = [];
+        for (let i = 0; i < numDivisions; i++) {
+            let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].create();
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].copy(pos, position);
+            let distance = -footprint[axis] / 2 + (i + 0.5) * (footprint[axis] / numDivisions);
+            switch (axis) {
+                case __WEBPACK_IMPORTED_MODULE_2__geometry_Axis__["a" /* Axis */].Y:
+                    pos[axis] = pos[axis] + distance;
+                    break;
+                case __WEBPACK_IMPORTED_MODULE_2__geometry_Axis__["a" /* Axis */].X:
+                    pos[0] = pos[0] + Math.cos(this.rotation[1]) * distance;
+                    pos[2] = pos[2] + Math.sin(this.rotation[1]) * distance;
+                    break;
+                case __WEBPACK_IMPORTED_MODULE_2__geometry_Axis__["a" /* Axis */].Z:
+                    pos[0] = pos[0] + Math.sin(this.rotation[1]) * distance;
+                    pos[2] = pos[2] + Math.cos(this.rotation[1]) * distance;
+                    break;
+            }
+            let foot = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].create();
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].copy(foot, footprint);
+            foot[axis] = footprint[axis] / numDivisions;
+            shapeInfo.push({ pos: pos, footprint: foot });
+        }
+        return shapeInfo;
+    }
+    /**
+     * Shrink shape from the center inward
+     * @param axis
+     * @param options
+     */
+    shrink(axis, shrinkBy) {
+        let shrinkage = NumOptions.getValue(shrinkBy, this.footprint[axis]);
+        this.footprint[axis] -= shrinkage;
+    }
+    shrinkX(shrinkBy) {
+        this.shrink(0, shrinkBy);
+    }
+    shrinkZ(shrinkBy) {
+        this.shrink(2, shrinkBy);
+    }
+    shrinkBoth(shrinkBy) {
+        this.shrinkX(shrinkBy);
+        this.shrinkZ(shrinkBy);
+    }
+    reduce(axis, reduceBy) {
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["b"] = Shape;
+
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BlockType; });
+var BlockType;
+(function (BlockType) {
+    BlockType[BlockType["CUBE"] = 1] = "CUBE";
+    BlockType[BlockType["PYRAMID"] = 2] = "PYRAMID";
+    BlockType[BlockType["TENT"] = 3] = "TENT";
+    BlockType[BlockType["TRI_TUBE"] = 4] = "TRI_TUBE";
+    BlockType[BlockType["QUARTER_PYRAMID"] = 5] = "QUARTER_PYRAMID";
+    BlockType[BlockType["SLANT"] = 6] = "SLANT";
+    BlockType[BlockType["WEDGE"] = 7] = "WEDGE";
+    BlockType[BlockType["QUARTER_ROUND"] = 10] = "QUARTER_ROUND"; //standard quarter round
+})(BlockType || (BlockType = {}));
+;
+class Block {
+}
+/* unused harmony export Block */
+
+
+
+/***/ }),
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -311,7 +449,7 @@ function cloneTurtle(turtle) {
 
 
 /***/ }),
-/* 6 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -494,23 +632,190 @@ var Prando = /** @class */ (function () {
 
 
 /***/ }),
-/* 7 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TextureType; });
-var TextureType;
-(function (TextureType) {
-    TextureType[TextureType["WALL"] = 0] = "WALL";
-    TextureType[TextureType["ROAD"] = 1] = "ROAD";
-    TextureType[TextureType["ROOF"] = 2] = "ROOF";
-    TextureType[TextureType["BUILDING"] = 3] = "BUILDING";
-    TextureType[TextureType["LEVEL_GROUND"] = 4] = "LEVEL_GROUND";
-})(TextureType || (TextureType = {}));
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(4);
+
+// enum BufferType {
+//   ELEMENT_ARRAY_BUFFER = 'ELEMENT_ARRAY_BUFFER',
+//   ARRAY_BUFFER = 'ARRAY_BUFFER'
+// }
+//
+// class Buffer {
+//   buffer: WebGLBuffer;
+//   bufferType: BufferType;
+// }
+class Drawable {
+    constructor() {
+        this.count = 0;
+        this.numInstances = 1;
+        this.idxBound = false;
+        this.posBound = false;
+        this.norBound = false;
+        this.infoBound = false;
+        this.colBound = false;
+        this.translateBound = false;
+        this.blockInfoBound = false;
+        this.rotateBound = false;
+        this.scaleBound = false;
+        this.adjustmentBound = false;
+        //starting the process of abstracting this out since it is a huge pain to do each one individually
+        // bufferExists(buffName: string) {
+        //   return this.buffers.hasOwnProperty(buffName);
+        // }
+        //
+        // generate(buffName: string, bufferType: BufferType) {
+        //   if(!this.bufferExists(buffName)) {
+        //     this.buffers[buffName] = {
+        //       buffer: gl.createBuffer(),
+        //       bufferType: bufferType
+        //     }
+        //   }
+        // }
+        //
+        // bind(buffName: string, bufferType: BufferType | null): boolean {
+        //   if(!this.bufferExists(buffName)) {
+        //     this.generate(buffName, bufferType);
+        //   }
+        //   if(this.buffers[buffName].bufferType == BufferType.ARRAY_BUFFER) {
+        //     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers[buffName].buffer);
+        //   }
+        //   else if(this.buffers[buffName].bufferType == BufferType.ELEMENT_ARRAY_BUFFER) {
+        //     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers[buffName].buffer);
+        //   }
+        //
+        //   return true;
+        // }
+    }
+    setNumInstances(num) {
+        this.numInstances = num;
+    }
+    destory() {
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufIdx);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufPos);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufNor);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufTranslate);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufBlockInfo);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufRotate);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufScale);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufAdjustment);
+    }
+    generateIdx() {
+        this.idxBound = true;
+        this.bufIdx = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generatePos() {
+        this.posBound = true;
+        this.bufPos = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateNor() {
+        this.norBound = true;
+        this.bufNor = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateInfo() {
+        this.infoBound = true;
+        this.bufInfo = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateCol() {
+        this.colBound = true;
+        this.bufCol = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateTranslate() {
+        this.translateBound = true;
+        this.bufTranslate = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateBlockInfo() {
+        this.blockInfoBound = true;
+        this.bufBlockInfo = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateRotate() {
+        this.rotateBound = true;
+        this.bufRotate = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateScale() {
+        this.scaleBound = true;
+        this.bufScale = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    generateAdjustment() {
+        this.adjustmentBound = true;
+        this.bufAdjustment = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
+    }
+    bindIdx() {
+        if (this.idxBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.bufIdx);
+        }
+        return this.idxBound;
+    }
+    bindPos() {
+        if (this.posBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
+        }
+        return this.posBound;
+    }
+    bindNor() {
+        if (this.norBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufNor);
+        }
+        return this.norBound;
+    }
+    bindInfo() {
+        if (this.infoBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufInfo);
+        }
+        return this.infoBound;
+    }
+    bindCol() {
+        if (this.colBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol);
+        }
+        return this.colBound;
+    }
+    bindTranslate() {
+        if (this.translateBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufTranslate);
+        }
+        return this.translateBound;
+    }
+    bindBlockInfo() {
+        if (this.blockInfoBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufBlockInfo);
+        }
+        return this.blockInfoBound;
+    }
+    bindRotate() {
+        if (this.rotateBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufRotate);
+        }
+        return this.rotateBound;
+    }
+    bindScale() {
+        if (this.scaleBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufScale);
+        }
+        return this.scaleBound;
+    }
+    bindAdjustment() {
+        if (this.adjustmentBound) {
+            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufAdjustment);
+        }
+        return this.scaleBound;
+    }
+    elemCount() {
+        return this.count;
+    }
+    drawMode() {
+        return __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TRIANGLES;
+    }
+}
+;
+/* harmony default export */ __webpack_exports__["a"] = (Drawable);
 
 
 /***/ }),
-/* 8 */
+/* 11 */
 /***/ (function(module, exports) {
 
 module.exports = invert;
@@ -570,7 +875,7 @@ function invert(out, a) {
 };
 
 /***/ }),
-/* 9 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -753,271 +1058,21 @@ VecMath.id = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["a" /* mat4 */].fromValues(
 
 
 /***/ }),
-/* 10 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noise_random__ = __webpack_require__(4);
-
-
-class NumOptions {
-    static getValue(options, maxValue, minValue) {
-        if (options.value)
-            return options.value;
-        if (options.percentage)
-            return maxValue * options.percentage;
-        if (!minValue)
-            minValue = 0;
-        let rand = __WEBPACK_IMPORTED_MODULE_1__noise_random__["a" /* default */].random1to1(1, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(options.seed, 4.2343));
-        return minValue + (maxValue - minValue) * rand;
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = NumOptions;
-
-class Shape {
-    constructor(options) {
-        this.children = [];
-        this.pos = options.pos;
-        this.footprint = options.footprint;
-        this.rotation = options.rotation;
-    }
-    /**
-     * Shrink shape from the center inward
-     * @param axis
-     * @param options
-     */
-    shrink(axis, shrinkBy) {
-        let shrinkage = NumOptions.getValue(shrinkBy, this.footprint[axis]);
-        this.footprint[axis] -= shrinkage;
-    }
-    shrinkX(shrinkBy) {
-        this.shrink(0, shrinkBy);
-    }
-    shrinkZ(shrinkBy) {
-        this.shrink(2, shrinkBy);
-    }
-    shrinkBoth(shrinkBy) {
-        this.shrinkX(shrinkBy);
-        this.shrinkZ(shrinkBy);
-    }
-    reduce(axis, reduceBy) {
-    }
-}
-/* harmony export (immutable) */ __webpack_exports__["b"] = Shape;
-
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BlockType; });
-var BlockType;
-(function (BlockType) {
-    BlockType[BlockType["CUBE"] = 1] = "CUBE";
-    BlockType[BlockType["PYRAMID"] = 2] = "PYRAMID";
-    BlockType[BlockType["TENT"] = 3] = "TENT";
-    BlockType[BlockType["TRI_TUBE"] = 4] = "TRI_TUBE";
-    BlockType[BlockType["QUARTER_PYRAMID"] = 5] = "QUARTER_PYRAMID";
-    BlockType[BlockType["SLANT"] = 6] = "SLANT";
-    BlockType[BlockType["WEDGE"] = 7] = "WEDGE";
-    BlockType[BlockType["QUARTER_ROUND"] = 10] = "QUARTER_ROUND"; //standard quarter round
-})(BlockType || (BlockType = {}));
-;
-class Block {
-}
-/* unused harmony export Block */
-
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(3);
-
-// enum BufferType {
-//   ELEMENT_ARRAY_BUFFER = 'ELEMENT_ARRAY_BUFFER',
-//   ARRAY_BUFFER = 'ARRAY_BUFFER'
-// }
-//
-// class Buffer {
-//   buffer: WebGLBuffer;
-//   bufferType: BufferType;
-// }
-class Drawable {
-    constructor() {
-        this.count = 0;
-        this.numInstances = 1;
-        this.idxBound = false;
-        this.posBound = false;
-        this.norBound = false;
-        this.infoBound = false;
-        this.colBound = false;
-        this.translateBound = false;
-        this.blockInfoBound = false;
-        this.rotateBound = false;
-        this.scaleBound = false;
-        this.adjustmentBound = false;
-        //starting the process of abstracting this out since it is a huge pain to do each one individually
-        // bufferExists(buffName: string) {
-        //   return this.buffers.hasOwnProperty(buffName);
-        // }
-        //
-        // generate(buffName: string, bufferType: BufferType) {
-        //   if(!this.bufferExists(buffName)) {
-        //     this.buffers[buffName] = {
-        //       buffer: gl.createBuffer(),
-        //       bufferType: bufferType
-        //     }
-        //   }
-        // }
-        //
-        // bind(buffName: string, bufferType: BufferType | null): boolean {
-        //   if(!this.bufferExists(buffName)) {
-        //     this.generate(buffName, bufferType);
-        //   }
-        //   if(this.buffers[buffName].bufferType == BufferType.ARRAY_BUFFER) {
-        //     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers[buffName].buffer);
-        //   }
-        //   else if(this.buffers[buffName].bufferType == BufferType.ELEMENT_ARRAY_BUFFER) {
-        //     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffers[buffName].buffer);
-        //   }
-        //
-        //   return true;
-        // }
-    }
-    setNumInstances(num) {
-        this.numInstances = num;
-    }
-    destory() {
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufIdx);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufPos);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufNor);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufCol);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufTranslate);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufBlockInfo);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufRotate);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufScale);
-        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].deleteBuffer(this.bufAdjustment);
-    }
-    generateIdx() {
-        this.idxBound = true;
-        this.bufIdx = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generatePos() {
-        this.posBound = true;
-        this.bufPos = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateNor() {
-        this.norBound = true;
-        this.bufNor = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateInfo() {
-        this.infoBound = true;
-        this.bufInfo = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateCol() {
-        this.colBound = true;
-        this.bufCol = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateTranslate() {
-        this.translateBound = true;
-        this.bufTranslate = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateBlockInfo() {
-        this.blockInfoBound = true;
-        this.bufBlockInfo = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateRotate() {
-        this.rotateBound = true;
-        this.bufRotate = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateScale() {
-        console.log('genscale');
-        this.scaleBound = true;
-        this.bufScale = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    generateAdjustment() {
-        this.adjustmentBound = true;
-        this.bufAdjustment = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createBuffer();
-    }
-    bindIdx() {
-        if (this.idxBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.bufIdx);
-        }
-        return this.idxBound;
-    }
-    bindPos() {
-        if (this.posBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
-        }
-        return this.posBound;
-    }
-    bindNor() {
-        if (this.norBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufNor);
-        }
-        return this.norBound;
-    }
-    bindInfo() {
-        if (this.infoBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufInfo);
-        }
-        return this.infoBound;
-    }
-    bindCol() {
-        if (this.colBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufCol);
-        }
-        return this.colBound;
-    }
-    bindTranslate() {
-        if (this.translateBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufTranslate);
-        }
-        return this.translateBound;
-    }
-    bindBlockInfo() {
-        if (this.blockInfoBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufBlockInfo);
-        }
-        return this.blockInfoBound;
-    }
-    bindRotate() {
-        if (this.rotateBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufRotate);
-        }
-        return this.rotateBound;
-    }
-    bindScale() {
-        if (this.scaleBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufScale);
-        }
-        return this.scaleBound;
-    }
-    bindAdjustment() {
-        if (this.adjustmentBound) {
-            __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufAdjustment);
-        }
-        return this.scaleBound;
-    }
-    elemCount() {
-        return this.count;
-    }
-    drawMode() {
-        return __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TRIANGLES;
-    }
-}
-;
-/* harmony default export */ __webpack_exports__["a"] = (Drawable);
-
-
-/***/ }),
 /* 13 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Axis; });
+var Axis;
+(function (Axis) {
+    Axis[Axis["X"] = 0] = "X";
+    Axis[Axis["Y"] = 1] = "Y";
+    Axis[Axis["Z"] = 2] = "Z";
+})(Axis || (Axis = {}));
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports) {
 
 module.exports = normalize;
@@ -1045,7 +1100,7 @@ function normalize(out, a) {
 }
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1056,7 +1111,75 @@ class ConstraintAdjustment {
 
 
 /***/ }),
-/* 15 */
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shape_foundation__ = __webpack_require__(102);
+
+
+class Building {
+    constructor(options) {
+        this.pos = options.pos;
+        this.footprint = options.footprint;
+        this.rotation = options.rotation;
+        this.seed = options.seed;
+        this.shapes = [
+            new __WEBPACK_IMPORTED_MODULE_1__shape_foundation__["a" /* Foundation */]({
+                footprint: this.footprint,
+                pos: this.pos,
+                rotation: this.rotation,
+            })
+        ];
+        this.runReplacement();
+    }
+    getBlocks() {
+        let blocks = [];
+        for (let i = 0; i < this.shapes.length; i++) {
+            blocks = blocks.concat(this.shapes[i].getBlocks());
+        }
+        return blocks;
+    }
+    allShapesTerminal() {
+        for (let i = 0; i < this.shapes.length; i++) {
+            if (!this.shapes[i].terminal)
+                return false;
+        }
+        return true;
+    }
+    runReplacements() {
+        let count = 0;
+        while (!this.allShapesTerminal() && count < 20) {
+            count++;
+            this.runReplacement();
+        }
+    }
+    runReplacement() {
+        this.seed += 1.23;
+        //get non terminal shapes
+        let nonTerminal = [];
+        for (let i = 0; i < this.shapes.length; i++) {
+            if (!this.shapes[i].terminal)
+                nonTerminal.push(i);
+        }
+        //pick a random shape to replace
+        let replaceIndex = nonTerminal[__WEBPACK_IMPORTED_MODULE_0__noise_random__["a" /* default */].randomInt(nonTerminal.length - 1, this.seed)];
+        if (this.shapes[replaceIndex]) {
+            let newShapes = this.shapes[replaceIndex].runReplacement(this.seed);
+            this.shapes[replaceIndex] = newShapes[0];
+            for (let i = 1; i < newShapes.length; i++) {
+                this.shapes.push(newShapes[i]);
+            }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Building;
+
+
+
+/***/ }),
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1905,7 +2028,7 @@ var mul = multiply;
 var sub = subtract;
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3801,7 +3924,7 @@ var mul = multiply;
 var sub = subtract;
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3841,9 +3964,9 @@ var sub = subtract;
 /* unused harmony export sqlerp */
 /* unused harmony export setAxes */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mat3_js__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vec3_js__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vec4_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__mat3_js__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__vec3_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__vec4_js__ = __webpack_require__(21);
 
 
 
@@ -4507,7 +4630,7 @@ var setAxes = function () {
 }();
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5349,7 +5472,7 @@ var forEach = function () {
 }();
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6010,7 +6133,7 @@ var forEach = function () {
 }();
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6018,8 +6141,8 @@ var forEach = function () {
 
 module.exports = createFilteredVector
 
-var cubicHermite = __webpack_require__(53)
-var bsearch = __webpack_require__(21)
+var cubicHermite = __webpack_require__(55)
+var bsearch = __webpack_require__(23)
 
 function clamp(lo, hi, x) {
   return Math.min(hi, Math.max(lo, x))
@@ -6308,7 +6431,7 @@ function createFilteredVector(initState, initVelocity, initTime) {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6375,7 +6498,7 @@ module.exports = {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = cross;
@@ -6399,7 +6522,7 @@ function cross(out, a, b) {
 }
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports) {
 
 module.exports = dot;
@@ -6416,10 +6539,10 @@ function dot(a, b) {
 }
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var identity = __webpack_require__(25);
+var identity = __webpack_require__(27);
 
 module.exports = lookAt;
 
@@ -6511,7 +6634,7 @@ function lookAt(out, eye, center, up) {
 };
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports) {
 
 module.exports = identity;
@@ -6543,7 +6666,7 @@ function identity(out) {
 };
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = translate;
@@ -6586,7 +6709,7 @@ function translate(out, a, v) {
 };
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports) {
 
 module.exports = create;
@@ -6618,7 +6741,7 @@ function create() {
 };
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports) {
 
 module.exports = scale;
@@ -6654,7 +6777,7 @@ function scale(out, a, v) {
 };
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = determinant;
@@ -6689,7 +6812,7 @@ function determinant(a) {
 };
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6697,7 +6820,7 @@ function determinant(a) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(0);
 
 
-let Prando = __webpack_require__(6).default;
+let Prando = __webpack_require__(9).default;
 class TurnTowardPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* BaseDrawRule */] {
     constructor(options) {
         super(options);
@@ -6743,7 +6866,7 @@ class TurnTowardPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6751,7 +6874,7 @@ class TurnTowardPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(0);
 
 
-let Prando = __webpack_require__(6).default;
+let Prando = __webpack_require__(9).default;
 class TurnAwayPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* BaseDrawRule */] {
     constructor(options) {
         super(options);
@@ -6799,86 +6922,179 @@ class TurnAwayPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__noise_random__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__shape_box__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__standardRoof__ = __webpack_require__(103);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__texture_texture_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__turret__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__standardBlock__ = __webpack_require__(106);
 
 
-class Building {
+
+
+
+
+
+
+
+class Box extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
     constructor(options) {
-        this.pos = options.pos;
-        this.footprint = options.footprint;
-        this.rotation = options.rotation;
-        this.seed = options.seed;
-        this.shapes = [
-            new __WEBPACK_IMPORTED_MODULE_1__shape_box__["a" /* Box */]({
-                footprint: this.footprint,
-                pos: this.pos,
-                rotation: this.rotation,
-            })
-        ];
-        this.runReplacements();
+        super(options);
+        this.symbol = 'B';
+        this.terminal = false;
+        this.textureType = (typeof options.textureType == 'undefined') ? __WEBPACK_IMPORTED_MODULE_6__texture_texture_type__["a" /* TextureType */].BUILDING : options.textureType;
     }
     getBlocks() {
-        let blocks = [];
-        for (let i = 0; i < this.shapes.length; i++) {
-            blocks = blocks.concat(this.shapes[i].getBlocks());
-        }
-        return blocks;
+        return [{
+                blockType: __WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].CUBE,
+                footprint: this.footprint,
+                pos: this.pos,
+                adjustScale1: 1,
+                adjustScale2: 1,
+                rotation: this.rotation,
+                scaleFromCenter: true,
+                textureType: this.textureType
+            }];
     }
-    allShapesTerminal() {
-        for (let i = 0; i < this.shapes.length; i++) {
-            if (!this.shapes[i].terminal)
-                return false;
+    runReplacement(seed) {
+        let type = __WEBPACK_IMPORTED_MODULE_3__noise_random__["a" /* default */].randomInt(13, seed);
+        switch (type) {
+            case 0: return this.splitX({ percentage: 0.5 });
+            case 1: return this.splitY({ percentage: 0.5 });
+            case 2: return this.splitZ({ percentage: 0.5 });
+            case 3: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].SLANT);
+            case 4: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].TENT);
+            case 5: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].PYRAMID);
+            case 6:
+                this.shrinkX({ percentage: 0.20 });
+                return [this];
+            case 7: return this.taperBoth({ percentage: 0.25 });
+            case 8: return this.taperX({ percentage: 0.25 });
+            case 9: return this.taperZ({ percentage: 0.25 });
+            //  case 10: this.terminal = true; return [this];
+            default:
+                return this.toTurret();
         }
-        return true;
     }
-    runReplacements() {
-        let count = 0;
-        while (!this.allShapesTerminal() && count < 20) {
-            count++;
-            this.runReplacement();
-        }
+    addRoof(blockType) {
+        let height = Math.min(this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X], this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z]);
+        let posY = this.pos[1] + 0.5 * this.footprint[1] + 0.5 * height;
+        let roof = new __WEBPACK_IMPORTED_MODULE_5__standardRoof__["a" /* StandardRoof */]({
+            blockType: blockType,
+            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], posY, this.pos[2]),
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], height, this.footprint[2]),
+            rotation: this.rotation
+        });
+        this.terminal = true;
+        return [this, roof];
     }
-    runReplacement() {
-        this.seed += 1.23;
-        //get non terminal shapes
-        let nonTerminal = [];
-        for (let i = 0; i < this.shapes.length; i++) {
-            if (!this.shapes[i].terminal)
-                nonTerminal.push(i);
+    taperBoth(shrinkBy) {
+        let newBoxes = this.splitY({ percentage: .5 });
+        if (newBoxes.length > 1) {
+            newBoxes[1].shrinkBoth(shrinkBy);
         }
-        //pick a random shape to replace
-        let replaceIndex = nonTerminal[__WEBPACK_IMPORTED_MODULE_0__noise_random__["a" /* default */].randomInt(nonTerminal.length - 1, this.seed)];
-        let newShapes = this.shapes[replaceIndex].runReplacement(this.seed);
-        this.shapes[replaceIndex] = newShapes[0];
-        for (let i = 1; i < newShapes.length; i++) {
-            this.shapes.push(newShapes[i]);
+        return newBoxes;
+    }
+    taperX(shrinkBy) {
+        let newBoxes = this.splitY({ percentage: .5 });
+        if (newBoxes.length > 1) {
+            newBoxes[1].shrinkX(shrinkBy);
         }
+        return newBoxes;
+    }
+    taperZ(shrinkBy) {
+        let newBoxes = this.splitY({ percentage: .5 });
+        if (newBoxes.length > 1) {
+            newBoxes[1].shrinkZ(shrinkBy);
+        }
+        return newBoxes;
+    }
+    toTurret() {
+        let newShapes7 = this.splitShape(8, __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Y, this.pos, this.footprint, this.rotation);
+        //create a base 1/4 the size of the current box
+        let base = new Box({
+            pos: newShapes7[0].pos,
+            footprint: newShapes7[0].footprint,
+            rotation: this.rotation
+        });
+        base.terminal = true;
+        let rot = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].copy(rot, this.rotation);
+        if (this.footprint[0] < this.footprint[2]) {
+            newShapes7[1].footprint[0] = this.footprint[2];
+            newShapes7[1].footprint[2] = this.footprint[0];
+            rot[1] += Math.PI / 2;
+        }
+        let transition = new __WEBPACK_IMPORTED_MODULE_8__standardBlock__["a" /* StandardBlock */]({
+            pos: newShapes7[1].pos,
+            footprint: newShapes7[1].footprint,
+            rotation: rot,
+            blockType: __WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].TENT,
+            adjustScale1: 0.5,
+            adjustScale2: 1,
+            textureType: __WEBPACK_IMPORTED_MODULE_6__texture_texture_type__["a" /* TextureType */].BUILDING
+        });
+        let turret = new __WEBPACK_IMPORTED_MODULE_7__turret__["a" /* Turret */]({
+            pos: newShapes7[4].pos,
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], this.footprint[1] * 5 / 7, this.footprint[2]),
+            rotation: this.rotation
+        });
+        return [base, transition, turret];
+    }
+    splitX(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X, splitAt); }
+    splitY(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Y, splitAt); }
+    splitZ(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z, splitAt); }
+    split(axis, splitAt) {
+        //too small to spit vertically
+        if (this.footprint[axis] < 0.4) {
+            return [this];
+        }
+        let offset = __WEBPACK_IMPORTED_MODULE_0__shape__["a" /* NumOptions */].getValue(splitAt, this.footprint[axis] * 0.7, this.footprint[axis] * 0.3);
+        let newPos = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], this.pos[1], this.pos[2]);
+        newPos[axis] = this.pos[axis] + 0.5 * offset;
+        let newFootprint = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
+        newFootprint[axis] = this.footprint[axis] - offset;
+        let newBox = new Box({
+            pos: newPos,
+            footprint: newFootprint,
+            rotation: this.rotation
+        });
+        this.pos[axis] = this.pos[axis] - this.footprint[axis] / 2 + 0.5 * offset;
+        this.footprint[axis] = offset;
+        //no more changes if we are supporting something on top
+        if (axis == 1)
+            this.terminal = true;
+        return [this, newBox];
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Building;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Box;
 
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export GatePosition */
 /* unused harmony export GridType */
 /* harmony export (immutable) */ __webpack_exports__["b"] = getDefaultLevelOptions;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__building_shape_block__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__building_shape_wall__ = __webpack_require__(104);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__building_shape_block__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__building_shape_wall__ = __webpack_require__(108);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noise_random__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__building_building__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__road__ = __webpack_require__(105);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__building_building__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__road__ = __webpack_require__(109);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__building_shape_battlement__ = __webpack_require__(110);
+
 
 
 
@@ -6913,11 +7129,14 @@ class GridInfo {
  * @param levelNum
  */
 function getDefaultLevelOptions(levelNum) {
+    let levelWidth = 5 + 5 - levelNum;
+    if (levelNum == 6)
+        levelWidth = 16;
     return {
         wallHeight: 1,
-        elevationRise: 6,
-        levelWidth: 4,
-        wallWidth: 2,
+        elevationRise: 9,
+        levelWidth: levelWidth,
+        wallWidth: 3,
         gridWidth: 6,
         seed: 1.34 * levelNum,
         buildingFootprintTarget: Math.pow(levelNum + 1.3, 1.7)
@@ -6934,7 +7153,7 @@ class CityLevel {
         this.levelWidth = options.levelWidth;
         this.elevationRise = options.elevationRise;
         this.gridWidth = options.gridWidth;
-        this.seed = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["b" /* vec2 */].fromValues(this.levelNum, options.seed);
+        this.seed = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["b" /* vec2 */].fromValues(this.levelNum + 1, options.seed);
         this.buildingFootprintTarget = options.buildingFootprintTarget;
         if (options.entranceGate)
             this.entranceGate = options.entranceGate;
@@ -6955,6 +7174,32 @@ class CityLevel {
         }
         return height;
     }
+    getNextLevelHeight() {
+        let nextLevelHeight = this.getLevelHeight();
+        if (this.levelNum < this.city.levels.length - 1) {
+            nextLevelHeight = this.city.levels[this.levelNum + 1].getLevelHeight();
+        }
+        else {
+            nextLevelHeight += this.elevationRise;
+        }
+        return nextLevelHeight;
+    }
+    getNextLevelElevationRise() {
+        if (this.levelNum < this.city.levels.length - 1) {
+            return this.city.levels[this.levelNum + 1].elevationRise;
+        }
+        return this.wallHeight;
+    }
+    getInnerRadius() {
+        let radius = 0;
+        for (let i = this.levelNum + 1; i < 7; i++) {
+            radius += this.city.levels[i].levelWidth + this.city.levels[i].wallWidth;
+        }
+        return radius;
+    }
+    getOuterRadius() {
+        return this.wallWidth + this.levelWidth + this.getInnerRadius();
+    }
     getLevelRadius() {
         let radius = this.wallWidth + this.levelWidth;
         for (let i = this.levelNum + 1; i < 7; i++) {
@@ -6969,24 +7214,17 @@ class CityLevel {
         if (!this.wall)
             this.initWall();
         let blocks = [];
-        let wallBlocks = this.wall.getBlocks();
-        let gateIndex = this.getGateWallBlockIndex();
         blocks = blocks.concat(this.road.getBlocks());
-        if (this.city.showWalls) {
-            for (let i = 0; i < wallBlocks.length; i++) {
-                if (i !== gateIndex) {
-                    blocks.push(wallBlocks[i]);
-                }
-            }
-        }
+        if (this.city.showWalls)
+            blocks = blocks.concat(this.getWallBlocks());
         if (this.city.showRoads)
-            blocks = blocks.concat(this.getRoadBlocks());
+            blocks = blocks.concat(this.getStreetBlocks());
         if (this.city.showBuildings)
             blocks = blocks.concat(this.getBuildingBlocks());
         return blocks;
     }
     getGridLength() {
-        let radius = this.getLevelRadius();
+        let radius = this.getInnerRadius();
         let gridLength = radius * this.city.sweep * this.gridWidth / this.levelWidth;
         return Math.floor(gridLength);
     }
@@ -7000,12 +7238,11 @@ class CityLevel {
     setElevationRise(rise) {
         this.elevationRise = rise;
         //initialize shapes for all levels here and below
-        for (let i = this.levelNum; i >= 0; i--) {
+        for (let i = this.levelNum; i < this.city.levels.length; i++) {
             this.city.levels[i].rescaleLevel();
         }
     }
     setBuildingFootprintTarget(footprint) {
-        console.log('here');
         this.buildingFootprintTarget = footprint;
         this.rescaleLevel();
     }
@@ -7020,7 +7257,14 @@ class CityLevel {
     updateGridPositions() {
         for (let i = 0; i < this.gridWidth; i++) {
             for (let j = 0; j < this.gridLength; j++) {
-                this.gridInfo[i][j].pos = this.getPosFromGridPos(i, j);
+                try {
+                    this.gridInfo[i][j].pos = this.getPosFromGridPos(i, j);
+                }
+                catch (e) {
+                    console.log(e);
+                    console.log('i: ' + i + ' j: ' + j);
+                    console.log(this);
+                }
             }
         }
     }
@@ -7046,11 +7290,12 @@ class CityLevel {
     }
     setGridWidth(width) {
         this.gridWidth = width;
+        this.initGrid();
         //initialize shapes for all levels here and below
         this.rescaleLevel();
     }
     getPosFromGridPos(i, j) {
-        let radius = this.getLevelRadius() - this.wallWidth / 2 - this.levelWidth + (i * this.levelWidth / this.gridWidth);
+        let radius = this.getInnerRadius() + (i + 0.5) * (this.levelWidth / this.gridWidth);
         let angle = this.getRotFromGridPos(i, j);
         let x = this.city.pos[0] + Math.cos(angle[1]) * radius;
         let y = this.getHeightFromGridPos(i, j);
@@ -7118,6 +7363,13 @@ class CityLevel {
         }
         return this.elevationRise + this.wallHeight + this.city.levels[this.levelNum - 1].elevationRise;
     }
+    getWallBase() {
+        let wallBase = this.getLevelHeight();
+        if (this.levelNum > 0) {
+            wallBase -= this.city.levels[this.levelNum - 1].elevationRise;
+        }
+        return wallBase;
+    }
     setWallHeight(height) {
         this.wallHeight = height;
         //initialize shapes for all levels here and above
@@ -7132,16 +7384,15 @@ class CityLevel {
             this.city.levels[i].rescaleLevel();
         }
     }
+    getWallTopElevation() {
+        return this.getWallBase() + this.getTotalWallHeight();
+    }
     initWall() {
         //initialize the wall
-        let wallBase = this.getLevelHeight();
-        if (this.levelNum > 0) {
-            wallBase -= this.city.levels[this.levelNum - 1].elevationRise;
-        }
-        let levelRadius = this.getLevelRadius();
+        let levelRadius = this.getOuterRadius() - this.wallWidth / 2;
         let numSegments = this.getNumWallSegments();
         this.wall = new __WEBPACK_IMPORTED_MODULE_1__building_shape_wall__["a" /* Wall */]({
-            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0], wallBase, this.city.pos[2]),
+            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0], this.getWallBase(), this.city.pos[2]),
             footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(levelRadius, this.getTotalWallHeight(), this.wallWidth),
             rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0),
             sweep: Math.PI,
@@ -7180,6 +7431,14 @@ class CityLevel {
             this.entranceGate = GatePosition.CENTER;
             this.exitGate = GatePosition.RIGHT;
         }
+        else if (levelNum == 5) {
+            this.entranceGate = GatePosition.RIGHT;
+            this.exitGate = GatePosition.CENTER;
+        }
+        else if (levelNum == 6) {
+            this.entranceGate = GatePosition.CENTER;
+            this.exitGate = GatePosition.CENTER;
+        }
         else if (levelNum % 2 == 1) {
             this.entranceGate = GatePosition.RIGHT;
             this.exitGate = GatePosition.LEFT;
@@ -7188,6 +7447,43 @@ class CityLevel {
             this.entranceGate = GatePosition.LEFT;
             this.exitGate = GatePosition.RIGHT;
         }
+    }
+    getSpurBlocks() {
+        let blocks = [];
+        if (this.levelNum == 6) {
+            let posX = this.city.pos[0] + 1.5 + this.getOuterRadius() / 2.0;
+            let posX2 = this.city.pos[0] - 1.5 - this.getOuterRadius() / 2.0;
+            let posY = this.getWallTopElevation() + 1;
+            let posZ = this.city.pos[2] - 5.0 + this.city.levels[1].getOuterRadius() / 2.0;
+            let rot = Math.atan((this.getOuterRadius()) / this.city.levels[1].getOuterRadius());
+            let length = Math.sqrt(this.getOuterRadius() * this.getOuterRadius() + this.city.levels[1].getOuterRadius() * this.city.levels[1].getOuterRadius());
+            length = length - 5.0;
+            let battlement1 = new __WEBPACK_IMPORTED_MODULE_7__building_shape_battlement__["a" /* Battlement */]({
+                pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(posX, posY, posZ),
+                footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(3, 2, length),
+                rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, rot, 0)
+            });
+            let battlement2 = new __WEBPACK_IMPORTED_MODULE_7__building_shape_battlement__["a" /* Battlement */]({
+                pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(posX2, posY, posZ),
+                footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(3, 2, length),
+                rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, Math.PI * 2 - rot, 0)
+            });
+            blocks = battlement1.getBlocks();
+            blocks = blocks.concat(battlement2.getBlocks());
+        }
+        return blocks;
+    }
+    getWallBlocks() {
+        let blocks = [];
+        let wallBlocks = this.wall.getBlocks();
+        let gateIndex = this.getGateWallBlockIndex();
+        for (let i = 0; i < wallBlocks.length; i++) {
+            if (i !== gateIndex) {
+                blocks.push(wallBlocks[i]);
+            }
+        }
+        blocks = blocks.concat(this.getSpurBlocks());
+        return blocks;
     }
     /******************************************************************************************************/
     /******************************************ROADS*******************************************************/
@@ -7199,12 +7495,13 @@ class CityLevel {
         this.initBoulevard();
         this.initGateEntranceRoads();
         this.initGateExitRoads();
+        this.initTunnelRoads();
         this.initSpokeRoads();
         let roadBase = this.getLevelHeight();
         if (this.levelNum > 0) {
             roadBase -= this.city.levels[this.levelNum - 1].elevationRise;
         }
-        let roadRadius = this.getLevelRadius() - 0.51 * (this.levelWidth);
+        let roadRadius = (this.getOuterRadius() + this.getInnerRadius()) / 2.01;
         let numSegments = this.getNumWallSegments();
         this.road = new __WEBPACK_IMPORTED_MODULE_6__road__["a" /* Road */]({
             pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0], roadBase, this.city.pos[2]),
@@ -7279,6 +7576,24 @@ class CityLevel {
             }
         }
     }
+    gridPosUnderSpur(i, j) {
+        let pos = this.getPosFromGridPos(i, j);
+        //use z = mx + b formula
+        let b = this.city.levels[1].getOuterRadius();
+        let m = b / this.city.levels[6].getOuterRadius();
+        let z = pos[2] - this.city.pos[2];
+        let x = -Math.abs(pos[0] - this.city.pos[0]) * 0.95;
+        return z < m * x + b;
+    }
+    initTunnelRoads() {
+        for (let i = 0; i < this.getBoulevardStartIndex(); i++) {
+            for (let j = 0; j < this.gridLength; j++) {
+                if (this.gridPosUnderSpur(i, j)) {
+                    this.gridInfo[i][j].gridType = GridType.ROAD;
+                }
+            }
+        }
+    }
     /**
      * initialize all the spoke roads
      */
@@ -7307,7 +7622,7 @@ class CityLevel {
             }
         }
     }
-    getRoadBlocks() {
+    getStreetBlocks() {
         let blocks = [];
         let gridSize = this.levelWidth / this.gridWidth;
         let footprint = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(gridSize, 1, gridSize);
@@ -7317,12 +7632,12 @@ class CityLevel {
                     let pos = this.gridInfo[i][j].pos;
                     blocks.push({
                         blockType: __WEBPACK_IMPORTED_MODULE_0__building_shape_block__["a" /* BlockType */].CUBE,
-                        pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(pos[0], pos[1] - 0.35, pos[2]),
+                        pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(pos[0], pos[1] + 0.35, pos[2]),
                         footprint: footprint,
                         adjustScale1: 1,
                         adjustScale2: 1,
                         rotation: this.gridInfo[i][j].rotation,
-                        scaleFromCenter: false,
+                        scaleFromCenter: true,
                         textureType: __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__["a" /* TextureType */].ROAD
                     });
                 }
@@ -7335,26 +7650,53 @@ class CityLevel {
     /******************************************************************************************************/
     initBuildings() {
         this.buildings = [];
-        for (let k = 0; k < this.outSpokes.length; k++) {
-            let startI = this.boulevardStartIndex + this.boulevardWidth;
-            let startJ = this.outSpokes[k] + 1;
-            let endI = this.gridWidth - 1;
-            let endJ = this.gridLength - 1;
-            if (k < this.outSpokes.length - 1) {
-                endJ = this.outSpokes[k + 1] - 1;
-            }
-            this.initBlockBuildings(startI, startJ, endI, endJ);
+        if (this.levelNum == 6) {
+            this.initPalace();
         }
-        for (let k = 0; k < this.inSpokes.length; k++) {
-            let startI = 0;
-            let startJ = this.inSpokes[k] + 1;
-            let endI = this.boulevardStartIndex - 1;
-            let endJ = this.gridLength - 1;
-            if (k < this.inSpokes.length - 1) {
-                endJ = this.inSpokes[k + 1] - 1;
+        else {
+            for (let k = 0; k < this.outSpokes.length; k++) {
+                let startI = this.boulevardStartIndex + this.boulevardWidth;
+                let startJ = this.outSpokes[k] + 1;
+                let endI = this.gridWidth - 1;
+                let endJ = this.gridLength - 1;
+                if (k < this.outSpokes.length - 1) {
+                    endJ = this.outSpokes[k + 1] - 1;
+                }
+                this.initBlockBuildings(startI, startJ, endI, endJ);
             }
-            this.initBlockBuildings(startI, startJ, endI, endJ);
+            for (let k = 0; k < this.inSpokes.length; k++) {
+                let startI = 0;
+                let startJ = this.inSpokes[k] + 1;
+                let endI = this.boulevardStartIndex - 1;
+                let endJ = this.gridLength - 1;
+                if (k < this.inSpokes.length - 1) {
+                    endJ = this.inSpokes[k + 1] - 1;
+                }
+                this.initBlockBuildings(startI, startJ, endI, endJ);
+            }
         }
+    }
+    initPalace() {
+        this.buildings = [];
+        console.log('palace');
+        let size = this.getOuterRadius() * 1.4;
+        let palace = new __WEBPACK_IMPORTED_MODULE_4__building_building__["a" /* Building */]({
+            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0], this.getWallTopElevation() + size / 4, this.city.pos[2] + size / 6.2),
+            rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0),
+            seed: Math.pow(this.seed[1], this.city.palaceSeed),
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(size, size / 2, size / 3.1)
+        });
+        palace.runReplacements();
+        this.buildings.push(palace);
+        let tower = new __WEBPACK_IMPORTED_MODULE_4__building_building__["a" /* Building */]({
+            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0] - size / 2 - 1.1, this.getWallTopElevation() + size * 1.2 / 2, this.city.pos[2] + 0.5),
+            rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0),
+            seed: Math.pow(this.seed[1], this.city.towerSeed),
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(2, size * 1.2, 2)
+        });
+        tower.runReplacements();
+        this.buildings.push(tower);
+        //add a wall at the top of the spur
     }
     initBlockBuildings(startI, startJ, endI, endJ) {
         //create a set of possible locations
@@ -7482,29 +7824,23 @@ class CityLevel {
     initBuilding(location, footprint) {
         let centerGridPosI = location[0] + footprint[0] / 2;
         let centerGridPosJ = location[1] + footprint[1] / 2;
-        let height = Math.min(footprint[0], footprint[1]);
-        let foot = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(footprint[0] * 0.5, height, footprint[1] * 0.5);
+        let scale = this.levelWidth / this.gridWidth;
+        let height = Math.min(footprint[0], footprint[1]) * scale;
+        let foot = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(footprint[0] * scale * 0.75, height, footprint[1] * scale * 0.75);
         this.buildings.push(new __WEBPACK_IMPORTED_MODULE_4__building_building__["a" /* Building */]({
             pos: this.getBuildingPosition(centerGridPosI, centerGridPosJ, foot[1]),
             rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
-            seed: Math.pow(this.seed[1], this.buildings.length + 1),
+            seed: Math.pow(this.seed[1] + 1.3434, this.buildings.length + 1),
             footprint: foot
         }));
+        this.buildings[this.buildings.length - 1].runReplacements();
     }
     getBuildingPosition(gridI, gridJ, buildingHeight) {
-        let pos = this.getPosFromGridPos(gridI, gridJ);
+        let pos = this.getPosFromGridPos(gridI - 0.5, gridJ - 0.5);
         pos[1] = pos[1] + buildingHeight / 2;
         return pos;
     }
     getBuildingBlocks() {
-        // let building = new Building({
-        //     pos: vec3.fromValues(250, 20, 250),
-        //     rotation: vec3.fromValues(0,0,0),
-        //     seed: 1,
-        //     footprint: vec3.fromValues(20, 20, 20)
-        //   }
-        // );
-        // return building.getBlocks();
         let blocks = [];
         for (let i = 0; i < this.buildings.length; i++) {
             blocks = blocks.concat(this.buildings[i].getBlocks());
@@ -7518,26 +7854,30 @@ class CityLevel {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_stats_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_stats_js__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(40);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_dat_gui___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_dat_gui__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Square__ = __webpack_require__(43);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Cube__ = __webpack_require__(44);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__geometry_TerrainPlane__ = __webpack_require__(45);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rendering_gl_OpenGLRenderer__ = __webpack_require__(46);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Camera__ = __webpack_require__(47);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__globals__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__ = __webpack_require__(82);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__generated_elements_terrain__ = __webpack_require__(83);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__generated_elements_city_city__ = __webpack_require__(103);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__generated_elements_city_city_level__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__geometry_Square__ = __webpack_require__(45);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Cube__ = __webpack_require__(46);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__geometry_TerrainPlane__ = __webpack_require__(47);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__rendering_gl_OpenGLRenderer__ = __webpack_require__(48);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Camera__ = __webpack_require__(49);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__globals__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__ = __webpack_require__(84);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__generated_elements_terrain__ = __webpack_require__(85);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__generated_elements_city_city__ = __webpack_require__(107);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__generated_elements_city_city_level__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__texture_texture__ = __webpack_require__(111);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__ = __webpack_require__(112);
+
+
 
 
 
@@ -7563,14 +7903,18 @@ function initLevels() {
 const controls = {
     'Levels': initLevels(),
     'AllLevels': Object(__WEBPACK_IMPORTED_MODULE_12__generated_elements_city_city_level__["b" /* getDefaultLevelOptions */])(0),
-    'Theme': 2,
+    'Theme': 3,
     'Show Highways': true,
     'Show Streets': false,
     'Show Population Density': true,
     'Show Buildings': true,
     'Show Build Sites': false,
     'Show Walls': true,
-    'Elevation Seed': 89.3943,
+    'Sample Buildings': false,
+    'Show Spur': true,
+    'Palace Seed': 0.4,
+    'Tower Seed': 0.2,
+    'Elevation Seed': 8,
     'Population Seed': 1.234,
     'Road Seed': 5.43,
     'Highway Segment Length': 8,
@@ -7588,6 +7932,12 @@ let terrain;
 let square;
 let cube;
 let plane;
+let spur1;
+let spur2;
+let spur3;
+let spur4;
+let spur5;
+let spur6;
 let roadSegments;
 let wPressed;
 let aPressed;
@@ -7595,6 +7945,8 @@ let sPressed;
 let dPressed;
 let planePos;
 let city;
+let pavementTexture;
+let whiteStoneTexture;
 function initTerrain() {
     //initialize terrain
     terrain = new __WEBPACK_IMPORTED_MODULE_10__generated_elements_terrain__["a" /* Terrain */]();
@@ -7611,8 +7963,20 @@ function initTerrain() {
 }
 function loadScene() {
     //create the plane geometry
-    plane = new __WEBPACK_IMPORTED_MODULE_5__geometry_TerrainPlane__["a" /* default */](terrain);
+    plane = new __WEBPACK_IMPORTED_MODULE_5__geometry_TerrainPlane__["a" /* default */]();
     plane.create();
+    spur1 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 1);
+    spur1.create();
+    spur2 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 2);
+    spur2.create();
+    spur3 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 3);
+    spur3.create();
+    spur4 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 4);
+    spur4.create();
+    spur5 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 5);
+    spur5.create();
+    spur6 = new __WEBPACK_IMPORTED_MODULE_14__geometry_SpurGeometry__["a" /* default */](city, 6);
+    spur6.create();
     //create the road geometry
     // roadSegments = new RoadSegments({
     //   gridSize: terrain.gridSize,
@@ -7643,10 +8007,10 @@ function loadScene() {
  */
 function addTerrainControls() {
     let terrainFolder = gui.addFolder('terrain');
-    let eSeed = terrainFolder.add(controls, 'Elevation Seed', { 'seed 1': 89.3943, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 1.234 }).listen();
-    eSeed.onChange(loadScene);
-    let pSeed = terrainFolder.add(controls, 'Population Seed', { 'seed 1': 1.234, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 43.343 }).listen();
-    pSeed.onChange(loadScene);
+    let eSeed = terrainFolder.add(controls, 'Elevation Seed', { 'seed 1': 8, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 1.234 }).listen();
+    eSeed.onChange(() => { initTerrain(); loadScene(); });
+    // let pSeed = terrainFolder.add(controls, 'Population Seed', {'seed 1': 1.234, 'seed 2': 5.43, 'seed 3': 8.987, 'seed 4': 43.343}).listen();
+    // pSeed.onChange(loadScene);
     // mapType.onChange();
 }
 function getDisplayOptions() {
@@ -7660,10 +8024,13 @@ function redoRoads() {
 }
 function getBackgroundColor() {
     if (controls.Theme == 1) {
-        return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(164.0 / 255.0, 233.0 / 255.0, 1.0);
+        return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0.65, .91, 1.0);
     }
     else if (controls.Theme == 2) {
         return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0);
+    }
+    else if (controls.Theme == 3) {
+        return __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0.65, .91, 1.0);
     }
 }
 /**
@@ -7672,16 +8039,21 @@ function getBackgroundColor() {
  */
 function addDisplayControls(options) {
     let displayFolder = gui.addFolder('display');
-    let theme = displayFolder.add(controls, 'Theme', { 'Map': 1, 'White City': 2 }).listen();
+    let theme = displayFolder.add(controls, 'Theme', { 'Textured': 3, 'White City': 2 }).listen();
     //let showHighways = displayFolder.add(controls, 'Show Highways').listen();
     let showStreets = displayFolder.add(controls, 'Show Streets').listen();
-    //let showPop = displayFolder.add(controls, 'Show Population Density').listen();
     let showBuildings = displayFolder.add(controls, 'Show Buildings').listen();
-    //let showBuildSites = displayFolder.add(controls, 'Show Build Sites').listen();
     let showWalls = displayFolder.add(controls, 'Show Walls');
+    let showSpur = displayFolder.add(controls, 'Show Spur');
+    let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
+    let palaceSeed = displayFolder.add(controls, 'Palace Seed').min(0).max(1.0).step(0.05).listen();
+    let towerSeed = displayFolder.add(controls, 'Tower Seed').min(0).max(1.0).step(0.05).listen();
     showBuildings.onChange(() => { city.showBuildings = controls["Show Buildings"]; loadScene(); });
     showStreets.onChange(() => { city.showRoads = controls["Show Streets"]; loadScene(); });
     showWalls.onChange(() => { city.showWalls = controls["Show Walls"]; loadScene(); });
+    sampleBuildings.onChange(() => { city.showSampleBuildings = controls["Sample Buildings"]; loadScene(); });
+    towerSeed.onChange(() => { city.towerSeed = controls["Tower Seed"]; city.initPalace(); loadScene(); });
+    palaceSeed.onChange(() => { city.palaceSeed = controls["Palace Seed"]; city.initPalace(); loadScene(); });
     theme.onChange(() => {
         options.terrainShader.setDisplayOptions(getDisplayOptions());
         options.roadShader.setDisplayOptions(getDisplayOptions());
@@ -7801,10 +8173,13 @@ function addLevelControls() {
 function main() {
     initTerrain();
     city = new __WEBPACK_IMPORTED_MODULE_11__generated_elements_city_city__["a" /* City */]({
-        pos: __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(250, 0, 200),
+        pos: __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(250, 0.1, 200),
         seed: 12345,
+        palaceSeed: controls["Palace Seed"],
+        towerSeed: controls["Tower Seed"]
     });
     city.initBuildings();
+    city.showSampleBuildings = controls["Sample Buildings"];
     window.addEventListener('keypress', function (e) {
         // console.log(e.key);
         switch (e.key) {
@@ -7854,27 +8229,33 @@ function main() {
     // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
     // Later, we can import `gl` from `globals.ts` to access it
     Object(__WEBPACK_IMPORTED_MODULE_8__globals__["b" /* setGL */])(gl);
-    // Initial call to load scene
-    loadScene();
-    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(-12, 10, 7), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 5, -3));
+    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(25, 21, 14), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 9, -9));
     const renderer = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor3(getBackgroundColor());
     gl.enable(gl.DEPTH_TEST);
     const terrainShader = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(106)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(107)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(113)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(114)),
     ]);
     const roadShader = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(108)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(109)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(115)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(116)),
     ]);
     const buildingShader = new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["b" /* default */]([
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(110)),
-        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(111)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.VERTEX_SHADER, __webpack_require__(117)),
+        new __WEBPACK_IMPORTED_MODULE_9__rendering_gl_ShaderProgram__["a" /* Shader */](gl.FRAGMENT_SHADER, __webpack_require__(118)),
     ]);
     terrainShader.setDisplayOptions(getDisplayOptions());
     roadShader.setDisplayOptions(getDisplayOptions());
     buildingShader.setDisplayOptions(getDisplayOptions());
+    whiteStoneTexture = new __WEBPACK_IMPORTED_MODULE_13__texture_texture__["a" /* default */]('src/texture/white-stone.jpg', 0);
+    pavementTexture = new __WEBPACK_IMPORTED_MODULE_13__texture_texture__["a" /* default */]('src/texture/pavement.jpg', 0);
+    buildingShader.bindTexToUnit(buildingShader.unifWhiteStoneSampler, whiteStoneTexture, 0);
+    buildingShader.bindTexToUnit(buildingShader.unifPavementSampler, pavementTexture, 1);
+    terrainShader.bindTexToUnit(terrainShader.unifWhiteStoneSampler, whiteStoneTexture, 0);
+    terrainShader.bindTexToUnit(terrainShader.unifPavementSampler, pavementTexture, 1);
+    // Initial call to load scene
+    loadScene();
     //add all the controls
     addDisplayControls({
         terrainShader: terrainShader,
@@ -7882,7 +8263,7 @@ function main() {
         roadShader: roadShader,
         renderer: renderer
     });
-    //addTerrainControls();
+    addTerrainControls();
     //addRoadControls();
     //addBuildingControls();
     addLevelControls();
@@ -7912,9 +8293,12 @@ function main() {
         gl.viewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.clear();
         processKeyPresses();
-        renderer.render(camera, terrainShader, [
-            plane
-        ]);
+        //figure out the ratio
+        let terrainDrawables = [plane, spur1, spur2, spur3, spur4, spur5, spur6];
+        if (controls["Sample Buildings"] || !controls["Show Spur"])
+            terrainDrawables = [plane];
+        terrainShader.setCityInfo({ cityHeight: city.getHeight() / 3.3, cityRadius: city.getRadius() * 0.2 });
+        renderer.render(camera, terrainShader, terrainDrawables);
         if (controls["Show Highways"] || controls["Show Streets"]) {
             //  renderer.render(camera, roadShader, [roadSegments]);
         }
@@ -7938,7 +8322,7 @@ main();
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8405,7 +8789,7 @@ var mul = multiply;
 var sub = subtract;
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8921,7 +9305,7 @@ var mul = multiply;
 var sub = subtract;
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8965,8 +9349,8 @@ var sub = subtract;
 /* unused harmony export exactEquals */
 /* unused harmony export equals */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_js__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__quat_js__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mat4_js__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__quat_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mat4_js__ = __webpack_require__(18);
 
 
 
@@ -9813,7 +10197,7 @@ function equals(a, b) {
 }
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10490,21 +10874,21 @@ var forEach = function () {
 }();
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(e,t){ true?module.exports=t():"function"==typeof define&&define.amd?define(t):e.Stats=t()}(this,function(){"use strict";var c=function(){var n=0,l=document.createElement("div");function e(e){return l.appendChild(e.dom),e}function t(e){for(var t=0;t<l.children.length;t++)l.children[t].style.display=t===e?"block":"none";n=e}l.style.cssText="position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000",l.addEventListener("click",function(e){e.preventDefault(),t(++n%l.children.length)},!1);var i=(performance||Date).now(),a=i,o=0,f=e(new c.Panel("FPS","#0ff","#002")),r=e(new c.Panel("MS","#0f0","#020"));if(self.performance&&self.performance.memory)var d=e(new c.Panel("MB","#f08","#201"));return t(0),{REVISION:16,dom:l,addPanel:e,showPanel:t,begin:function(){i=(performance||Date).now()},end:function(){o++;var e=(performance||Date).now();if(r.update(e-i,200),a+1e3<=e&&(f.update(1e3*o/(e-a),100),a=e,o=0,d)){var t=performance.memory;d.update(t.usedJSHeapSize/1048576,t.jsHeapSizeLimit/1048576)}return e},update:function(){i=this.end()},domElement:l,setMode:t}};return c.Panel=function(n,l,i){var a=1/0,o=0,f=Math.round,r=f(window.devicePixelRatio||1),d=80*r,e=48*r,c=3*r,p=2*r,u=3*r,s=15*r,m=74*r,h=30*r,y=document.createElement("canvas");y.width=d,y.height=e,y.style.cssText="width:80px;height:48px";var v=y.getContext("2d");return v.font="bold "+9*r+"px Helvetica,Arial,sans-serif",v.textBaseline="top",v.fillStyle=i,v.fillRect(0,0,d,e),v.fillStyle=l,v.fillText(n,c,p),v.fillRect(u,s,m,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u,s,m,h),{dom:y,update:function(e,t){a=Math.min(a,e),o=Math.max(o,e),v.fillStyle=i,v.globalAlpha=1,v.fillRect(0,0,d,s),v.fillStyle=l,v.fillText(f(e)+" "+n+" ("+f(a)+"-"+f(o)+")",c,p),v.drawImage(y,u+r,s,m-r,h,u,s,m-r,h),v.fillRect(u+m-r,s,r,h),v.fillStyle=i,v.globalAlpha=.9,v.fillRect(u+m-r,s,r,f((1-e/t)*h))}}},c});
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(41)
-module.exports.color = __webpack_require__(42)
+module.exports = __webpack_require__(43)
+module.exports.color = __webpack_require__(44)
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports) {
 
 /**
@@ -14169,7 +14553,7 @@ dat.dom.dom,
 dat.utils.common);
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports) {
 
 /**
@@ -14929,13 +15313,13 @@ dat.color.toString,
 dat.utils.common);
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(4);
 
 
 
@@ -14965,7 +15349,6 @@ class Square extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /*
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.normals, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
         __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.positions, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
-        console.log(`Created square`);
     }
 }
 ;
@@ -14973,12 +15356,12 @@ class Square extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /*
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
 
 
@@ -15084,12 +15467,14 @@ class Cube extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
         //   1, 0.6, 0.5,  1]);
         this.generateIdx();
         this.generatePos();
+        this.generateNor();
         this.count = this.indices.length;
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.bufIdx);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.indices, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].STATIC_DRAW);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
         __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.positions, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].STATIC_DRAW);
-        console.log(`Created Cube`);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.bufNor);
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].ARRAY_BUFFER, this.normals, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].STATIC_DRAW);
     }
     gridPosToScreenPos(gridPos) {
         let screenPos = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].create();
@@ -15149,24 +15534,25 @@ class Cube extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* d
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(4);
 
 
 
 class TerrainPlane extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* default */] {
-    constructor(terrain) {
+    //terrain: Terrain;
+    constructor() {
         super(); // Call the constructor of the super class. This is required.
         this.seed = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(342.3423, 984.843);
         this.scale = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(100, 100);
-        this.gridSize = terrain.gridSize;
+        this.gridSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(100, 100);
         this.subdivs = 20;
-        this.terrain = terrain;
+        //this.terrain = terrain;
     }
     create() {
         this.initGrid();
@@ -15208,7 +15594,7 @@ class TerrainPlane extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__[
                 this.normals[posIdx] = 1;
                 this.info[posIdx] = 0; //this.terrain.gridParts[x % this.gridSize[0]][z % this.gridSize[1]].hasBuilding ? 1: 0;
                 this.colors[posIdx] = 0;
-                this.positions[posIdx++] = this.terrain.elevations[x][z];
+                this.positions[posIdx++] = 0; //this.terrain.elevations[x][z];
                 this.normals[posIdx] = 0;
                 this.info[posIdx] = 0;
                 this.positions[posIdx++] = z * normalizeY * this.scale[1] - this.scale[1] * 0.5;
@@ -15247,12 +15633,12 @@ class TerrainPlane extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__[
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(4);
 
 
 // In this file, `gl` is accessible because it is imported above
@@ -15291,12 +15677,12 @@ class OpenGLRenderer {
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-var CameraControls = __webpack_require__(48);
+var CameraControls = __webpack_require__(50);
 
 class Camera {
     constructor(position, target) {
@@ -15349,7 +15735,7 @@ class Camera {
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15357,12 +15743,12 @@ class Camera {
 
 module.exports = createCamera
 
-var now         = __webpack_require__(49)
-var createView  = __webpack_require__(51)
-var mouseChange = __webpack_require__(74)
-var mouseWheel  = __webpack_require__(76)
-var mouseOffset = __webpack_require__(79)
-var hasPassive  = __webpack_require__(80)
+var now         = __webpack_require__(51)
+var createView  = __webpack_require__(53)
+var mouseChange = __webpack_require__(76)
+var mouseWheel  = __webpack_require__(78)
+var mouseOffset = __webpack_require__(81)
+var hasPassive  = __webpack_require__(82)
 
 function createCamera(element, options) {
   element = element || document.body
@@ -15592,7 +15978,7 @@ function createCamera(element, options) {
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {module.exports =
@@ -15603,10 +15989,10 @@ function createCamera(element, options) {
     return +new Date
   }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(50)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(52)))
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports) {
 
 var g;
@@ -15633,7 +16019,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15641,9 +16027,9 @@ module.exports = g;
 
 module.exports = createViewController
 
-var createTurntable = __webpack_require__(52)
-var createOrbit     = __webpack_require__(55)
-var createMatrix    = __webpack_require__(58)
+var createTurntable = __webpack_require__(54)
+var createOrbit     = __webpack_require__(57)
+var createMatrix    = __webpack_require__(60)
 
 function ViewController(controllers, mode) {
   this._controllerNames = Object.keys(controllers)
@@ -15761,7 +16147,7 @@ function createViewController(options) {
 }
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15769,12 +16155,12 @@ function createViewController(options) {
 
 module.exports = createTurntableController
 
-var filterVector = __webpack_require__(20)
-var invert44     = __webpack_require__(8)
-var rotateM      = __webpack_require__(54)
-var cross        = __webpack_require__(22)
-var normalize3   = __webpack_require__(13)
-var dot3         = __webpack_require__(23)
+var filterVector = __webpack_require__(22)
+var invert44     = __webpack_require__(11)
+var rotateM      = __webpack_require__(56)
+var cross        = __webpack_require__(24)
+var normalize3   = __webpack_require__(14)
+var dot3         = __webpack_require__(25)
 
 function len3(x, y, z) {
   return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2))
@@ -16339,7 +16725,7 @@ function createTurntableController(options) {
 }
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16384,7 +16770,7 @@ module.exports = cubicHermite
 module.exports.derivative = dcubicHermite
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, exports) {
 
 module.exports = rotate;
@@ -16453,7 +16839,7 @@ function rotate(out, a, rad, axis) {
 };
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16461,11 +16847,11 @@ function rotate(out, a, rad, axis) {
 
 module.exports = createOrbitController
 
-var filterVector  = __webpack_require__(20)
-var lookAt        = __webpack_require__(24)
-var mat4FromQuat  = __webpack_require__(56)
-var invert44      = __webpack_require__(8)
-var quatFromFrame = __webpack_require__(57)
+var filterVector  = __webpack_require__(22)
+var lookAt        = __webpack_require__(26)
+var mat4FromQuat  = __webpack_require__(58)
+var invert44      = __webpack_require__(11)
+var quatFromFrame = __webpack_require__(59)
 
 function len3(x,y,z) {
   return Math.sqrt(Math.pow(x,2) + Math.pow(y,2) + Math.pow(z,2))
@@ -16852,7 +17238,7 @@ function createOrbitController(options) {
 }
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports) {
 
 module.exports = fromQuat;
@@ -16904,7 +17290,7 @@ function fromQuat(out, q) {
 };
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16951,22 +17337,22 @@ function quatFromFrame(
 }
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var bsearch   = __webpack_require__(21)
-var m4interp  = __webpack_require__(59)
-var invert44  = __webpack_require__(8)
-var rotateX   = __webpack_require__(71)
-var rotateY   = __webpack_require__(72)
-var rotateZ   = __webpack_require__(73)
-var lookAt    = __webpack_require__(24)
-var translate = __webpack_require__(26)
-var scale     = __webpack_require__(28)
-var normalize = __webpack_require__(13)
+var bsearch   = __webpack_require__(23)
+var m4interp  = __webpack_require__(61)
+var invert44  = __webpack_require__(11)
+var rotateX   = __webpack_require__(73)
+var rotateY   = __webpack_require__(74)
+var rotateZ   = __webpack_require__(75)
+var lookAt    = __webpack_require__(26)
+var translate = __webpack_require__(28)
+var scale     = __webpack_require__(30)
+var normalize = __webpack_require__(14)
 
 var DEFAULT_CENTER = [0,0,0]
 
@@ -17156,15 +17542,15 @@ function createMatrixCameraController(options) {
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var lerp = __webpack_require__(60)
+var lerp = __webpack_require__(62)
 
-var recompose = __webpack_require__(61)
-var decompose = __webpack_require__(64)
-var determinant = __webpack_require__(29)
-var slerp = __webpack_require__(69)
+var recompose = __webpack_require__(63)
+var decompose = __webpack_require__(66)
+var determinant = __webpack_require__(31)
+var slerp = __webpack_require__(71)
 
 var state0 = state()
 var state1 = state()
@@ -17213,7 +17599,7 @@ function vec4() {
 }
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports) {
 
 module.exports = lerp;
@@ -17238,7 +17624,7 @@ function lerp(out, a, b, t) {
 }
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -17253,12 +17639,12 @@ From: http://www.w3.org/TR/css3-transforms/#recomposing-to-a-3d-matrix
 */
 
 var mat4 = {
-    identity: __webpack_require__(25),
-    translate: __webpack_require__(26),
-    multiply: __webpack_require__(62),
-    create: __webpack_require__(27),
-    scale: __webpack_require__(28),
-    fromRotationTranslation: __webpack_require__(63)
+    identity: __webpack_require__(27),
+    translate: __webpack_require__(28),
+    multiply: __webpack_require__(64),
+    create: __webpack_require__(29),
+    scale: __webpack_require__(30),
+    fromRotationTranslation: __webpack_require__(65)
 }
 
 var rotationMatrix = mat4.create()
@@ -17303,7 +17689,7 @@ module.exports = function recomposeMat4(matrix, translation, scale, skew, perspe
 }
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports) {
 
 module.exports = multiply;
@@ -17350,7 +17736,7 @@ function multiply(out, a, b) {
 };
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports) {
 
 module.exports = fromRotationTranslation;
@@ -17408,7 +17794,7 @@ function fromRotationTranslation(out, q, v) {
 };
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*jshint unused:true*/
@@ -17428,18 +17814,18 @@ https://github.com/ChromiumWebApps/chromium/blob/master/ui/gfx/transform_util.cc
 http://www.w3.org/TR/css3-transforms/#decomposing-a-3d-matrix
 */
 
-var normalize = __webpack_require__(65)
+var normalize = __webpack_require__(67)
 
-var create = __webpack_require__(27)
-var clone = __webpack_require__(66)
-var determinant = __webpack_require__(29)
-var invert = __webpack_require__(8)
-var transpose = __webpack_require__(67)
+var create = __webpack_require__(29)
+var clone = __webpack_require__(68)
+var determinant = __webpack_require__(31)
+var invert = __webpack_require__(11)
+var transpose = __webpack_require__(69)
 var vec3 = {
-    length: __webpack_require__(68),
-    normalize: __webpack_require__(13),
-    dot: __webpack_require__(23),
-    cross: __webpack_require__(22)
+    length: __webpack_require__(70),
+    normalize: __webpack_require__(14),
+    dot: __webpack_require__(25),
+    cross: __webpack_require__(24)
 }
 
 var tmp = create()
@@ -17592,7 +17978,7 @@ function combine(out, a, b, scale1, scale2) {
 }
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = function normalize(out, mat) {
@@ -17607,7 +17993,7 @@ module.exports = function normalize(out, mat) {
 }
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports) {
 
 module.exports = clone;
@@ -17640,7 +18026,7 @@ function clone(a) {
 };
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports) {
 
 module.exports = transpose;
@@ -17694,7 +18080,7 @@ function transpose(out, a) {
 };
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports) {
 
 module.exports = length;
@@ -17713,13 +18099,13 @@ function length(a) {
 }
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(70)
+module.exports = __webpack_require__(72)
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports) {
 
 module.exports = slerp
@@ -17776,7 +18162,7 @@ function slerp (out, a, b, t) {
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports) {
 
 module.exports = rotateX;
@@ -17825,7 +18211,7 @@ function rotateX(out, a, rad) {
 };
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports) {
 
 module.exports = rotateY;
@@ -17874,7 +18260,7 @@ function rotateY(out, a, rad) {
 };
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports) {
 
 module.exports = rotateZ;
@@ -17923,7 +18309,7 @@ function rotateZ(out, a, rad) {
 };
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17931,7 +18317,7 @@ function rotateZ(out, a, rad) {
 
 module.exports = mouseListen
 
-var mouse = __webpack_require__(75)
+var mouse = __webpack_require__(77)
 
 function mouseListen (element, callback) {
   if (!callback) {
@@ -18135,7 +18521,7 @@ function mouseListen (element, callback) {
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18202,13 +18588,13 @@ exports.y = mouseRelativeY
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var toPX = __webpack_require__(77)
+var toPX = __webpack_require__(79)
 
 module.exports = mouseWheelListen
 
@@ -18249,13 +18635,13 @@ function mouseWheelListen(element, callback, noScroll) {
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var parseUnit = __webpack_require__(78)
+var parseUnit = __webpack_require__(80)
 
 module.exports = toPX
 
@@ -18330,7 +18716,7 @@ function toPX(str, element) {
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports) {
 
 module.exports = function parseUnit(str, out) {
@@ -18345,7 +18731,7 @@ module.exports = function parseUnit(str, out) {
 }
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports) {
 
 var rootPosition = { left: 0, top: 0 }
@@ -18376,13 +18762,13 @@ function getBoundingClientOffset (element) {
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var isBrowser = __webpack_require__(81)
+var isBrowser = __webpack_require__(83)
 
 function detect() {
 	var supported = false
@@ -18407,18 +18793,18 @@ module.exports = isBrowser && detect()
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports) {
 
 module.exports = true;
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__globals__ = __webpack_require__(4);
 
 
 var activeProgram = null;
@@ -18459,12 +18845,22 @@ class ShaderProgram {
         this.unifViewProj = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_ViewProj");
         this.unifPlanePos = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_PlanePos");
         this.unifDisplayOptions = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_DisplayOptions");
+        this.unifCityInfo = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_CityInfo");
+        this.unifWhiteStoneSampler = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_WhiteStoneSampler");
+        this.unifPavementSampler = __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].getUniformLocation(this.prog, "u_PavementSampler");
     }
     use() {
         if (activeProgram !== this.prog) {
             __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].useProgram(this.prog);
             activeProgram = this.prog;
         }
+    }
+    // Bind the given Texture to the given texture unit
+    bindTexToUnit(handleName, tex, unit) {
+        this.use();
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].activeTexture(__WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].TEXTURE0 + unit);
+        tex.bindTex();
+        __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform1i(handleName, unit);
     }
     setModelMatrix(model) {
         this.use();
@@ -18496,8 +18892,15 @@ class ShaderProgram {
             __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform4fv(this.unifDisplayOptions, options);
         }
     }
+    setCityInfo(options) {
+        this.use();
+        if (this.unifCityInfo !== -1) {
+            __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].uniform4fv(this.unifCityInfo, __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["d" /* vec4 */].fromValues(options.cityRadius, options.cityHeight, 0, 0));
+        }
+    }
     draw(d) {
         this.use();
+        //this.setPavementTexture();
         if (this.attrPos != -1 && d.bindPos()) {
             __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].enableVertexAttribArray(this.attrPos);
             __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].vertexAttribPointer(this.attrPos, 4, __WEBPACK_IMPORTED_MODULE_1__globals__["a" /* gl */].FLOAT, false, 0, 0);
@@ -18570,18 +18973,18 @@ class ShaderProgram {
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export TerrainType */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noise_noise__ = __webpack_require__(84);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__road_roads__ = __webpack_require__(85);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_vec_math__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__road_turtle__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__building_building__ = __webpack_require__(32);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__noise_random__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__noise_noise__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__road_roads__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_vec_math__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__road_turtle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__building_building__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__noise_random__ = __webpack_require__(5);
 
 
 
@@ -18594,6 +18997,8 @@ var TerrainType;
     TerrainType[TerrainType["WATER"] = 0] = "WATER";
     TerrainType[TerrainType["LAND"] = 1] = "LAND";
     TerrainType[TerrainType["COAST"] = 2] = "COAST";
+    TerrainType[TerrainType["MOUNTAIN"] = 3] = "MOUNTAIN";
+    TerrainType[TerrainType["SPUR"] = 4] = "SPUR";
 })(TerrainType || (TerrainType = {}));
 class GridPart {
     constructor() {
@@ -18652,8 +19057,8 @@ class Terrain {
         for (let x = 0; x <= this.gridSize[0]; x++) {
             this.elevations.push([]);
             for (let z = 0; z <= this.gridSize[1]; z++) {
-                let y = __WEBPACK_IMPORTED_MODULE_1__noise_noise__["a" /* default */].fbm2to1(__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(x * 5 / this.gridSize[0], z * 5 / this.gridSize[1]), this.elevationSeed);
-                this.elevations[x].push(y);
+                //let y = Noise.fbm2to1(vec2.fromValues(x * 5 / this.gridSize[0], z * 5/ this.gridSize[1]), this.elevationSeed);
+                this.elevations[x].push(0);
             }
         }
     }
@@ -19093,13 +19498,13 @@ class Terrain {
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_vec_math__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__random__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__utils_vec_math__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__random__ = __webpack_require__(5);
 
 
 
@@ -19166,22 +19571,22 @@ class Noise {
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lsystem__ = __webpack_require__(86);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__x_rule_x_replace__ = __webpack_require__(94);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__draw_rule_turn_toward_population__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lsystem__ = __webpack_require__(88);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__x_rule_x_replace__ = __webpack_require__(96);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__draw_rule_turn_toward_population__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__draw_rule_turn_away_population__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__draw_rule_span_population__ = __webpack_require__(95);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__turtle__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__draw_rule_start_branch__ = __webpack_require__(96);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__constraint_water_constraint__ = __webpack_require__(97);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__constraint_edge_of_map_constraint__ = __webpack_require__(98);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__noise_random__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__constraint_current_roads_constraint__ = __webpack_require__(99);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__draw_rule_turn_away_population__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__draw_rule_span_population__ = __webpack_require__(97);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__turtle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__draw_rule_start_branch__ = __webpack_require__(98);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__constraint_water_constraint__ = __webpack_require__(99);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__constraint_edge_of_map_constraint__ = __webpack_require__(100);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__constraint_current_roads_constraint__ = __webpack_require__(101);
 
 
 
@@ -19364,20 +19769,20 @@ class Roads extends __WEBPACK_IMPORTED_MODULE_0__lsystem__["b" /* LSystem */] {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* unused harmony export SegmentStatus */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__turtle__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__turtle__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__draw_rule_turn_right__ = __webpack_require__(87);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__draw_rule_turn_left__ = __webpack_require__(88);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__draw_rule_random_angle__ = __webpack_require__(89);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__draw_rule_scale_length__ = __webpack_require__(90);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__draw_rule_scale_angle__ = __webpack_require__(91);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__draw_rule_end_branch__ = __webpack_require__(92);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__draw_rule_draw__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__draw_rule_turn_right__ = __webpack_require__(89);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__draw_rule_turn_left__ = __webpack_require__(90);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__draw_rule_random_angle__ = __webpack_require__(91);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__draw_rule_scale_length__ = __webpack_require__(92);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__draw_rule_scale_angle__ = __webpack_require__(93);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__draw_rule_end_branch__ = __webpack_require__(94);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__draw_rule_draw__ = __webpack_require__(95);
 
 
 
@@ -19553,7 +19958,7 @@ class LSystem {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19574,7 +19979,7 @@ class TurnRight extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* Bas
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19595,13 +20000,13 @@ class TurnLeft extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* Base
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__ = __webpack_require__(1);
 
-let Prando = __webpack_require__(6).default;
+let Prando = __webpack_require__(9).default;
 class RandomAngle extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* BaseDrawRule */] {
     constructor(options) {
         super(options);
@@ -19625,7 +20030,7 @@ class RandomAngle extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* B
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19646,7 +20051,7 @@ class ScaleLength extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* B
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19667,7 +20072,7 @@ class ScaleAngle extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* Ba
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19687,14 +20092,14 @@ class EndBranch extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* Bas
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_prando__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_prando__ = __webpack_require__(9);
 
 
 
@@ -19738,7 +20143,7 @@ class Draw extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* BaseDraw
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -19755,14 +20160,14 @@ class XReplace {
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prando__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__turn_toward_population__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__turn_away_population__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prando__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__turn_toward_population__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__turn_away_population__ = __webpack_require__(33);
 
 
 
@@ -19789,12 +20194,12 @@ class SpanPopulation extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(8);
 
 
 class StartBranch extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* BaseDrawRule */] {
@@ -19815,12 +20220,12 @@ class StartBranch extends __WEBPACK_IMPORTED_MODULE_0__base_draw_rule__["a" /* B
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__turtle__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constraint__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__turtle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__constraint__ = __webpack_require__(15);
 
 
 class WaterConstraint {
@@ -19855,11 +20260,11 @@ class WaterConstraint {
 
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__constraint__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__constraint__ = __webpack_require__(15);
 
 class EdgeOfMapConstraint {
     constructor(options) {
@@ -19886,14 +20291,14 @@ class EdgeOfMapConstraint {
 
 
 /***/ }),
-/* 99 */
+/* 101 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__constraint__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_vec_math__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__turtle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__constraint__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_vec_math__ = __webpack_require__(12);
 
 
 
@@ -19947,17 +20352,17 @@ class CurrentRoadsConstraint {
 
 
 /***/ }),
-/* 100 */
+/* 102 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noise_random__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__ = __webpack_require__(101);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__standardRoof__ = __webpack_require__(102);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__texture_texture_type__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__noise_random__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__box__ = __webpack_require__(34);
 
 
 
@@ -19965,7 +20370,7 @@ class CurrentRoadsConstraint {
 
 
 
-class Box extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
+class Foundation extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
     constructor(options) {
         super(options);
         this.symbol = 'B';
@@ -19980,115 +20385,104 @@ class Box extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
                 adjustScale2: 1,
                 rotation: this.rotation,
                 scaleFromCenter: true,
-                textureType: __WEBPACK_IMPORTED_MODULE_6__texture_texture_type__["a" /* TextureType */].BUILDING
+                textureType: __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__["a" /* TextureType */].BUILDING
             }];
     }
+    getBase() {
+        //move the foundation underground one block
+        let pos = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].create();
+        let rot = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].create();
+        let footprint = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].create();
+        __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].copy(pos, this.pos);
+        __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].copy(rot, this.rotation);
+        __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].copy(footprint, this.footprint);
+        pos[1] = this.pos[1] - this.footprint[1] / 2 - 0.5;
+        footprint[1] = 1;
+        let foundation = new __WEBPACK_IMPORTED_MODULE_6__box__["a" /* Box */]({
+            pos: pos,
+            footprint: footprint,
+            rotation: rot,
+            textureType: __WEBPACK_IMPORTED_MODULE_5__texture_texture_type__["a" /* TextureType */].FOUNDATION
+        });
+        foundation.terminal = true;
+        return foundation;
+    }
     runReplacement(seed) {
+        //get the ratio of x,z dimension
+        let ratio = Math.min(this.footprint[0], this.footprint[2]) / Math.max(this.footprint[0], this.footprint[2]);
+        //really skinny buildings
+        if (ratio < 0.33) {
+            let shapes = this.getSkinnyBuildingShapes(seed);
+            return shapes;
+        }
+        else if (ratio < 0.66) {
+            let shapes = this.getRectangularBuildingShapes(seed);
+        }
         let type = __WEBPACK_IMPORTED_MODULE_3__noise_random__["a" /* default */].randomInt(12, seed);
+        return [
+            new __WEBPACK_IMPORTED_MODULE_6__box__["a" /* Box */]({
+                pos: this.pos,
+                rotation: this.rotation,
+                footprint: this.footprint
+            }),
+            this.getBase()
+        ];
+    }
+    getSkinnyBuildingShapes(seed) {
+        let axis = __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X;
+        if (this.footprint[2] > this.footprint[0]) {
+            axis = __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z;
+        }
+        let newShapes = this.splitShape(3, axis, this.pos, this.footprint, this.rotation);
+        let adjustHeight = this.footprint[1] * 0.3;
+        let type = __WEBPACK_IMPORTED_MODULE_3__noise_random__["a" /* default */].randomInt(3, seed);
         switch (type) {
-            case 0: return this.splitX({ percentage: 0.5 });
-            case 1: return this.splitY({ percentage: 0.5 });
-            case 2: return this.splitZ({ percentage: 0.5 });
-            case 3: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].SLANT);
-            case 4: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].TENT);
-            case 5: return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].PYRAMID);
-            case 6:
-                this.shrinkX({ percentage: 0.20 });
-                return [this];
-            case 7: return this.taperBoth({ percentage: 0.25 });
-            case 8: return this.taperX({ percentage: 0.25 });
-            case 9: return this.taperZ({ percentage: 0.25 });
-            case 10:
-                this.terminal = true;
-                return [this];
-            default:
-                return this.addRoof(__WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].CUBE);
+            case 0: //raise up the selected
+            case 1:
+            case 2:
+                newShapes[type].footprint[1] = newShapes[type].footprint[1] + adjustHeight;
+                newShapes[type].pos[1] = newShapes[type].pos[1] + adjustHeight / 2;
+                break;
+            case 3:
+                newShapes[1].footprint[1] = newShapes[1].footprint[1] - adjustHeight;
+                newShapes[1].pos[1] = newShapes[1].pos[1] - adjustHeight / 2;
+                break;
         }
+        return [
+            new __WEBPACK_IMPORTED_MODULE_6__box__["a" /* Box */]({
+                pos: newShapes[0].pos,
+                rotation: this.rotation,
+                footprint: newShapes[0].footprint
+            }),
+            new __WEBPACK_IMPORTED_MODULE_6__box__["a" /* Box */]({
+                pos: newShapes[1].pos,
+                rotation: this.rotation,
+                footprint: newShapes[1].footprint
+            }),
+            new __WEBPACK_IMPORTED_MODULE_6__box__["a" /* Box */]({
+                pos: newShapes[2].pos,
+                rotation: this.rotation,
+                footprint: newShapes[2].footprint
+            }),
+            this.getBase()
+        ];
     }
-    addRoof(blockType) {
-        let height = Math.min(this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X], this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z]);
-        let posY = this.pos[1] + 0.5 * this.footprint[1] + 0.5 * height;
-        let roof = new __WEBPACK_IMPORTED_MODULE_5__standardRoof__["a" /* StandardRoof */]({
-            blockType: blockType,
-            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], posY, this.pos[2]),
-            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], height, this.footprint[2]),
-            rotation: this.rotation
-        });
-        this.terminal = true;
-        return [this, roof];
-    }
-    taperBoth(shrinkBy) {
-        let newBoxes = this.splitY({ percentage: .5 });
-        if (newBoxes.length > 1) {
-            newBoxes[1].shrinkBoth(shrinkBy);
-        }
-        return newBoxes;
-    }
-    taperX(shrinkBy) {
-        let newBoxes = this.splitY({ percentage: .5 });
-        if (newBoxes.length > 1) {
-            newBoxes[1].shrinkX(shrinkBy);
-        }
-        return newBoxes;
-    }
-    taperZ(shrinkBy) {
-        let newBoxes = this.splitY({ percentage: .5 });
-        if (newBoxes.length > 1) {
-            newBoxes[1].shrinkZ(shrinkBy);
-        }
-        return newBoxes;
-    }
-    splitX(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X, splitAt); }
-    splitY(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Y, splitAt); }
-    splitZ(splitAt) { return this.split(__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z, splitAt); }
-    split(axis, splitAt) {
-        //too small to spit vertically
-        if (this.footprint[axis] < 0.4) {
-            return [this];
-        }
-        let offset = __WEBPACK_IMPORTED_MODULE_0__shape__["a" /* NumOptions */].getValue(splitAt, this.footprint[axis] * 0.7, this.footprint[axis] * 0.3);
-        let newPos = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], this.pos[1], this.pos[2]);
-        newPos[axis] = this.pos[axis] + 0.5 * offset;
-        let newFootprint = __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0], this.footprint[1], this.footprint[2]);
-        newFootprint[axis] = this.footprint[axis] - offset;
-        let newBox = new Box({
-            pos: newPos,
-            footprint: newFootprint,
-            rotation: this.rotation
-        });
-        this.pos[axis] = this.pos[axis] - this.footprint[axis] / 2 + 0.5 * offset;
-        this.footprint[axis] = offset;
-        //no more changes if we are supporting something on top
-        if (axis == 1)
-            this.terminal = true;
-        return [this, newBox];
+    getRectangularBuildingShapes(seed) {
+        let shapes = [];
+        return shapes;
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Box;
+/* harmony export (immutable) */ __webpack_exports__["a"] = Foundation;
 
 
 
 /***/ }),
-/* 101 */
+/* 103 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Axis; });
-var Axis;
-(function (Axis) {
-    Axis[Axis["X"] = 0] = "X";
-    Axis[Axis["Y"] = 1] = "Y";
-    Axis[Axis["Z"] = 2] = "Z";
-})(Axis || (Axis = {}));
-
-
-/***/ }),
-/* 102 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__texture_texture_type__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__texture_texture_type__ = __webpack_require__(3);
 
 
 class StandardRoof extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
@@ -20119,11 +20513,184 @@ class StandardRoof extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */]
 
 
 /***/ }),
-/* 103 */
+/* 104 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__city_level__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__geometry_Axis__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__turret_roof__ = __webpack_require__(105);
+
+
+
+
+
+
+class Turret extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
+    constructor(options) {
+        super(options);
+        this.width = Math.min(this.footprint[0], this.footprint[2]);
+        this.footprint[0] = this.width;
+        this.footprint[2] = this.width;
+        this.radius = 0;
+        this.sweep = options.sweep ? options.sweep : Math.PI;
+        this.numSegments = options.numSegments ? options.numSegments : 8;
+        this.corners = options.corners ? options.corners : false;
+    }
+    getBlocks() {
+        let segmentAngle = this.sweep / (this.numSegments - 1);
+        let blockZ = 2 * (this.radius + this.width / 2) * Math.tan(segmentAngle / 2);
+        let blockZ2 = 2 * (this.radius - this.width / 2) * Math.tan(segmentAngle / 2);
+        let scaleBottom = blockZ2 / blockZ;
+        let blocks = [];
+        for (let i = 0; i < this.numSegments; i++) {
+            let angle = this.rotation[1] + segmentAngle * i;
+            blocks.push({
+                pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0] + (this.radius * Math.cos(angle)), this.pos[1], this.pos[2] + (this.radius * Math.sin(angle))),
+                footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.width, this.footprint[1], blockZ),
+                blockType: __WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].WEDGE,
+                adjustScale1: scaleBottom,
+                adjustScale2: 1,
+                adjustScale3: 1,
+                adjustScale4: 1,
+                rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, angle, 0),
+                scaleFromCenter: true,
+                textureType: __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__["a" /* TextureType */].TURRET
+            });
+        }
+        return blocks;
+    }
+    runReplacement() {
+        return this.addRoof();
+    }
+    addRoof() {
+        let height = Math.min(this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].X], this.footprint[__WEBPACK_IMPORTED_MODULE_4__geometry_Axis__["a" /* Axis */].Z]);
+        let posY = this.pos[1] + 0.5 * this.footprint[1] + 0.5 * height;
+        let roof = new __WEBPACK_IMPORTED_MODULE_5__turret_roof__["a" /* TurretRoof */]({
+            pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0], posY, this.pos[2]),
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.footprint[0] * 1.2, height, this.footprint[0] * 1.2),
+            rotation: this.rotation,
+            numSegments: this.numSegments
+        });
+        this.terminal = true;
+        return [this, roof];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Turret;
+
+
+
+/***/ }),
+/* 105 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(3);
+
+
+
+
+class TurretRoof extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
+    constructor(options) {
+        super(options);
+        this.center = options.pos;
+        this.width = options.footprint[0] / 2;
+        this.height = options.footprint[1];
+        this.radius = options.footprint[0];
+        this.sweep = options.sweep ? options.sweep : Math.PI * 2;
+        this.numSegments = options.numSegments ? options.numSegments : 20;
+        this.terminal = true;
+    }
+    getBlocks() {
+        let segmentAngle = this.sweep / (this.numSegments - 1);
+        let blockZ = 2 * (this.width) * Math.tan(segmentAngle / 2);
+        let blockZ2 = 0;
+        let scaleBottom = blockZ2 / blockZ;
+        let blocks = [];
+        for (let i = 0; i < this.numSegments; i++) {
+            let angle = this.rotation[1] + segmentAngle * i;
+            blocks.push({
+                pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.center[0] + (this.width / 2 * Math.cos(angle)), this.center[1], this.center[2] + (this.width / 2 * Math.sin(angle))),
+                footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.width, this.height, blockZ),
+                blockType: __WEBPACK_IMPORTED_MODULE_1__block__["a" /* BlockType */].WEDGE,
+                adjustScale1: scaleBottom,
+                adjustScale2: 1,
+                adjustScale3: 1,
+                adjustScale4: 0,
+                rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, angle, 0),
+                scaleFromCenter: true,
+                textureType: __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__["a" /* TextureType */].ROOF
+            });
+        }
+        return blocks;
+    }
+    runReplacement() {
+        return [this];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = TurretRoof;
+
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__texture_texture_type__ = __webpack_require__(3);
+
+
+class StandardBlock extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
+    constructor(options) {
+        super(options);
+        this.blockType = options.blockType;
+        this.symbol = 'S';
+        this.terminal = true;
+        this.adjustScale1 = (typeof options.adjustScale1 == 'undefined') ? 1 : options.adjustScale1;
+        this.adjustScale2 = (typeof options.adjustScale2 == 'undefined') ? 1 : options.adjustScale2;
+        this.adjustScale3 = (typeof options.adjustScale3 == 'undefined') ? 1 : options.adjustScale3;
+        this.adjustScale4 = (typeof options.adjustScale4 == 'undefined') ? 1 : options.adjustScale4;
+        this.textureType = (typeof options.textureType == 'undefined') ? __WEBPACK_IMPORTED_MODULE_1__texture_texture_type__["a" /* TextureType */].BUILDING : options.textureType;
+    }
+    getBlocks() {
+        return [
+            {
+                blockType: this.blockType,
+                footprint: this.footprint,
+                pos: this.pos,
+                adjustScale1: this.adjustScale1,
+                adjustScale2: this.adjustScale2,
+                rotation: this.rotation,
+                scaleFromCenter: true,
+                textureType: this.textureType
+            },
+        ];
+    }
+    runReplacement() {
+        return [this];
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = StandardBlock;
+
+
+
+/***/ }),
+/* 107 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__city_level__ = __webpack_require__(35);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__building_building__ = __webpack_require__(16);
+
+
 
 class City {
     constructor(options) {
@@ -20131,11 +20698,15 @@ class City {
         this.showBuildings = true;
         this.showRoads = false;
         this.showWalls = true;
+        this.showSampleBuildings = false;
+        this.sampleBuildings = [];
         this.pos = options.pos;
         this.seed = options.seed;
+        this.towerSeed = options.towerSeed;
+        this.palaceSeed = options.palaceSeed;
         this.levels = [];
         for (let i = 0; i < 7; i++) {
-            this.levels.push(new __WEBPACK_IMPORTED_MODULE_0__city_level__["a" /* CityLevel */](i, this, {}));
+            this.levels.push(new __WEBPACK_IMPORTED_MODULE_1__city_level__["a" /* CityLevel */](i, this, {}));
         }
     }
     initBuildings() {
@@ -20153,7 +20724,6 @@ class City {
                 level.setWallHeight(value);
                 break;
             case 'wallWidth':
-                console.log('setting wall width');
                 level.setWallWidth(value);
                 break;
             case 'levelWidth':
@@ -20171,11 +20741,66 @@ class City {
         }
     }
     getBlocks() {
+        if (this.showSampleBuildings)
+            return this.getSampleBlocks();
         let blocks = [];
         for (let i = 0; i < this.levels.length; i++) {
             blocks = blocks.concat(this.levels[i].getBlocks());
         }
         return blocks;
+    }
+    getSampleBlocks() {
+        let blocks = [];
+        this.getSampleBuildings();
+        for (let i = 0; i < this.sampleBuildings.length; i++) {
+            blocks = blocks.concat(this.sampleBuildings[i].getBlocks());
+        }
+        return blocks;
+    }
+    getSampleBuildings() {
+        if (this.sampleBuildings.length > 0)
+            return this.sampleBuildings;
+        let footprints = [
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(1, 1, 4),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(8, 3, 2),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(3, 7, 6),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(4, 4, 5),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(5, 8, 8),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(6, 6, 3),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(7, 7, 5),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(8, 8, 8),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(9, 9, 2),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(10, 10, 7),
+            __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(11, 11, 11),
+        ];
+        let xPos = 200;
+        for (let i = 0; i < footprints.length; i++) {
+            let foot = footprints[i];
+            xPos = xPos + foot[0] / 2;
+            let pos = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(xPos, foot[1] / 2, 210);
+            let seed = Math.pow(1.232, i);
+            let b = new __WEBPACK_IMPORTED_MODULE_2__building_building__["a" /* Building */]({
+                pos: pos,
+                footprint: foot,
+                rotation: __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, i * Math.PI / 10, 0),
+                seed: seed
+            });
+            b.runReplacements();
+            this.sampleBuildings.push(b);
+            xPos = xPos + foot[0] / 2 + 3;
+        }
+        return this.sampleBuildings;
+    }
+    initPalace() {
+        this.levels[this.levels.length - 1].initPalace();
+    }
+    getHeight() {
+        let topLevel = this.levels[this.levels.length - 1];
+        return topLevel.getLevelHeight();
+    }
+    getRadius() {
+        let topLevel = this.levels[0];
+        return topLevel.getLevelRadius();
     }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = City;
@@ -20183,14 +20808,14 @@ class City {
 
 
 /***/ }),
-/* 104 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__block__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(3);
 
 
 
@@ -20238,14 +20863,14 @@ class Wall extends __WEBPACK_IMPORTED_MODULE_0__shape__["b" /* Shape */] {
 
 
 /***/ }),
-/* 105 */
+/* 109 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__building_shape_shape__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__building_shape_block__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__building_shape_shape__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__building_shape_block__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_gl_matrix__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__ = __webpack_require__(3);
 
 
 
@@ -20278,6 +20903,7 @@ class Road extends __WEBPACK_IMPORTED_MODULE_0__building_shape_shape__["b" /* Sh
                 adjustScale1: scaleBottom,
                 adjustScale2: this.getLeftScale(angle),
                 adjustScale3: this.getRightScale(angle),
+                adjustScale4: 1,
                 rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, angle, 0),
                 scaleFromCenter: true,
                 textureType: __WEBPACK_IMPORTED_MODULE_3__texture_texture_type__["a" /* TextureType */].LEVEL_GROUND
@@ -20298,9 +20924,6 @@ class Road extends __WEBPACK_IMPORTED_MODULE_0__building_shape_shape__["b" /* Sh
     getRightScale(rotation) {
         let el1 = this.getBlockElevation(rotation);
         let el2 = this.getBlockElevation(rotation + this.segmentAngle);
-        if (this.cityLevel.levelNum == 0) {
-            console.log(rotation + '-' + el1 + '-' + el2);
-        }
         if (el1 >= el2)
             return 1;
         let scale = 1 + (el2 - el1);
@@ -20323,40 +20946,401 @@ class Road extends __WEBPACK_IMPORTED_MODULE_0__building_shape_shape__["b" /* Sh
 
 
 /***/ }),
-/* 106 */
-/***/ (function(module, exports) {
+/* 110 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "#version 300 es\n\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;\nuniform mat4 u_ViewProj;\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec4 vs_Info;\n\nout vec3 fs_Pos;\nout vec4 fs_Nor;\nout vec4 fs_Col;\nout vec4 fs_Info;\n\nfloat random1( vec2 p , vec2 seed) {\n  return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n  return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n  return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\nvoid main()\n{\n  fs_Pos = vs_Pos.xyz;\n  fs_Col = vs_Col;\n  fs_Nor = vs_Nor;\n  fs_Info = vs_Info;\n  vec4 modelposition = vec4(vs_Pos.x, vs_Pos.y, vs_Pos.z, 1.0);\n  //water\n  if(vs_Pos.y < 0.4) {\n     modelposition.y = -0.5;\n     fs_Pos.y = 0.4;\n  }\n  //sand\n  else if(vs_Pos.y < 0.5) {\n     modelposition.y = vs_Pos.y - 0.5;\n  }\n  //land\n  else {\n     modelposition.y = -0.001;\n  }\n  //building\n  if(vs_Info.y == 1.0) {\n     //modelposition.y = 4.0;\n  }\n  modelposition = u_Model * modelposition;\n  gl_Position = u_ViewProj * modelposition;\n}\n"
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__block__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__texture_texture_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__box__ = __webpack_require__(34);
+
+
+
+
+var MerlonPlacement;
+(function (MerlonPlacement) {
+    MerlonPlacement[MerlonPlacement["NONE"] = 0] = "NONE";
+    MerlonPlacement[MerlonPlacement["FILL"] = 1] = "FILL";
+    MerlonPlacement[MerlonPlacement["HALF_GAP"] = 2] = "HALF_GAP";
+    MerlonPlacement[MerlonPlacement["DOUBLE_GAP"] = 3] = "DOUBLE_GAP";
+})(MerlonPlacement || (MerlonPlacement = {}));
+class Battlement extends __WEBPACK_IMPORTED_MODULE_3__box__["a" /* Box */] {
+    constructor(options) {
+        super(options);
+        this.xSide1 = MerlonPlacement.FILL;
+        this.xSide2 = MerlonPlacement.FILL;
+        this.zSide1 = MerlonPlacement.DOUBLE_GAP;
+        this.zSide2 = MerlonPlacement.DOUBLE_GAP;
+        this.symbol = 'B';
+        this.terminal = false;
+        this.textureType = (typeof options.textureType == 'undefined') ? __WEBPACK_IMPORTED_MODULE_2__texture_texture_type__["a" /* TextureType */].BUILDING : options.textureType;
+        this.numMerlons = (typeof options.numMerlons == 'undefined') ? 4 : options.numMerlons;
+        if (typeof options.xSide1 !== 'undefined')
+            this.xSide1 = options.xSide1;
+        if (typeof options.xSide2 !== 'undefined')
+            this.xSide2 = options.xSide2;
+        if (typeof options.zSide1 !== 'undefined')
+            this.zSide1 = options.zSide1;
+        if (typeof options.zSide2 !== 'undefined')
+            this.zSide2 = options.zSide2;
+        this.scaleInner = 1;
+    }
+    getBlocks() {
+        let blocks = [{
+                blockType: __WEBPACK_IMPORTED_MODULE_0__block__["a" /* BlockType */].CUBE,
+                footprint: this.footprint,
+                pos: this.pos,
+                adjustScale1: 1,
+                adjustScale2: 1,
+                rotation: this.rotation,
+                scaleFromCenter: true,
+                textureType: this.textureType
+            }];
+        blocks = blocks.concat(this.getMerlons());
+        return blocks;
+    }
+    runReplacement(seed) {
+        return [this];
+    }
+    getMerlons() {
+        let blocks = [];
+        let size = Math.min(this.footprint[2], this.footprint[0]) / (this.numMerlons * 2);
+        let y = this.pos[1] + this.footprint[1] * 0.5 + size * 0.5;
+        let pos = [];
+        let z1 = this.footprint[2] * 0.5 - size * 0.5;
+        let z2 = -this.footprint[2] * 0.5 + size * 0.5;
+        pos = pos.concat(this.getXMerlonsPos(size, y, z1, this.xSide1));
+        pos = pos.concat(this.getXMerlonsPos(size, y, z2, this.xSide2));
+        let x1 = this.footprint[0] * 0.5 - size * 0.5;
+        let x2 = -this.footprint[0] * 0.5 + size * 0.5;
+        pos = pos.concat(this.getZMerlonsPos(size, x1, y, this.zSide1));
+        pos = pos.concat(this.getZMerlonsPos(size, x2, y, this.zSide2));
+        for (let i = 0; i < pos.length; i++) {
+            blocks.push({
+                pos: pos[i],
+                footprint: __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec3 */].fromValues(size, size, size),
+                rotation: this.rotation,
+                blockType: __WEBPACK_IMPORTED_MODULE_0__block__["a" /* BlockType */].CUBE,
+                adjustScale1: this.scaleInner,
+                adjustScale2: 1,
+                adjustScale3: 1,
+                adjustScale4: 1,
+                scaleFromCenter: true,
+                textureType: this.textureType
+            });
+        }
+        return blocks;
+    }
+    getXMerlonsPos(size, y, z, merlonPlacement) {
+        let pos = [];
+        if (merlonPlacement == MerlonPlacement.NONE)
+            return pos;
+        //get the number of merlons
+        let numMerlons = Math.floor(this.footprint[0] / (size * 2));
+        let startX = -this.footprint[0] * 0.5 + size * 0.5;
+        let endX = this.footprint[0] * 0.5 - size * 0.5;
+        if (merlonPlacement == MerlonPlacement.HALF_GAP) {
+            startX = startX + size * 0.5;
+            endX = endX - size * 0.5;
+        }
+        else if (merlonPlacement == MerlonPlacement.DOUBLE_GAP) {
+            numMerlons = numMerlons - 2;
+            startX = startX + size * 2.5;
+            endX = endX - size * 2.5;
+        }
+        let incX = (endX - startX) / (numMerlons - 1);
+        for (let x = startX; x <= endX; x = x + incX) {
+            let rotPos = __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].fromValues(x, z);
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].rotate(rotPos, rotPos, __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].fromValues(0, 0), this.rotation[1]);
+            pos.push(__WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0] + rotPos[0], y, this.pos[2] + rotPos[1]));
+        }
+        return pos;
+    }
+    getZMerlonsPos(size, x, y, merlonPlacement) {
+        let pos = [];
+        if (merlonPlacement == MerlonPlacement.NONE)
+            return pos;
+        //get the number of merlons
+        let numMerlons = Math.floor(this.footprint[2] / (size * 2));
+        let startZ = -this.footprint[2] * 0.5 + size * 0.5;
+        let endZ = this.footprint[2] * 0.5 - size * 0.5;
+        if (merlonPlacement == MerlonPlacement.HALF_GAP) {
+            startZ = startZ + size * 0.5;
+            endZ = endZ - size * 0.5;
+        }
+        else if (merlonPlacement == MerlonPlacement.DOUBLE_GAP) {
+            numMerlons = numMerlons - 2;
+            startZ = startZ + size * 2.0;
+            endZ = endZ - size * 2.0;
+        }
+        let incZ = (endZ - startZ) / (numMerlons - 1);
+        for (let z = startZ; z <= endZ; z = z + incZ) {
+            let rotPos = __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].fromValues(x, z);
+            __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].rotate(rotPos, rotPos, __WEBPACK_IMPORTED_MODULE_1_gl_matrix__["b" /* vec2 */].fromValues(0, 0), this.rotation[1]);
+            pos.push(__WEBPACK_IMPORTED_MODULE_1_gl_matrix__["c" /* vec3 */].fromValues(this.pos[0] + rotPos[0], y, this.pos[2] + rotPos[1]));
+        }
+        return pos;
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Battlement;
+
+
 
 /***/ }),
-/* 107 */
-/***/ (function(module, exports) {
+/* 111 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_DisplayOptions;\n\nin vec3 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec4 fs_Info;\n\n//in float fs_Sine;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\nconst float MAP_THEME = 1.0;\nconst float DAZZLE_THEME = 2.0;\n\nconst float WATER_LINE = 0.4;\nconst float COAST_LINE = 0.43;\n\nconst int WATER = 0;\nconst int LAND = 1;\nconst int COAST = 2;\n\n\nfloat random1( vec2 p , vec2 seed) {\n    return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n    return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\nfloat interpNoiseRandom2to1(vec2 p, vec2 seed) {\n    float fractX = fract(p.x);\n    float x1 = floor(p.x);\n    float x2 = x1 + 1.0;\n\n    float fractY = fract(p.y);\n    float y1 = floor(p.y);\n    float y2 = y1 + 1.0;\n\n    float v1 = random1(vec2(x1, y1), seed);\n    float v2 = random1(vec2(x2, y1), seed);\n    float v3 = random1(vec2(x1, y2), seed);\n    float v4 = random1(vec2(x2, y2), seed);\n\n    float i1 = mix(v1, v2, fractX);\n    float i2 = mix(v3, v4, fractX);\n\n    //    return smoothstep(i1, i2, fractY);\n    return mix(i1, i2, fractY);\n\n}\n\nfloat fbm2to1(vec2 p, vec2 seed) {\n    float total  = 0.0;\n    float persistence = 0.5;\n    float octaves = 8.0;\n\n    for(float i = 0.0; i < octaves; i++) {\n        float freq = pow(2.0, i);\n        float amp = pow(persistence, i+1.0);\n        total = total + interpNoiseRandom2to1(p * freq, seed) * amp;\n    }\n    return total;\n}\n\n\n\nint getTerrainType() {\n    //check for water\n    if(fs_Pos.y <= WATER_LINE) {\n        return WATER;\n    }\n    //check for sand\n    else if(fs_Pos.y < COAST_LINE) {\n        return COAST;\n    }\n    return LAND;\n}\n\nvec3 getMapThemeBackground() {\n    return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);\n}\n\nvec3 getMapThemeColor() {\n    vec3 groundColor = vec3(.0, 1, 0);\n    int type = getTerrainType();\n    //add population density whic is stored in last of normal\n\n\n    //check for water\n    if(type == WATER) {\n        groundColor = vec3(0.0, 0.0, 1.0);\n    }\n    //check for sand\n    else if(type == COAST) {\n        groundColor = mix(vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);\n    }\n    else if(type == LAND) {\n        groundColor = vec3(.0, 1, 0);\n        if(u_DisplayOptions.r > 0.0) {\n            groundColor = groundColor * (1.0 - fs_Nor.a*2.0);\n        }\n    }\n\n\n    //building possibility\n    if(fs_Info.x == 1.0 && u_DisplayOptions.g > 0.0) {\n        groundColor = vec3(0.5, 0.5, 0.5);\n    }\n    //building locations\n    if(fs_Info.y == 1.0) {\n        groundColor = vec3(0.0, 0.0, 0.0);\n    }\n\n    return groundColor;\n}\n\nvec3 getDazzleThemeColor() {\n    int type = getTerrainType();\n    vec3 groundColor;\n    if(type == WATER) {\n        vec3 waterColor = vec3(0.0, 0.0, 0.2);\n        vec3 highlightColor = vec3(0.3, 0.3, 0.8);\n\n        float fbm = fbm2to1(fs_Pos.xz* 5.0, vec2(4.4343, 4.343));\n        groundColor = waterColor * fbm;\n        float hBreak = 0.70;\n        if(fbm > hBreak) {\n            //groundColor = highlightColor;\n            groundColor = mix(waterColor * fbm, highlightColor, (fbm - hBreak) / (1.0 - hBreak));//);\n        }\n    }\n    if(type == COAST) {\n       groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.1, 0.1, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);\n    }\n    if(type == LAND) {\n        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);\n\n    }\n    if(u_DisplayOptions.r > 0.0) {\n        groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));\n    }\n\n    return groundColor;\n\n}\n\nvec3 getDazzleThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\nvoid main()\n{\n    vec3 groundColor = vec3(.0, 1, 0);\n    vec3 backgroundColor = vec3(1.0, 1.0, 1.0);\n    if(u_DisplayOptions[2] == MAP_THEME) {\n        groundColor = getMapThemeColor();\n        backgroundColor = getMapThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == DAZZLE_THEME) {\n        groundColor = getDazzleThemeColor();\n        backgroundColor = getDazzleThemeBackground();\n    }\n\n    float t = clamp(smoothstep(40.0, 50.0, length(fs_Pos)), 0.0, 1.0); // Distance fog\n\n    out_Col = vec4(mix(groundColor, backgroundColor, t), 1.0);\n}\n"
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__globals__ = __webpack_require__(4);
+
+class Texture {
+    bindTex() {
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].bindTexture(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, this.texture);
+    }
+    handle() {
+        return this.texture;
+    }
+    isPowerOf2(value) {
+        return (value & (value - 1)) == 0;
+    }
+    constructor(imgSource, clampVert) {
+        this.texture = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].createTexture();
+        this.bindTex();
+        // create a white pixel to serve as placeholder
+        const formatSrc = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].RGBA;
+        const formatDst = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].RGBA;
+        const lvl = 0;
+        const phWidth = 1; // placeholder
+        const phHeight = 1;
+        const phImg = new Uint8Array([255, 255, 255, 255]);
+        const formatBit = __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].UNSIGNED_BYTE; // TODO: HDR
+        __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texImage2D(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, lvl, formatDst, phWidth, phHeight, 0, formatSrc, formatBit, phImg);
+        // get a javascript image locally and load it. not instant but will auto-replace white pixel
+        const img = new Image();
+        if (clampVert == 0) {
+            img.onload = function () {
+                this.bindTex();
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texImage2D(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, lvl, formatDst, img.width, img.height, 0, formatSrc, formatBit, img);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_WRAP_S, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].REPEAT);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_WRAP_T, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].REPEAT);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_MIN_FILTER, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].LINEAR);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_MAG_FILTER, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].LINEAR);
+            }.bind(this);
+        }
+        else {
+            img.onload = function () {
+                this.bindTex();
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texImage2D(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, lvl, formatDst, img.width, img.height, 0, formatSrc, formatBit, img);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_WRAP_S, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].CLAMP_TO_EDGE);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_WRAP_T, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].CLAMP_TO_EDGE);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_MIN_FILTER, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].LINEAR);
+                __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].texParameteri(__WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_2D, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].TEXTURE_MAG_FILTER, __WEBPACK_IMPORTED_MODULE_0__globals__["a" /* gl */].LINEAR);
+            }.bind(this);
+        }
+        img.src = imgSource; // load the image
+    }
+}
+/* unused harmony export Texture */
+
+;
+/* harmony default export */ __webpack_exports__["a"] = (Texture);
+
 
 /***/ }),
-/* 108 */
+/* 112 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_gl_matrix__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__globals__ = __webpack_require__(4);
+
+
+
+class SpurGeometry extends __WEBPACK_IMPORTED_MODULE_1__rendering_gl_Drawable__["a" /* default */] {
+    constructor(city, level) {
+        super(); // Call the constructor of the super class. This is required.
+        this.seed = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(342.3423, 984.843);
+        this.gridSectionsPerLevel = 10;
+        this.numLevels = 6;
+        this.gridSize = __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["b" /* vec2 */].fromValues(500, 500);
+        this.city = city;
+        this.numLevels = 5;
+        this.level = level;
+    }
+    create() {
+        this.initGrid();
+        this.generateIdx();
+        this.generatePos();
+        this.generateNor();
+        this.generateInfo();
+        //this.generateCol();
+        this.count = this.indices.length;
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.bufIdx);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ELEMENT_ARRAY_BUFFER, this.indices, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufNor);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.normals, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufPos);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.positions, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bindBuffer(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.bufInfo);
+        __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].bufferData(__WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].ARRAY_BUFFER, this.info, __WEBPACK_IMPORTED_MODULE_2__globals__["a" /* gl */].STATIC_DRAW);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, this.bufCol);
+        // gl.bufferData(gl.ARRAY_BUFFER, this.colors, gl.STATIC_DRAW);
+    }
+    //get the number of points
+    getNumPoints() {
+        let numPoints = 0;
+        for (let level = this.numLevels; level >= 1; level--) {
+            numPoints += (level * this.gridSectionsPerLevel + 1) * (this.gridSectionsPerLevel + 1);
+        }
+        return numPoints * 2; //two sides of spur
+    }
+    toTerrainPos(pos) {
+        return (pos - 250) / 5;
+    }
+    initGrid() {
+        let numPoints = this.getNumPoints();
+        this.normals = new Float32Array(numPoints * 4);
+        let indicies = [];
+        let positions = [];
+        let info = [];
+        let normals = [];
+        for (let widthLevel = this.level; widthLevel >= 1; widthLevel--) {
+            this.initGridSection(this.level, widthLevel, indicies, positions, info, normals);
+        }
+        this.positions = new Float32Array(positions);
+        this.info = new Float32Array(info);
+        this.normals = new Float32Array(normals);
+        this.indices = new Uint32Array(indicies); // NxN squares, each square is two triangles, each triangle is three indices
+    }
+    /**
+     * This is just an approximation
+     * @param radius
+     */
+    getSpurRadiusZIntersection(radius) {
+        let lev7radius = this.city.levels[this.city.levels.length - 1].getOuterRadius();
+        let lev2radius = this.city.levels[1].getOuterRadius();
+        let spurDeltaZ = lev2radius;
+        let spurDeltaX = lev7radius;
+        let deltaX = spurDeltaX * (spurDeltaZ - radius) / spurDeltaZ;
+        let angle = Math.atan(deltaX / radius);
+        let z = radius - Math.sin(angle / 3.1415) * radius;
+        return z;
+    }
+    initGridSection(levelHeight, levelWidth, indicies, positions, info, normals) {
+        let heightLevel = this.city.levels[levelHeight];
+        let innerRadius = this.city.levels[levelWidth].getInnerRadius();
+        let outerRadius = this.city.levels[levelWidth].getOuterRadius();
+        let startElevation = heightLevel.getLevelHeight();
+        let endElevation = heightLevel.getNextLevelHeight();
+        if (levelHeight == 6) {
+            if (levelWidth == 5)
+                innerRadius = 0;
+            endElevation = heightLevel.getWallTopElevation() + 0.1;
+        }
+        //get the start, end and increments for the z coordinate
+        let startZ = this.city.pos[2] + this.getSpurRadiusZIntersection(innerRadius);
+        let endZ = this.city.pos[2] + this.getSpurRadiusZIntersection(outerRadius);
+        let incZ = (endZ - startZ) / (this.gridSectionsPerLevel);
+        //get the start end and increments for the y coordinate
+        let startY = startElevation;
+        let endY = endElevation;
+        let incY = (endY - startY) / (this.gridSectionsPerLevel);
+        //get the x offset
+        let lev7radius = this.city.levels[this.city.levels.length - 1].getOuterRadius();
+        let lev2radius = this.city.levels[1].getOuterRadius();
+        let spurDeltaZ = lev2radius;
+        let spurDeltaX = lev7radius;
+        let startOffsetX = spurDeltaX * (spurDeltaZ - innerRadius) / spurDeltaZ;
+        let endOffsetX = spurDeltaX * (spurDeltaZ - outerRadius) / spurDeltaZ;
+        let incOffsetX = (startOffsetX - endOffsetX) / (this.gridSectionsPerLevel);
+        for (let i = 0; i <= this.gridSectionsPerLevel; ++i) {
+            for (let j = 0; j <= this.gridSectionsPerLevel; j++) {
+                let posIndex = positions.length / 4;
+                positions.push(this.toTerrainPos(this.city.pos[0] + startOffsetX - i * incOffsetX));
+                positions.push((startY + j * incY) / 5);
+                positions.push(this.toTerrainPos(startZ + i * incZ));
+                positions.push(0);
+                positions.push(this.toTerrainPos(this.city.pos[0] - startOffsetX + i * incOffsetX));
+                positions.push((startY + j * incY) / 5);
+                positions.push(this.toTerrainPos(startZ + i * incZ));
+                positions.push(0);
+                //make the triangles
+                if (i < this.gridSectionsPerLevel && j < this.gridSectionsPerLevel && !this.checkForTunnel(i, j, levelHeight, levelWidth)) {
+                    //triangles for first
+                    indicies.push(posIndex, posIndex + 2, posIndex + this.gridSectionsPerLevel * 2 + 2);
+                    indicies.push(posIndex + 2, posIndex + this.gridSectionsPerLevel * 2 + 2, posIndex + this.gridSectionsPerLevel * 2 + 4);
+                    indicies.push(posIndex + 1, posIndex + 3, posIndex + this.gridSectionsPerLevel * 2 + 3);
+                    indicies.push(posIndex + 3, posIndex + this.gridSectionsPerLevel * 2 + 3, posIndex + this.gridSectionsPerLevel * 2 + 5);
+                }
+                //if this is the top then make roof of triangles
+                if (this.level == 6 && i < this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
+                    indicies.push(posIndex, posIndex + 1, posIndex + this.gridSectionsPerLevel * 2 + 2);
+                    indicies.push(posIndex + 1, posIndex + this.gridSectionsPerLevel * 2 + 2, posIndex + this.gridSectionsPerLevel * 2 + 3);
+                }
+                //add normals
+                if (j == this.gridSectionsPerLevel && j == this.gridSectionsPerLevel) {
+                    normals.push(-1, 0, 0, 1);
+                    normals.push(1, 0, 0, 1);
+                }
+                else {
+                    normals.push(-1, 0, 0, 0);
+                    normals.push(1, 0, 0, 0);
+                }
+                //add info
+                info.push(0, 0, 0, 0);
+                info.push(1, 1, 1, 1);
+            }
+        }
+    }
+    checkForTunnel(i, j, levelHeight, levelWidth) {
+        if (levelHeight != levelWidth)
+            return false;
+        if (i > this.gridSectionsPerLevel * 0.4)
+            return false;
+        return true;
+    }
+}
+;
+/* harmony default export */ __webpack_exports__["a"] = (SpurGeometry);
+
+
+/***/ }),
+/* 113 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\n\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;\nuniform mat4 u_ViewProj;\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_CityInfo; //[0] = city radius [1] = cityHeight\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec4 vs_Info;\n\nout vec3 fs_Pos;\nout vec4 fs_Nor;\nout vec4 fs_Col;\nout vec4 fs_Info;\nout vec4 fs_RealPos;\nout vec4 fs_LandNormal;\n\nconst float WATER = 0.0;\nconst float LAND = 1.0;\nconst float COAST = 2.0;\nconst float MOUNTAIN = 3.0;\nconst float SPUR = 4.0;\n\nvec4 vs_Pos2;\n\nfloat random1( vec2 p , vec2 seed) {\n  return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n  return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n  return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\n\nfloat interpNoiseRandom2to1(vec2 p, vec2 seed) {\n  float fractX = fract(p.x);\n  float x1 = floor(p.x);\n  float x2 = x1 + 1.0;\n\n  float fractY = fract(p.y);\n  float y1 = floor(p.y);\n  float y2 = y1 + 1.0;\n\n  float v1 = random1(vec2(x1, y1), seed);\n  float v2 = random1(vec2(x2, y1), seed);\n  float v3 = random1(vec2(x1, y2), seed);\n  float v4 = random1(vec2(x2, y2), seed);\n\n  float i1 = mix(v1, v2, fractX);\n  float i2 = mix(v3, v4, fractX);\n\n  //    return smoothstep(i1, i2, fractY);\n  return mix(i1, i2, fractY);\n\n}\n\nfloat fbm2to1(vec2 p, vec2 seed) {\n  float total  = 0.0;\n  float persistence = 0.5;\n  float octaves = 8.0;\n\n  for(float i = 0.0; i < octaves; i++) {\n    float freq = pow(2.0, i);\n    float amp = pow(persistence, i+1.0);\n    total = total + interpNoiseRandom2to1(p * freq, seed) * amp;\n  }\n  return total;\n}\n\n\n\n\nfloat calcMountainHeight(float x, float y, float z) {\n  float cityRadius = u_CityInfo[0];\n  float cityHeight = u_CityInfo[1];\n  float maxElevation = 15.0;\n  float baseMtHeight =  cityHeight;\n  float baseZ = -10.0;\n  float baseToMaxWidth = u_CityInfo[1];\n  float yNew = 0.0;\n  //wall behind city\n  if (abs(x) < cityRadius) {\n    baseMtHeight= cityHeight * (1.0 - abs(x)/cityRadius);\n  }\n  //wall moving out fromthe city\n  else {\n    baseMtHeight = cityHeight * min(1.0, (abs(x) - cityRadius)/cityRadius);\n  }\n\n\n  //standard mountaints 10 clicks back from back of fortress\n  if (z < baseZ - baseToMaxWidth) {\n    yNew = cityHeight + vs_Pos2.y * maxElevation;\n    fs_Col.r = MOUNTAIN;\n  }\n  //ramp up from mountain height at back of fortress\n  else if (z <= baseZ) {\n    float scale = (baseZ - z) / baseToMaxWidth;\n    //ramp up to ultimate height\n    yNew = mix(baseMtHeight, cityHeight + vs_Pos2.y * maxElevation, scale);\n    fs_Col.r = MOUNTAIN;\n  }\n  //mountain start radiates out from fortress\n  else if (abs(x) >= cityRadius) {\n    float mtStart = (abs(x) - cityRadius) * 0.5;\n    float distToBase = z - baseZ;\n    if (z < mtStart) {\n      float scale = (mtStart - z) / (mtStart - baseZ);\n      if (scale < 0.5) scale = smoothstep(0.0, 1.0, scale);\n      //modelposition.y = baseMtHeight + (baseZ - z) * 0.1  *  vs_Pos.y*(maxElevation - baseMtHeight);\n      yNew = vs_Pos.y * scale + baseMtHeight * scale;\n      fs_Col.r = MOUNTAIN;\n    }\n  }\n  return yNew;\n\n}\n\n/**\nCalculate the normal for each vertex by getting the height of the four\nsurrounding vertex and calculate the slope between them\n*/\nvec4 calcMountainNormal(float x, float y, float z) {\n\n  //get the four surrounding points\n  float sampleDistance = 0.1;\n  vec3 x1 = vec3(x, calcMountainHeight(x, y, z + sampleDistance), z + sampleDistance);\n  vec3 x2 = vec3(x, calcMountainHeight(x, y, z - sampleDistance), z - sampleDistance);\n\n  vec3 z1 = vec3(x + sampleDistance, calcMountainHeight(x + sampleDistance, y, z), z);\n  vec3 z2 = vec3(x - sampleDistance, calcMountainHeight(x - sampleDistance, y, z), z);\n\n  return vec4(normalize(cross(x1-x2, z1-z2)), 1.0);\n\n}\n\nfloat calcSpurXOffset(float y, float z) {\n  return fbm2to1(vec2(y,z), vec2(3.34, 4343.2)) - 0.5;\n}\n\nfloat calcSpurZOffset(float x, float y) {\n  return fbm2to1(vec2(x,y), vec2(3.1, 43.2)) * 0.3;\n}\n\n\nvoid main()\n{\n  vs_Pos2 = vs_Pos;\n  fs_Col = vs_Col;\n  if(vs_Pos.y == 0.0) {\n    vs_Pos2.y = fbm2to1(vec2(vs_Pos2.x/10.0, vs_Pos2.z/10.0), vec2(3.43, 4.43));\n    fs_Col.r = LAND;\n  }\n  fs_Pos = vs_Pos2.xyz;\n  fs_Nor = vs_Nor;\n  fs_Info = vs_Info;\n  vec4 modelposition = vec4(vs_Pos2.x, vs_Pos2.y, vs_Pos2.z, 1.0);\n\n  //this must be our spur stuff\n  if(vs_Pos2.y > 1.0) {\n      fs_Col.r = SPUR;\n    //adjust the x position\n    //float adjustment = fbm2to1(vs_Pos2.yz, vec2(3.34, 4343.2));\n    modelposition.x = vs_Pos2.x + calcSpurXOffset(vs_Pos2.y, vs_Pos2.z);\n    //modelposition.z = vs_Pos2.z - calcSpurZOffset(vs_Pos2.x, vs_Pos2.y);\n  }\n\n  if(vs_Pos2.y <= 1.0) {\n    modelposition.y = calcMountainHeight(modelposition.x, modelposition.y, modelposition.z);\n  }\n\n  fs_LandNormal = calcMountainNormal(modelposition.x, modelposition.y, modelposition.z);\n  fs_RealPos = modelposition.xyzw;\n\n  modelposition = u_Model * modelposition;\n  gl_Position = u_ViewProj * modelposition;\n}\n"
+
+/***/ }),
+/* 114 */
+/***/ (function(module, exports) {
+
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_DisplayOptions;\nuniform vec4 u_CityInfo; //[0] = city radius [1] = cityHeight\nuniform sampler2D u_PavementSampler;\nuniform sampler2D u_WhiteStoneSampler;\n\nin vec3 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec4 fs_Info;\nin vec4 fs_RealPos;\nin vec4 fs_LandNormal;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\nconst float MAP_THEME = 1.0;\nconst float DAZZLE_THEME = 2.0;\nconst float TEXTURE_THEME = 3.0;\n\nconst float WATER_LINE = 0.4;\nconst float COAST_LINE = 0.43;\n\nconst int WATER = 0;\nconst int LAND = 1;\nconst int COAST = 2;\nconst int MOUNTAIN = 3;\nconst int SPUR = 4;\n\nvec3 fs_LightVector;\nvec3 sunPosition = vec3(12000.0, 10000.0, 8000.0);\n\nfloat random1( vec2 p , vec2 seed) {\n    return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n    return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\nfloat interpNoiseRandom2to1(vec2 p, vec2 seed) {\n    float fractX = fract(p.x);\n    float x1 = floor(p.x);\n    float x2 = x1 + 1.0;\n\n    float fractY = fract(p.y);\n    float y1 = floor(p.y);\n    float y2 = y1 + 1.0;\n\n    float v1 = random1(vec2(x1, y1), seed);\n    float v2 = random1(vec2(x2, y1), seed);\n    float v3 = random1(vec2(x1, y2), seed);\n    float v4 = random1(vec2(x2, y2), seed);\n\n    float i1 = mix(v1, v2, fractX);\n    float i2 = mix(v3, v4, fractX);\n\n    //    return smoothstep(i1, i2, fractY);\n    return mix(i1, i2, fractY);\n\n}\n\nfloat fbm2to1(vec2 p, vec2 seed) {\n    float total  = 0.0;\n    float persistence = 0.5;\n    float octaves = 8.0;\n\n    for(float i = 0.0; i < octaves; i++) {\n        float freq = pow(2.0, i);\n        float amp = pow(persistence, i+1.0);\n        total = total + interpNoiseRandom2to1(p * freq, seed) * amp;\n    }\n    return total;\n}\n\n\n\nint getTerrainType() {\n    //check for water\n    if(fs_Col.r == 4.0) {\n        return SPUR;\n    }\n    if(fs_Col.r == 3.0) {\n        return MOUNTAIN;\n    }\n    //check for sand\n    else if(fs_Col.r == 2.0) {\n        return COAST;\n    }\n    return LAND;\n}\n\nfloat calcSpurXOffset(float y, float z) {\n    return fbm2to1(vec2(y,z), vec2(3.34, 4343.2)) - 0.5;\n}\n\n\nvec4 calcSpurNormal(float x, float y, float z) {\n    //get the four surrounding points\n    float sampleDistance = 0.001;\n    vec3 y1 = vec3(x + calcSpurXOffset(y, z + sampleDistance), y, z + sampleDistance);\n    vec3 y2 = vec3(x + calcSpurXOffset(y, z - sampleDistance), y, z - sampleDistance);\n\n    vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);\n    vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);\n\n    //right side\n    if(fs_Nor.x == 1.0) {\n        return vec4(normalize(cross(y1-y2, z1-z2)), 1.0);\n    }\n    //left side\n    else if(fs_Nor.x == -1.0) {\n        return vec4(normalize(cross(y1-y2, z2-z1)), 1.0);\n    }\n    else return vec4(0.0, 1.0, 0.0, 1.0);\n}\n\nfloat calcMountainOffset(float x, float z) {\n   return fbm2to1(vec2(x, z), vec2(4.43, 4343.4));\n}\n\nvec4 calcMountainNormal(float x, float y, float z) {\n    //get the four surrounding points\n    float sampleDistance = 0.001;\n    vec3 x1 = vec3(x + calcMountainOffset(x, z + sampleDistance), y, z + sampleDistance);\n    vec3 x2 = vec3(x + calcMountainOffset(x, z - sampleDistance), y, z - sampleDistance);\n\n    vec3 z1 = vec3(x + calcSpurXOffset(y + sampleDistance, z), y + sampleDistance, z);\n    vec3 z2 = vec3(x + calcSpurXOffset(y - sampleDistance, z), y - sampleDistance, z);\n\n    return vec4(normalize(cross(x1-x2, z1-z2)), 1.0);\n}\n\nvec3 adjustColorForSun(vec3 color, vec4 normal) {\n    fs_LightVector = vec3(10, 10, 10);\n\n    vec3 diffuseColor;\n\n    // Calculate the diffuse term for Lambert shading\n    float sunDiffuseTerm = dot(normalize(normal.xyz), normalize(fs_LightVector.xyz));\n    float ambientTerm = 0.1;\n    float sunIntensity = clamp(0.1, 1.0, sunDiffuseTerm + ambientTerm);//Add a small float value to the color multiplier\n    diffuseColor = vec3(color.rgb * sunIntensity);\n    return diffuseColor;\n}\n\nvec3 adjustColorForLights(vec3 color, vec3 normal, vec3 point) {\n    vec3 direction;\n    vec3 lightColor;\n    vec3 sunDirection = normalize(sunPosition - point);\n    vec3 sunColor = vec3(1.5, 1.25, 1.0);\n    vec3 skyColor = vec3(0.16,0.20,0.28);\n    vec3 indirectColor = vec3(0.17, 0.14, 0.10);\n    vec3 fireFlyColor = vec3(0.698, 0.956, 0.145);\n    float hour = 15.0;\n    float night = 0.0;\n    float dawn = 0.0;\n    float sunset = 0.1;\n\n\n\n    //get the soft shadow and subsurface amounts\n    //float shadow = sunShadow(point, 3.0, sdfIndex);\n    float sunIntensity;\n\n\n    if(dot(normal, sunDirection) >= 0.0) {\n        sunIntensity = clamp(dot(normal, sunDirection), 0.0, 1.0);// * shadow;\n    }\n    else {\n        sunIntensity = 0.0;\n    }\n\n    //make sun brighter at noon\n    sunIntensity = sunIntensity * clamp(sunPosition.y/80.0, 0.0, 1.0);\n    float skyIntensity = clamp(0.5 + 0.5*normal.y, 0.0, 1.0);\n\n\n    vec3 indirectDirection = vec3(-sunDirection[0], sunDirection[1], sunDirection[2]);\n    //vec3 indirectDirection = normalize(vec3(0.2, 0.0, 1.0));\n    float indirectIntensity = clamp(dot(normal, indirectDirection), 0.0, 1.0);// * shadow;\n\n    //make sun redder at sunrise/sunset\n    sunColor.r = max(sunColor.r * 3.0 * (dawn*0.8 + sunset), sunColor.r);\n    if(hour < 5.0) {\n        sunIntensity = 0.0;\n    }\n\n\n\n    vec3 intensity = sunIntensity*sunColor +\n     skyIntensity * skyColor\n    + indirectIntensity * indirectColor;\n\n\n    color = color * intensity;\n    return color;\n\n}\n\nvec3 getMapThemeBackground() {\n    return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);\n}\n\nvec3 getMapThemeColor() {\n    vec3 groundColor = vec3(.0, 1, 0);\n    int type = getTerrainType();\n    //add population density whic is stored in last of normal\n\n\n    //check for water\n    if(type == WATER) {\n        groundColor = vec3(0.0, 0.0, 1.0);\n    }\n    //check for sand\n    else if(type == COAST) {\n        groundColor = mix(vec3(0.0, 1.0, 0.0), vec3(1.0, 1.0, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);\n    }\n    else if(type == LAND) {\n        groundColor = vec3(.0, 1, 0);\n        if(u_DisplayOptions.r > 0.0) {\n            groundColor = groundColor * (1.0 - fs_Nor.a*2.0);\n        }\n    }\n    else if(type == SPUR) {\n        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);\n        return adjustColorForSun(vec3(1.0, 1.0, 1.0), normal);\n    }\n\n    //building possibility\n    if(fs_Info.x == 1.0 && u_DisplayOptions.g > 0.0) {\n        groundColor = vec3(0.5, 0.5, 0.5);\n    }\n    //building locations\n    if(fs_Info.y == 1.0) {\n        groundColor = vec3(0.0, 0.0, 0.0);\n    }\n\n    return groundColor;\n}\n\nvec3 getDazzleThemeColor() {\n    int type = getTerrainType();\n    vec3 groundColor;\n    if(type == WATER) {\n        vec3 waterColor = vec3(0.0, 0.0, 0.2);\n        vec3 highlightColor = vec3(0.3, 0.3, 0.8);\n\n        float fbm = fbm2to1(fs_Pos.xz* 5.0, vec2(4.4343, 4.343));\n        groundColor = waterColor * fbm;\n        float hBreak = 0.70;\n        if(fbm > hBreak) {\n            //groundColor = highlightColor;\n            groundColor = mix(waterColor * fbm, highlightColor, (fbm - hBreak) / (1.0 - hBreak));//);\n        }\n    }\n    else if(type == COAST) {\n       groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.1, 0.1, 0.0), (COAST_LINE - fs_Pos.y) * 33.33);\n    }\n    else if(type == SPUR) {\n        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);\n        return adjustColorForSun(vec3(1.0, 1.0, 1.0), normal);\n    }\n    if(type == LAND) {\n        groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);\n    }\n    groundColor = mix(vec3(0.0, 0.3, 0.2), vec3(0.7, 0.7, 1.0), (fs_Pos.y - COAST_LINE) / COAST_LINE);\n    if(u_DisplayOptions.r > 0.0) {\n        groundColor = groundColor * (1.0 + pow(fs_Nor.a*2.0, 2.0));\n    }\n\n    return groundColor;\n\n}\n\nvec3 getDazzleThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\n\n\nvec3 getTopPlazaColor(float x, float z) {\n    if(abs(fs_Pos.x) < 0.4) {\n        return texture(u_PavementSampler, fs_Pos.xz).xyz;\n    }\n    float elevation = fbm2to1(vec2(fs_RealPos.x + 20.0, fs_RealPos.z), vec2(3.43, 5.454));\n    return mix(vec3(0.0, 0.4, 0.2), vec3(0.5, 0.7, .3), elevation);\n}\n\nvec3 getTextureThemeColor() {\n    int type = getTerrainType();\n    vec3 groundColor;\n\n    if(type == SPUR) {\n        vec4 normal = calcSpurNormal(fs_Pos.x, fs_Pos.y, fs_Pos.z);\n        //signifies we are on the top\n        if (fs_Nor.a == 1.0) {\n            return getTopPlazaColor(fs_Pos.x, fs_Pos.z);\n        }\n        return adjustColorForLights(vec3(0.5, 0.5, 0.5), normal.xyz, fs_RealPos.xyz).xyz;\n    }\n\n\n    vec3 landColor = mix(vec3(0.0, 0.4, 0.2), vec3(1.0, 1.0, .3), fs_Pos.y);\n    vec3 mountainColor = mix(vec3(0.4, 0.4, 0.4), vec3(0.0, 0.0, .0), fs_Pos.y);\n\n    float percentMountain = 0.0;\n    if(type == MOUNTAIN) {\n        groundColor = mix(vec3(0.5, 0.5, 0.5), vec3(0.0, 0.4, 0.2), fs_Pos.y);\n        percentMountain = 1.0;\n    }\n    //the baVnd along the transition from land to mountain\n    if(\n    (\n        abs(abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) < 10.0\n        || (abs(fs_Pos.x) - 1.0 < u_CityInfo[0] && fs_Pos.z < 0.5)\n        )\n        && fs_Pos.z > -10.0\n    ) {\n        float percentByXY = (abs(fs_Pos.x)*0.5 - fs_Pos.z - 10.0) / 10.0;\n        float percentByElevation =  fs_RealPos.y / 2.0;\n\n        percentMountain = clamp(0.0, 1.0, percentByXY);\n\n    }\n\n    vec3 color = mix(landColor, mountainColor,  percentMountain);\n    //hack for back of caslte\n    if(abs(fs_Pos.x) + 0.5 < u_CityInfo[0] && fs_Pos.z <= -9.0) color = mountainColor;\n    return adjustColorForLights(color, fs_LandNormal.xyz, fs_RealPos.xyz).xyz;\n\n}\n\nvec3 getTextureThemeBackground() {\n    return vec3(0.65, .91, 1.0);\n}\n\n\nvoid main()\n{\n    vec3 groundColor = vec3(.0, 0.5, 0);\n    vec3 backgroundColor = vec3(1.0, 1.0, 1.0);\n\n\n    if(u_DisplayOptions[2] == MAP_THEME) {\n        groundColor = getMapThemeColor();\n        backgroundColor = getMapThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == DAZZLE_THEME) {\n        groundColor = getDazzleThemeColor();\n        backgroundColor = getDazzleThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == TEXTURE_THEME) {\n        groundColor = getTextureThemeColor();\n        backgroundColor = getTextureThemeBackground();\n    }\n\n    float t = clamp(smoothstep(40.0, 50.0, length(fs_Pos)), 0.0, 1.0); // Distance fog\n\n    out_Col = vec4(mix(groundColor, backgroundColor, t), 1.0);\n}\n"
+
+/***/ }),
+/* 115 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\n\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;\nuniform mat4 u_ViewProj;\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec4 vs_Translate;\n\nout vec3 fs_Pos;\nout vec4 fs_Nor;\nout vec4 fs_Col;\nout vec4 fs_Translate;\n\nfloat random1( vec2 p , vec2 seed) {\n  return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n  return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n  return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\nvoid main()\n{\n    fs_Pos = vs_Pos.xyz;\n    fs_Translate = vs_Translate;\n    fs_Col = vs_Col;\n    vec4 modelposition = vec4(vs_Pos.x*1.05, 0.501 + vs_Col.y / 10.0, vs_Pos.z, 1.0);\n   //scale by width and height\n    modelposition.x = modelposition.x * vs_Col.x; //vs_Col.x = length\n    modelposition.z = modelposition.z * vs_Col.y; //vs_Col.y = width;\n\n    //fs_Pos.y = vs_Pos.y * vs_Col.y;\n\n    //rotate\n    float s = sin(vs_Col.z);\n    float c = cos(vs_Col.z);\n    modelposition.xz = mat2(c, s, -s, c) * modelposition.xz;\n\n    //translate\n    modelposition.xyz += vs_Translate.xyz;\n\n    modelposition = u_Model * modelposition;\n    gl_Position = u_ViewProj * modelposition;\n}\n"
 
 /***/ }),
-/* 109 */
+/* 116 */
 /***/ (function(module, exports) {
 
 module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_DisplayOptions;\n\nin vec3 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col; //fs_Col.x = length, fs_Col.y = width\nin vec4 fs_Translate;\n\n//in float fs_Sine;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nfloat MAP_THEME = 1.0;\nfloat DAZZLE_THEME = 2.0;\n\n\nvec2 random2( vec2 p , vec2 seed) {\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\n/*\nDetermine worley noise for given position and grid size\n- param vec2 pos :      the position to test for\n- param vec2 gridSize:  the size of the grid\n- param vec2 seed:       the random seed\n- return vec2:          the location of the closest worley point\n*/\nvec2 getClosestWorleyPoint2d(vec2 pos, vec2 gridSize, vec2 seed) {\n    vec2 centerGridPos = pos - mod(pos, gridSize);  //the corner of the grid in which this point resides\n    vec2 closestWorleyPoint = vec2(1.0, 1.0);\n    float closestDistance = (gridSize.x + gridSize.y) * 2.0;\n\n    vec2 currentGridPos;\n    vec2 currentWorleyPoint;\n    float currentDistance;\n    //loop through the 9 grid sections surrouding this one to find the closes worley point\n    for(float gridX = -1.0; gridX <= 1.0; gridX += 1.0) {\n        for(float gridY = -1.0; gridY <= 1.0; gridY += 1.0) {\n            currentGridPos = centerGridPos + vec2(gridX, gridY) * gridSize;\n            currentWorleyPoint = currentGridPos + random2(currentGridPos, seed) * gridSize;\n            currentDistance = length(currentWorleyPoint - pos);\n            if(currentDistance < closestDistance) {\n                closestDistance = currentDistance;\n                closestWorleyPoint = currentWorleyPoint;\n            }\n        }\n    }\n\n    return closestWorleyPoint;\n}\n\nfloat getWorleyNoise2d(vec2 pos, vec2 gridSize, vec2 seed) {\n    vec2 wPoint = getClosestWorleyPoint2d(pos, gridSize, seed);\n    return length(wPoint - pos) / length(gridSize);\n}\n\n\nvec3 getMapThemeColor() {\n    //stripes in the road\n    if(abs(fs_Pos.z) < 0.1) {\n        return vec3(1.0, 1.0, 0.0);\n    }\n\n    return vec3(1.0, 0.0, 0.0);\n\n}\nvec3 getDazzleThemeColor() {\n    vec3 roadColor = vec3(0.301, 0.274, 0.219);\n    vec3 stripeColor = vec3(1.0, 1.0, 1.0);\n\n    //stripes in the highway\n    if(abs(fs_Pos.z) < 0.05 && fs_Col.y >= 0.5) {\n       roadColor = stripeColor;\n    }\n    //dashes on the streets\n    if(\n      abs(fs_Pos.z) < 0.05\n      && fs_Col.y < 0.5\n      && floor(mod(fs_Pos.x * 8.0, 2.0)) == 0.0\n    ) {\n        roadColor =  stripeColor;\n    }\n\n    //add worley noise to the road\n    vec2 pos = fs_Pos.xz * 500.0;\n    vec2 seed = vec2(1.23,2.32);\n    vec2 gridSize = vec2(1.0, 1.0); //size of our road\n    float wNoise = getWorleyNoise2d(pos, gridSize, seed);\n    roadColor = mix(roadColor, vec3(0.0, 0.0, 0.0), pow(wNoise,2.0));\n\n\n    return roadColor;\n\n}\nvec3 getDazzleThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\nvec3 getMapThemeBackground() {\n    return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);\n}\n\nvoid main()\n{\n\n    vec3 roadColor = vec3(0.0, 0.0, 0.0);\n    vec3 backgroundColor = vec3(0,0,0);\n\n    if(u_DisplayOptions[2] == MAP_THEME) {\n        roadColor = getMapThemeColor();\n        backgroundColor = getMapThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == DAZZLE_THEME) {\n        roadColor = getDazzleThemeColor();\n        backgroundColor = getDazzleThemeBackground();\n    }\n\n    float t = clamp(smoothstep(40.0, 50.0, length(fs_Translate.xz)), 0.0, 1.0); // Distance fog\n    out_Col = vec4(mix(roadColor, backgroundColor, t), 1.0);\n}\n"
 
 /***/ }),
-/* 110 */
+/* 117 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\n\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;\nuniform mat4 u_ViewProj;\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec4 vs_Rotate;\nin vec4 vs_Scale;\nin vec4 vs_Translate;\nin vec4 vs_BlockInfo;\nin vec4 vs_Adjustment;\n\nout vec3 fs_Pos;   //position on unit cube (0 or 1)\nout vec4 fs_Nor;\nout vec4 fs_Col;   //scale\nout vec4 fs_Translate;\nout vec4 fs_BlockInfo;\n\nconst float CUBE = 1.0;\nconst float PYRAMID = 2.0;\nconst float TENT = 3.0;\nconst float TRI_TUBE = 4.0;\nconst float QUARTER_PYRAMID = 5.0;\nconst float SLANT = 6.0;\nconst float WEDGE = 7.0;\n\nfloat adjust1; //contained in vs_BlockInfo[3]\nfloat adjust2;  //contained in vs_BlockInfo[2]\nfloat adjust3; //contained in vs_BlockInfo[3]\nfloat scaleX;  //contained in vs_Col[0];\nfloat scaleY; //contained in vs_Col[1];\nfloat scaleZ; //contained in vs_Col[2];\nbool scaleFromCenter; //boolean indicating if scaling should be done from the center - contained in vs_Col[3]\n\nfloat random1( vec2 p , vec2 seed) {\n  return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n  return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n  return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\n\nfloat getVertexNum() {\n   if(vs_BlockInfo.x < 10.0 ) {\n       return vs_Pos.x + vs_Pos.z * 2.0 + vs_Pos.y * 4.0;\n   }\n\n   return 0.0;\n}\n\nvec3 getCubeVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    //scale top toward middle\n    else {\n        return mix(vec3(0.5, 1.0, 0.5), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n}\n\nvec3 getSlantVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum == 0.0 || vertexNum == 2.0 || vertexNum == 4.0 || vertexNum == 6.0) {\n        return vs_Pos.xyz;\n    }\n    //scale top toward middle\n    else if(vertexNum == 1.0 || vertexNum == 3.0) {\n        return mix(vec3(0.0, 0.0, vs_Pos.z), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else {\n        return mix(vec3(0.0, 1.0, vs_Pos.z), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n}\n\nvec3 getTentVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    //scale top toward middle\n    else {\n        return mix(vec3(0.5, vs_Pos[1], vs_Pos[2]), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n}\n\nvec3 getTriTubeVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 3.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else if(vertexNum == 3.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vec3(0.5, 0.0, 0.5), vs_BlockInfo[2]);\n    }\n    else if(vertexNum < 7.0) {\n        return mix(vec3(0.0, 1.0, 0.0), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n    else { //vertex num = 7\n        return mix(vec3(0.0, 1.0, 0.0), vec3(0.5, 1.0, 0.5), vs_BlockInfo[3]);\n    }\n}\n\nvec3 getQuarterPyramidVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else if(vertexNum < 7.0) {\n        return mix(vec3(0.0, 1.0, 0.0), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n    else {\n        return mix(vec3(0.0, 1.0, 0.0), vec3(0.5, 1.0, 0.5), vs_BlockInfo[3]);\n    }\n}\n\nvec3 getWedgeVertexPosition() {\n    float vertexNum = getVertexNum();\n    vec3 pos = vs_Pos.xyz;\n    //adjust interior points to be smaller\n    if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {\n        pos = mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, adjust1);\n    }\n\n    if(vertexNum == 4.0 || vertexNum == 5.0) {\n        pos.y = pos.y * adjust2;\n    }\n\n    if(vertexNum == 6.0 || vertexNum == 7.0) {\n        pos.y = pos.y * adjust3;\n    }\n\n    return pos;\n}\n\n\nmat3 rotationMatrix(int axis, float angle) {\n    float c = cos(angle);\n    float s = sin(angle);\n    mat3 rot;\n    if(axis == 0) {\n        rot = mat3(\n        1.0, 0.0, 0.0,\n        0.0, c,   -s,\n        0.0, s,   c);\n    }\n\n    if(axis == 1) {\n        rot = mat3(\n        c,   0.0, s,\n        0.0, 1.0, 0.0,\n        -s,  0.0, c\n        );\n    }\n    if(axis == 2) {\n        rot =mat3(\n        c,  -s,   0.0,\n        s,   c,   0.0,\n        0.0, 0.0, 1.0\n        );\n    }\n\n    return rot;\n}\n\nvec3 rotate(vec3 pos) {\n    mat3 rot;\n    if(vs_Rotate.x > 0.0) {\n        mat3 rot = rotationMatrix(0, vs_Rotate.x);\n        pos = rot * pos;\n    }\n    if(vs_Rotate.y > 0.0) {\n        mat3 rot = rotationMatrix(1, vs_Rotate.y);\n        pos = rot * pos;\n    }\n    return pos;\n}\n\nvec3 getVertexPosition() {\n    vec3 shapePos;\n    if(vs_BlockInfo[0] == CUBE\n      || vs_BlockInfo[0] == PYRAMID\n    ) {\n        shapePos = getCubeVertexPosition();\n    }\n    else if (vs_BlockInfo[0] == TENT) shapePos = getTentVertexPosition();\n    else if (vs_BlockInfo[0] == TRI_TUBE) shapePos = getTriTubeVertexPosition();\n    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) shapePos = getQuarterPyramidVertexPosition();\n    else if (vs_BlockInfo[0] == SLANT) shapePos = getSlantVertexPosition();\n    else if (vs_BlockInfo[0] == WEDGE) shapePos = getWedgeVertexPosition();\n    else shapePos = vs_Pos.xyz;\n\n    if(scaleFromCenter) {\n        shapePos = shapePos - vec3(0.5, 0.5, 0.5);\n    }\n    shapePos.x = shapePos.x * scaleX;\n    shapePos.y = shapePos.y * scaleY;\n    shapePos.z = shapePos.z * scaleZ;\n    shapePos = rotate(shapePos);\n    return shapePos;\n}\n\n\nvoid main()\n{\n    fs_Pos = vs_Pos.xyz;\n    fs_Translate = vs_Translate;\n    fs_BlockInfo = vs_BlockInfo;\n    adjust1 = vs_Adjustment[0];\n    adjust2 = vs_Adjustment[1];\n    adjust3 = vs_Adjustment[2];\n    scaleX = vs_Scale[0];\n    scaleY = vs_Scale[1];\n    scaleZ = vs_Scale[2];\n    scaleFromCenter = (vs_Scale[3] == 1.0);\n\n    vec4 modelposition = vec4(getVertexPosition(), 1.0);\n\n\n    modelposition.xyz += vs_Translate.xyz;\n\n    modelposition = u_Model * modelposition;\n    gl_Position = u_ViewProj * modelposition;\n}\n\n///redblobgames.com/maps/mapgen4"
+module.exports = "#version 300 es\n\n\nuniform mat4 u_Model;\nuniform mat4 u_ModelInvTr;\nuniform mat4 u_ViewProj;\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\n\n\nin vec4 vs_Pos;\nin vec4 vs_Nor;\nin vec4 vs_Col;\nin vec4 vs_Rotate;\nin vec4 vs_Scale;\nin vec4 vs_Translate;\nin vec4 vs_BlockInfo;\nin vec4 vs_Adjustment;\n\nflat out int fs_Face;\nout vec3 fs_Pos;   //position on unit cube (0 or 1)\nout vec4 fs_Nor;\nout vec4 fs_Col;   //scale\nout vec4 fs_Translate;\nout vec4 fs_BlockInfo;\nout vec4 fs_Scale;\n\nconst float CUBE = 1.0;\nconst float PYRAMID = 2.0;\nconst float TENT = 3.0;\nconst float TRI_TUBE = 4.0;\nconst float QUARTER_PYRAMID = 5.0;\nconst float SLANT = 6.0;\nconst float WEDGE = 7.0;\n\nconst int FACE_BACK = 0;\nconst int FACE_FRONT = 1;\nconst int FACE_LEFT = 2;\nconst int FACE_RIGHT = 3;\nconst int FACE_BOTTOM = 4;\nconst int FACE_TOP = 5;\n\nfloat adjust1; //contained in vs_BlockInfo[3]\nfloat adjust2;  //contained in vs_BlockInfo[2]\nfloat adjust3; //contained in vs_BlockInfo[3]\nfloat adjust4; //contained in vs_BlockInfo[3]\nfloat scaleX;  //contained in vs_Col[0];\nfloat scaleY; //contained in vs_Col[1];\nfloat scaleZ; //contained in vs_Col[2];\nbool scaleFromCenter; //boolean indicating if scaling should be done from the center - contained in vs_Col[3]\n\nfloat random1( vec2 p , vec2 seed) {\n  return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n  return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n  return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\n\n\nfloat getVertexNum() {\n   if(vs_BlockInfo.x < 10.0 ) {\n       return vs_Pos.x + vs_Pos.z * 2.0 + vs_Pos.y * 4.0;\n   }\n\n   return 0.0;\n}\n\n/**\n* Get the face number of the block\n* 0 - Front\n* 1 - Back\n* 2 - Left\n* 3 - Right\n* 4 - Bottom\n* 5 - Top\n*/\nint getFaceNum() {\n    if     (vs_Nor.z == -1.0) { return FACE_BACK; }\n    else if(vs_Nor.z ==  1.0) { return FACE_FRONT; }\n    else if(vs_Nor.x == -1.0) { return FACE_LEFT; }\n    else if(vs_Nor.x ==  1.0) { return FACE_RIGHT; }\n    else if(vs_Nor.y == -1.0) { return FACE_BOTTOM; }\n    else if(vs_Nor.y ==  1.0) { return FACE_TOP; }\n    return 0;\n}\n\nvec3 getCubeVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    //scale top toward middle\n    else {\n        return mix(vec3(0.5, 1.0, 0.5), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n}\n\nvec3 getSlantVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum == 0.0 || vertexNum == 2.0 || vertexNum == 4.0 || vertexNum == 6.0) {\n        return vs_Pos.xyz;\n    }\n    //scale top toward middle\n    else if(vertexNum == 1.0 || vertexNum == 3.0) {\n        return mix(vec3(0.0, 0.0, vs_Pos.z), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else {\n        return mix(vec3(0.0, 1.0, vs_Pos.z), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n}\n\nvec3 getTentVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.5, 0.0, 0.5), vs_Pos.xyz, adjust2);\n    }\n    //scale top toward middle\n    else {\n        return mix(vec3(0.5, vs_Pos[1], vs_Pos[2]), vs_Pos.xyz, adjust1);\n    }\n}\n\nvec3 getTriTubeVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 3.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else if(vertexNum == 3.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vec3(0.5, 0.0, 0.5), vs_BlockInfo[2]);\n    }\n    else if(vertexNum < 7.0) {\n        return mix(vec3(0.0, 1.0, 0.0), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n    else { //vertex num = 7\n        return mix(vec3(0.0, 1.0, 0.0), vec3(0.5, 1.0, 0.5), vs_BlockInfo[3]);\n    }\n}\n\nvec3 getQuarterPyramidVertexPosition() {\n    float vertexNum = getVertexNum();\n    //scale bottom toward middle\n    if(vertexNum < 4.0) {\n        return mix(vec3(0.0, 0.0, 0.0), vs_Pos.xyz, vs_BlockInfo[2]);\n    }\n    else if(vertexNum < 7.0) {\n        return mix(vec3(0.0, 1.0, 0.0), vs_Pos.xyz, vs_BlockInfo[3]);\n    }\n    else {\n        return mix(vec3(0.0, 1.0, 0.0), vec3(0.5, 1.0, 0.5), vs_BlockInfo[3]);\n    }\n}\n\nvec3 getWedgeVertexPosition() {\n    float vertexNum = getVertexNum();\n    vec3 pos = vs_Pos.xyz;\n    //adjust interior points to be smaller\n    if(vertexNum == 0.0 || vertexNum == 4.0 || vertexNum == 2.0 || vertexNum == 6.0) {\n        pos = mix(vec3(vs_Pos.xy, 0.5), vs_Pos.xyz, adjust1);\n    }\n\n    if(vertexNum == 4.0 || vertexNum == 5.0) {\n        pos.y = pos.y * adjust2;\n    }\n\n    if(vertexNum == 6.0 || vertexNum == 7.0) {\n        pos.y = pos.y * adjust3;\n    }\n\n    //slope toward the center\n    if(vertexNum == 5.0 || vertexNum == 7.0) {\n        //adjust4 = 0.0;\n        float innerZ = mix(0.5, vs_Pos.z, adjust1);\n        pos.x = mix(-0.0, pos.x, adjust4);\n        pos.z = mix(innerZ, pos.z, adjust4);\n    }\n\n    return pos;\n}\n\n\nmat3 rotationMatrix(int axis, float angle) {\n    float c = cos(angle);\n    float s = sin(angle);\n    mat3 rot;\n    if(axis == 0) {\n        rot = mat3(\n        1.0, 0.0, 0.0,\n        0.0, c,   -s,\n        0.0, s,   c);\n    }\n\n    if(axis == 1) {\n        rot = mat3(\n        c,   0.0, s,\n        0.0, 1.0, 0.0,\n        -s,  0.0, c\n        );\n    }\n    if(axis == 2) {\n        rot =mat3(\n        c,  -s,   0.0,\n        s,   c,   0.0,\n        0.0, 0.0, 1.0\n        );\n    }\n\n    return rot;\n}\n\nvec3 rotate(vec3 pos, vec3 rotation) {\n    mat3 rot;\n    if(vs_Rotate.x > 0.0) {\n        mat3 rot = rotationMatrix(0, rotation.x);\n        pos = rot * pos;\n    }\n    if(vs_Rotate.y > 0.0) {\n        mat3 rot = rotationMatrix(1, rotation.y);\n        pos = rot * pos;\n    }\n    return pos;\n}\n\nvec3 getVertexPosition() {\n    vec3 shapePos;\n    if(vs_BlockInfo[0] == CUBE\n      || vs_BlockInfo[0] == PYRAMID\n    ) {\n        shapePos = getCubeVertexPosition();\n    }\n    else if (vs_BlockInfo[0] == TENT) shapePos = getTentVertexPosition();\n    else if (vs_BlockInfo[0] == TRI_TUBE) shapePos = getTriTubeVertexPosition();\n    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) shapePos = getQuarterPyramidVertexPosition();\n    else if (vs_BlockInfo[0] == SLANT) shapePos = getSlantVertexPosition();\n    else if (vs_BlockInfo[0] == WEDGE) shapePos = getWedgeVertexPosition();\n    else shapePos = vs_Pos.xyz;\n\n    if(scaleFromCenter) {\n        shapePos = shapePos - vec3(0.5, 0.5, 0.5);\n    }\n    shapePos.x = shapePos.x * scaleX;\n    shapePos.y = shapePos.y * scaleY;\n    shapePos.z = shapePos.z * scaleZ;\n    shapePos = rotate(shapePos, vs_Rotate.xyz);\n    return shapePos;\n}\n\nvec3 getWedgeNormal() {\n    float vertexNum = getVertexNum();\n\n    //get the angle which the wedge causes the vertex to adjust\n    float angle = atan(scaleZ * 0.5 * (1.0 - adjust1) / scaleX);\n    if(vertexNum == 0.0 || vertexNum == 1.0 || vertexNum == 4.0 || vertexNum == 5.0) {\n        return rotate(vs_Nor.xyz, vec3(0.0, -angle, 0.0));\n    }\n    else {\n        return rotate(vs_Nor.xyz, vec3(0.0, angle, 0.0));\n    }\n}\n\nvec4 getVertexNormal() {\n    vec3 normal = vs_Nor.xyz;\n    if(vs_BlockInfo[0] == CUBE)  normal = normal;\n//    else if(vs_BlockInfo[0] == PYRAMID) { }\n//    else if (vs_BlockInfo[0] == TENT) normal = getTentVertexPosition();\n//    else if (vs_BlockInfo[0] == TRI_TUBE) normal = getTriTubeVertexPosition();\n//    else if (vs_BlockInfo[0] == QUARTER_PYRAMID) normal = getQuarterPyramidVertexPosition();\n//    else if (vs_BlockInfo[0] == SLANT) normal = getSlantVertexPosition();\n    else if (vs_BlockInfo[0] == WEDGE) normal = getWedgeNormal();\n\n    return vec4(rotate(normal.xyz, vs_Rotate.xyz), 1.0);\n\n}\n\n\nvoid main()\n{\n    fs_Pos = vs_Pos.xyz;\n    fs_Translate = vs_Translate;\n    fs_BlockInfo = vs_BlockInfo;\n    fs_Face = getFaceNum();\n    fs_Scale = vs_Scale;\n    adjust1 = vs_Adjustment[0];\n    adjust2 = vs_Adjustment[1];\n    adjust3 = vs_Adjustment[2];\n    adjust4 = vs_Adjustment[3];\n    scaleX = vs_Scale[0];\n    scaleY = vs_Scale[1];\n    scaleZ = vs_Scale[2];\n    fs_Nor = getVertexNormal();\n    scaleFromCenter = (vs_Scale[3] == 1.0);\n\n    vec4 modelposition = vec4(getVertexPosition(), 1.0);\n\n\n    modelposition.xyz += vs_Translate.xyz;\n\n    modelposition = u_Model * modelposition;\n    gl_Position = u_ViewProj * modelposition;\n}\n\n///redblobgames.com/maps/mapgen4"
 
 /***/ }),
-/* 111 */
+/* 118 */
 /***/ (function(module, exports) {
 
-module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_DisplayOptions; //\n\nin vec3 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec4 fs_Translate;\nin vec4 fs_BlockInfo;\n\n//in float fs_Sine;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nfloat MAP_THEME = 1.0;\nfloat DAZZLE_THEME = 2.0;\n\nfloat TEXTURE_WALL     = 0.0;\nfloat TEXTURE_ROAD     = 1.0;\nfloat TEXTURE_ROOF     = 2.0;\nfloat TEXTURE_BUILDING = 3.0;\nfloat TEXTURE_LEVEL_GROUND = 4.0;\n\n\nvec3 getMapThemeColor() {\n    vec3 buildingColor = vec3(0.0, 0.0, 0.0);\n    if(fs_Pos.x > 0.999999) {\n        buildingColor = vec3(0.8, 0.8, 0.8);\n    }\n    else if(fs_Pos.z < 0.0001) {\n        buildingColor = vec3(0.3, 0.3, 0.3);\n    }\n    else if(fs_Pos.z > 0.999999) {\n        buildingColor = vec3(0.6, 0.6, 0.6);\n    }\n    else if(fs_Pos.y > 0.99999) {\n        buildingColor = vec3(0.9, 0.9, 0.9);\n\n    }\n\n    return buildingColor;\n}\n\nvec3 getDazzleThemeColor() {\n    vec3 color = vec3(1.0, 1.0, 1.0);\n\n    //highlight the edges\n    float lum = 500.0 * (\n        max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.z - 0.5, 4.0),\n        max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0),\n        pow(fs_Pos.z -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0)))\n    );\n    //lum = smoothstep(0.9999, 1.0, lum);\n    color = (1.0-lum) * color;\n\n    return color;\n}\n\nvec3 getDazzleThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\nvec3 getMapThemeBackground() {\n    return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);\n}\n\nvoid main()\n{\n    vec3 buildingColor = vec3(0,0,0);\n    vec3 backgroundColor = vec3(0,0,0);\n\n    if(u_DisplayOptions[2] == MAP_THEME) {\n        buildingColor = getMapThemeColor();\n        backgroundColor = getMapThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == DAZZLE_THEME) {\n        buildingColor = getDazzleThemeColor();\n        backgroundColor = getDazzleThemeBackground();\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_ROAD) {\n        buildingColor = vec3(0.9, 0.4, 0.4);\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {\n        buildingColor = vec3(0.4, 0.4, 0.4);\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_WALL) {\n        //buildingColor = vec3(0.9, 0.9, 0.9);\n    }\n\n\n    float t = clamp(smoothstep(40.0, 50.0, length(fs_Translate.xz)), 0.0, 1.0); // Distance fog\n    out_Col = vec4(mix(buildingColor, backgroundColor, t), 1.0);\n}\n"
+module.exports = "#version 300 es\nprecision highp float;\n\nuniform vec2 u_PlanePos; // Our location in the virtual world displayed by the plane\nuniform vec4 u_DisplayOptions; //\nuniform sampler2D u_PavementSampler;\nuniform sampler2D u_WhiteStoneSampler;\n\nin vec3 fs_Pos;\nin vec4 fs_Nor;\nin vec4 fs_Col;\nin vec4 fs_Translate;\nin vec4 fs_BlockInfo;\nin vec4 fs_Scale;\nflat in int fs_Face;\n\n//in float fs_Sine;\n\nout vec4 out_Col; // This is the final output color that you will see on your\n                  // screen for the pixel that is currently being processed.\n\nfloat MAP_THEME = 1.0;\nfloat DAZZLE_THEME = 2.0;\nfloat TEXTURED_THEME = 3.0;\n\nfloat TEXTURE_WALL     = 0.0;\nfloat TEXTURE_ROAD     = 1.0;\nfloat TEXTURE_ROOF     = 2.0;\nfloat TEXTURE_BUILDING = 3.0;\nfloat TEXTURE_LEVEL_GROUND = 4.0;\nfloat TEXTURE_TURRET = 5.0;\nfloat TEXTURE_FOUNDATION = 6.0;\n\nvec3 sunPosition = vec3(12000.0, 10000.0, 8000.0);\n\nconst float CUBE = 1.0;\nconst float PYRAMID = 2.0;\nconst float TENT = 3.0;\nconst float TRI_TUBE = 4.0;\nconst float QUARTER_PYRAMID = 5.0;\nconst float SLANT = 6.0;\nconst float WEDGE = 7.0;\n\nconst int FACE_BACK = 0;\nconst int FACE_FRONT = 1;\nconst int FACE_LEFT = 2;\nconst int FACE_RIGHT = 3;\nconst int FACE_BOTTOM = 4;\nconst int FACE_TOP = 5;\n\n\nvec3 fs_LightVector;\n\nfloat random1( vec2 p , vec2 seed) {\n    return fract(sin(dot(p + seed, vec2(127.1, 311.7))) * 43758.5453);\n}\n\nfloat random1( vec3 p , vec3 seed) {\n    return fract(sin(dot(p + seed, vec3(987.654, 123.456, 531.975))) * 85734.3545);\n}\n\nvec2 random2( vec2 p , vec2 seed) {\n    return fract(sin(vec2(dot(p + seed, vec2(311.7, 127.1)), dot(p + seed, vec2(269.5, 183.3)))) * 85734.3545);\n}\nfloat interpNoiseRandom2to1(vec2 p, vec2 seed) {\n    float fractX = fract(p.x);\n    float x1 = floor(p.x);\n    float x2 = x1 + 1.0;\n\n    float fractY = fract(p.y);\n    float y1 = floor(p.y);\n    float y2 = y1 + 1.0;\n\n    float v1 = random1(vec2(x1, y1), seed);\n    float v2 = random1(vec2(x2, y1), seed);\n    float v3 = random1(vec2(x1, y2), seed);\n    float v4 = random1(vec2(x2, y2), seed);\n\n    float i1 = mix(v1, v2, fractX);\n    float i2 = mix(v3, v4, fractX);\n\n    //    return smoothstep(i1, i2, fractY);\n    return mix(i1, i2, fractY);\n\n}\n\nfloat fbm2to1(vec2 p, vec2 seed) {\n    float total  = 0.0;\n    float persistence = 0.5;\n    float octaves = 8.0;\n\n    for(float i = 0.0; i < octaves; i++) {\n        float freq = pow(2.0, i);\n        float amp = pow(persistence, i+1.0);\n        total = total + interpNoiseRandom2to1(p * freq, seed) * amp;\n    }\n    return total;\n}\n\nvec3 getMapThemeColor() {\n    vec3 buildingColor = vec3(0.0, 0.0, 0.0);\n    if(fs_Pos.x > 0.999999) {\n        buildingColor = vec3(0.8, 0.8, 0.8);\n    }\n    else if(fs_Pos.z < 0.0001) {\n        buildingColor = vec3(0.3, 0.3, 0.3);\n    }\n    else if(fs_Pos.z > 0.999999) {\n        buildingColor = vec3(0.6, 0.6, 0.6);\n    }\n    else if(fs_Pos.y > 0.99999) {\n        buildingColor = vec3(0.9, 0.9, 0.9);\n\n    }\n\n\n    if(fs_BlockInfo[1] == TEXTURE_ROAD) {\n        buildingColor = vec3(0.9, 0.4, 0.4);\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {\n        buildingColor = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;\n        //buildingColor = mySample.xyz;\n    }\n\n\n    return buildingColor;\n}\n\nvec3 getDazzleThemeColor() {\n    vec3 color = vec3(1.0, 1.0, 1.0);\n\n    //highlight the edges\n    float lum = 500.0 * (\n        max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.z - 0.5, 4.0),\n        max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0),\n        pow(fs_Pos.z -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0)))\n    );\n    //lum = smoothstep(0.9999, 1.0, lum);\n    color = (1.0-lum) * color;\n\n    return color;\n}\n\nvec3 getRoofColor() {\n    return vec3(0.0, 0.0, 0.5);\n}\n\n/**\n* Divid the geometry into segments based on scale and send back where this point falls in its segment\n**/\nvec2 getBuildingFloorWallPosition() {\n    vec2 floorSegmentPos = vec2(0.0, 0.0);\n\n    //handle the case for top and bottom faces\n    if(fs_Face == FACE_BOTTOM || fs_Face == FACE_TOP) {\n        return vec2(0.0, 0.0);\n    }\n    float numFloors = ceil(fs_Scale.y);\n    floorSegmentPos.y = fs_Pos.y * numFloors - floor(fs_Pos.y * numFloors);\n\n\n    //handle front and back faces\n    if(fs_Face == FACE_FRONT || fs_Face == FACE_BACK) { float numSegments = ceil(fs_Scale.x);\n        floorSegmentPos.x = fs_Pos.x * numSegments - floor(fs_Pos.x * numSegments);\n        return floorSegmentPos;\n    }\n\n    //handle front and back faces\n    float numSegments = ceil(fs_Scale.z);\n    floorSegmentPos.x = fs_Pos.z * numSegments - floor(fs_Pos.z * numSegments);\n    return floorSegmentPos;\n}\n\nbool posInWindow(vec2 pos) {\n    //make sure this piece isn't too skinny\n    if(fs_Scale.y < 0.5 && fs_Scale.z > 1.5) return false;\n    if(fs_Scale.y < 0.5 && fs_Scale.x > 1.5) return false;\n    return (true\n        && pos.y > 0.33\n        && pos.x * 4.0 - 1.5 > smoothstep(0.0, 1.0, pos.y * 2.0 - 1.0)\n        && pos.x * 4.0 - 1.5 < smoothstep(0.0, 1.0, 1.0 -  pos.y * 2.0  + 1.0)\n    );\n}\n\n\nvec3 getBuildingCubeColor() {\n    vec2 wallPos = getBuildingFloorWallPosition();\n    if(posInWindow(wallPos) ) {\n        return vec3(0.0);\n    }\n    float fbm = fbm2to1(vec2(fs_Pos.x + fs_Pos.y/2.0, fs_Pos.z + fs_Pos.y/2.0)*500.0, vec2(3.43, 43.23));\n    return vec3((fbm + 1.0) / 2.0);\n}\n\n\nfloat calcPlasterOffset(float x, float z) {\n    return fbm2to1(vec2(x,z), vec2(3.34, 4343.2)) - 0.5;\n}\n\nvec4 calcPlasterNormal(float x, float z) {\n    //get the four surrounding points\n    float sampleDistance = 0.001;\n    vec3 x1 = vec3(x, calcPlasterOffset(x, z + sampleDistance), z + sampleDistance);\n    vec3 x2 = vec3(x, calcPlasterOffset(x, z - sampleDistance), z - sampleDistance);\n\n    vec3 z1 = vec3(x + sampleDistance, calcPlasterOffset(x + sampleDistance, z), z);\n    vec3 z2 = vec3(x - sampleDistance, calcPlasterOffset(x - sampleDistance, z), z);\n\n    return vec4(normalize(cross(x1-x2, z1-z2)), 1.0);\n\n}\n\nvec3 getOrthogonal(vec3 nor) {\n\n    int imin = 0;\n    for(int i = 0; i < 3; ++i) {\n        if(abs(nor[i]) < abs(nor[imin])) imin = i;\n    }\n    vec3 orth = vec3(0.0, 0.0, 0.0);\n    float dt = nor[imin];\n    orth[imin] = 1.0;\n    for(int i = 0; i < 3; i++) {\n        orth[i] = dt*nor[i];\n    }\n    return orth;\n\n}\n\nmat4 getNormalTransform(vec3 nor) {\n    mat4 mat;\n    mat[0][0] = nor[0];\n    mat[0][1] = nor[1];\n    mat[0][2] = nor[2];\n    mat[0][3] = 0.0;\n\n    vec3 orth = getOrthogonal(nor);\n    mat[1][0] = orth[0];\n    mat[1][1] = orth[1];\n    mat[1][2] = orth[2];\n    mat[1][3] = 0.0;\n\n    vec3 orth2 = cross(nor, orth);\n    mat[2][0] = orth2[0];\n    mat[2][1] = orth2[1];\n    mat[2][2] = orth2[2];\n    mat[2][3] = 0.0;\n\n    mat[3][0] = 0.0;\n    mat[3][1] = 0.0;\n    mat[3][2] = 0.0;\n    mat[3][3] = 1.0;\n\n    return mat;\n}\n\nvec3 getPlasterNormal() {\n\n    //get the general normal for material\n    vec2 wallPos = getBuildingFloorWallPosition();\n\n    //add a ledge\n    if(wallPos.y > 0.95) {\n        return mix(fs_Nor.xyz, vec3(0.0, 1.0, 0.0), (wallPos.y - 0.95) * 20.0);\n    }\n    else if(wallPos.y > 0.90) {\n        return mix(vec3(0.0, -1.0, 0.0), fs_Nor.xyz, (1.0 - wallPos.y) * 20.0);\n    }\n\n    return fs_Nor.xyz;\n}\n\n\nvec3 getTexturedNormal() {\n    if (\n        fs_BlockInfo[1] == TEXTURE_BUILDING\n        || fs_BlockInfo[1] == TEXTURE_TURRET\n    ) {\n        return  getPlasterNormal();\n    }\n    return fs_Nor.xyz;\n}\n\nvec3 getBuildingColor() {\n    if(fs_BlockInfo[0] == CUBE || fs_BlockInfo[0] == WEDGE) return getBuildingCubeColor();\n\n    return vec3(0.5, 0.5, 0.5);\n}\n\nvec3 getTexturedThemeColor() {\n    vec3 color = vec3(1.0, 1.0, 1.0);\n\n    //highlight the edges\n    float lum = 500.0 * (\n    max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.z - 0.5, 4.0),\n    max(pow(fs_Pos.x -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0),\n    pow(fs_Pos.z -0.5, 4.0) * pow(fs_Pos.y - 0.5, 4.0)))\n    );\n    //lum = smoothstep(0.9999, 1.0, lum);\n    color = (1.0-lum) * color;\n\n    if(fs_BlockInfo[1] == TEXTURE_ROAD) {\n        color = vec3(0.9, 0.4, 0.4);\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_LEVEL_GROUND) {\n        color = texture(u_PavementSampler, fs_Pos.xz * 3.0).xyz;\n        //buildingColor = mySample.xyz;\n    }\n\n    if(fs_BlockInfo[1] == TEXTURE_WALL) {\n        vec2 uv = vec2(0.0,0.0);\n        if(fs_Face == 0 || fs_Face == 1) uv = fs_Pos.xy; //gate opening\n        if(fs_Face == 2 || fs_Face == 3) uv = fs_Pos.zy; //sides\n        if(fs_Face == 4 || fs_Face == 5) uv = fs_Pos.zx; //tops\n        color = texture(u_WhiteStoneSampler, uv).xyz;\n        //buildingColor = vec3(0.9, 0.9, 0.9);\n    }\n    if(fs_BlockInfo[1] == TEXTURE_ROOF) {\n        color = getRoofColor();\n    }\n    if(fs_BlockInfo[1] == TEXTURE_BUILDING\n       || fs_BlockInfo[1] == TEXTURE_TURRET\n       || fs_BlockInfo[1] == TEXTURE_FOUNDATION) {\n        color = getBuildingColor();\n    }\n    return color;\n}\n\nvec3 getDazzleThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\nvec3 getMapThemeBackground() {\n    return vec3(164.0 / 255.0, 233.0 / 255.0, 1.0);\n}\nvec3 getTexturedThemeBackground() {\n    return vec3(0.0, 0.0, 0.0);\n}\n\n\nvoid adjustColorForLights(inout vec3 color, vec3 normal, vec3 point) {\n    vec3 direction;\n    vec3 lightColor;\n    vec3 sunDirection = normalize(sunPosition - point);\n    vec3 sunColor = vec3(1.5, 1.25, 1.0);\n    vec3 skyColor = vec3(0.08,0.10,0.14);\n    vec3 indirectColor = vec3(0.04, 0.028, 0.020);\n    vec3 fireFlyColor = vec3(0.698, 0.956, 0.145);\n    float hour = 15.0;\n    float night = 0.0;\n    float dawn = 0.0;\n    float sunset = 0.1;\n\n\n\n    //get the soft shadow and subsurface amounts\n    //float shadow = sunShadow(point, 3.0, sdfIndex);\n    float sunIntensity;\n\n\n    if(dot(normal, sunDirection) >= 0.0) {\n        sunIntensity = clamp(dot(normal, sunDirection), 0.0, 1.0);// * shadow;\n    }\n    else {\n        sunIntensity = 0.0;\n    }\n\n\n    //make sun brighter at noon\n    sunIntensity = sunIntensity * clamp(sunPosition.y/80.0, 0.0, 1.0);\n\n    float skyIntensity = clamp(0.5 + 0.5*normal.y, 0.0, 1.0);\n\n    //decrease skyintesity at night\n    if(hour > 17.0) {\n        skyIntensity = clamp(pow((1.0 - (hour - 17.0)/7.0), 4.0), 0.1, 1.0)  * skyIntensity;\n    }\n    if(hour < 6.0) {\n        skyIntensity = clamp(pow((1.0 - (6.0-hour)/6.0), 4.0), 0.1, 1.0)  * skyIntensity;\n    }\n\n    vec3 indirectDirection = normalize(sunDirection * vec3(-1.0, 0.0, -1.0));\n    //vec3 indirectDirection = normalize(vec3(0.2, 0.0, 1.0));\n    float indirectIntensity = clamp(dot(normal, indirectDirection), 0.0, 1.0);\n\n    //tone down indirect at night\n    //indirectIntensity = indirectIntensity * (1.0 - night);\n\n    //make sun redder at sunrise/sunset\n    sunColor.r = max(sunColor.r * 3.0 * (dawn*0.8 + sunset), sunColor.r);\n    if(hour < 5.0) {\n        sunIntensity = 0.0;\n    }\n\n\n\n    vec3 intensity = sunIntensity*sunColor\n    + skyIntensity * skyColor\n    + indirectIntensity * indirectColor;\n\n\n    color = color * intensity;\n\n}\n\nvoid main()\n{\n    vec3 buildingColor = vec3(0,0,0);\n    vec3 backgroundColor = vec3(0,0,0);\n\n    if(u_DisplayOptions[2] == MAP_THEME) {\n        buildingColor = getMapThemeColor();\n        backgroundColor = getMapThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == DAZZLE_THEME) {\n        buildingColor = getDazzleThemeColor();\n        backgroundColor = getDazzleThemeBackground();\n    }\n    else if(u_DisplayOptions[2] == TEXTURED_THEME) {\n        buildingColor = getTexturedThemeColor();\n        backgroundColor = getTexturedThemeBackground();\n        adjustColorForLights(buildingColor, getTexturedNormal(), fs_Pos.xyz);\n    }\n\n\n\n    float t = clamp(smoothstep(40.0, 50.0, length(fs_Translate.xz)), 0.0, 1.0); // Distance fog\n    out_Col = vec4(mix(buildingColor, backgroundColor, t), 1.0);\n}\n"
 
 /***/ })
 /******/ ]);
