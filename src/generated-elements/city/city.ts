@@ -142,7 +142,7 @@ export class City {
   }
 
   getRadius(): number {
-    let topLevel = this.levels[this.levels.length -1];
+    let topLevel = this.levels[0];
     return topLevel.getLevelRadius();
   }
 

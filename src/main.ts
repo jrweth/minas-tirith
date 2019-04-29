@@ -474,7 +474,7 @@ function main() {
 
     let terrainDrawables = [plane, spur1, spur2, spur3, spur4, spur5, spur6];
     if(controls["Sample Buildings"] || !controls["Show Spur"]) terrainDrawables = [plane];
-    terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius()*0.75});
+    terrainShader.setCityInfo({cityHeight: city.getHeight()/3.3, cityRadius: city.getRadius() * 0.2});
     renderer.render(camera, terrainShader, terrainDrawables);
 
     if(controls["Show Highways"] || controls["Show Streets"]) {
