@@ -45,7 +45,7 @@ export class Box extends Shape{
       case 7: return this.taperBoth({percentage: 0.25});
       case 8: return this.taperX({percentage: 0.25})
       case 9: return this.taperZ({percentage: 0.25})
-      case 10: this.terminal = true; return [this];
+    //  case 10: this.terminal = true; return [this];
       default:
         return this.toTurret();
 

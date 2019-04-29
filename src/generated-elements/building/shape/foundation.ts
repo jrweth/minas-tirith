@@ -69,16 +69,7 @@ export class Foundation extends Shape{
       let shapes = this.getRectangularBuildingShapes(seed);
     }
 
-    else {
-      let type = Random.randomInt(12, seed);
-      return [new Box({
-        pos: this.pos,
-        rotation: this.rotation,
-        footprint: this.footprint
-      })];
-    }
-
-
+    let type = Random.randomInt(12, seed);
     return [
       new Box({
         pos: this.pos,
@@ -87,6 +78,7 @@ export class Foundation extends Shape{
       }),
       this.getBase()
     ];
+
   }
 
   getSkinnyBuildingShapes(seed: number): Shape[] {

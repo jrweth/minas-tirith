@@ -100,7 +100,7 @@ export class CityLevel {
     this.levelWidth   = options.levelWidth;
     this.elevationRise= options.elevationRise;
     this.gridWidth    = options.gridWidth;
-    this.seed         = vec2.fromValues(this.levelNum, options.seed);
+    this.seed         = vec2.fromValues(this.levelNum + 1, options.seed);
     this.buildingFootprintTarget = options.buildingFootprintTarget;
     if(options.entranceGate) this.entranceGate = options.entranceGate;
     if(options.exitGate)     this.exitGate     = options.exitGate;
@@ -879,10 +879,11 @@ export class CityLevel {
     this.buildings.push(new Building({
       pos: this.getBuildingPosition(centerGridPosI,centerGridPosJ, foot[1]),
       rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
-      seed:  Math.pow(this.seed[1],this.buildings.length + 1),
+      seed:  Math.pow(this.seed[1] + 1,this.buildings.length + 1),
       footprint: foot
     }));
     this.buildings[this.buildings.length - 1].runReplacements();
+
   }
 
   getBuildingPosition(gridI: number, gridJ: number, buildingHeight: number): vec3 {
