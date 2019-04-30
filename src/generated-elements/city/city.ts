@@ -20,6 +20,7 @@ export class City {
   sampleBuildings: Building[] = [];
   towerSeed: number;
   palaceSeed: number;
+  maxBuildingIterations: number = 20;
 
 
   constructor(options: {

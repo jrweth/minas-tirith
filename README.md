@@ -115,7 +115,26 @@ from different collections of distortions of the unit cube.
 
 ![](img/cube_deformations.png)
 
+## Palace and Tower Seed
 
+On the seventh level of the fortress a palace and tower were created by using the shape
+grammar.  The seed which determines which replacements can be adjusted in the 
+user controls.  The following shows how the shape grammar takes the footprint and height
+defined for the palace and tower to procedurally create the final building:
+
+![](img/grammar1.png)
+![](img/grammar2.png)
+![](img/grammar4.png)
+![](img/grammar5.png)
+![](img/grammar6.png)
+![](img/grammar7.png)
+![](img/grammar8.png)
+![](img/grammar9.png)
+![](img/grammar10.png)
+![](img/grammar11.png)
+![](img/grammar12.png)
+![](img/grammar13.png)
+![](img/grammar14.png)
 
 ## Texturing Buildings
 
@@ -136,6 +155,7 @@ are automatically generated
 
 Again in the fragment shader, the normal was manipulated at the 
 divisions between each floor to give a further sense of their being separate floors.
+
 ![](img/buildings2.png)
 
 

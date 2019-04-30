@@ -40,6 +40,7 @@ const controls = {
   'Show Spur': true,
   'Palace Seed': 0.4,//0.95,
   'Tower Seed': 0.2,
+  'Building Iterations': 20,
 
   'Elevation Seed': 8,
   'Population Seed': 1.234,
@@ -198,6 +199,7 @@ function addDisplayControls(options: {
   let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
   let palaceSeed = displayFolder.add(controls, 'Palace Seed').min(0).max(1.0).step(0.05).listen();
   let towerSeed = displayFolder.add(controls, 'Tower Seed').min(0).max(1.0).step(0.05).listen();
+  let maxReplace = displayFolder.add(controls, 'Building Iterations').min(1).max(20).step(1).listen();
 
 
 
@@ -212,52 +214,14 @@ function addDisplayControls(options: {
     options.roadShader.setDisplayOptions(getDisplayOptions());
     options.buildingShader.setDisplayOptions(getDisplayOptions());
     options.renderer.setClearColor3(getBackgroundColor());
+  });
+  maxReplace.onChange(() => {
+    city.maxBuildingIterations = controls["Building Iterations"] - 1;
+    city.initBuildings();
+    loadScene();
   })
-  //showHighways.onChange(redoRoads);
-  //showStreets.onChange(redoRoads);
-  //showPop.onChange(() => {
-  //  options.terrainShader.setDisplayOptions(getDisplayOptions());
-  //});
-  // showBuildSites.onChange(() => {
-  //   options.terrainShader.setDisplayOptions(getDisplayOptions());
-  // })
 }
 
-function addRoadControls() {
-  let roadFolder = gui.addFolder('roads');
-  let rSeed = roadFolder.add(controls, 'Road Seed', {'seed 1': 8.987, 'seed 2': 5.43, 'seed 3': 1.234, 'seed 4': 43.343}).listen();
-  let rLength = roadFolder.add(controls, 'Highway Segment Length', [1,2,4, 8, 12, 16, 32]).listen();
-  let rIter = roadFolder.add(controls, 'Highway Iterations', [3,4,5]).listen();
-  let rAngle = roadFolder.add(controls, 'Highway Max Turn Angle', {
-    '2 deg': Math.PI / 90,
-    '5 deg': Math.PI / 36,
-    '10 deg': Math.PI / 18,
-    '15 deg': Math.PI / 12,
-    '20 deg': Math.PI / 9,
-    '30 deg': Math.PI / 6,
-    '45 deg': Math.PI / 4
-  }).listen();
-
-  let sIter = roadFolder.add(controls, 'Street Iterations', [3,4,5,6,7]).listen();
-  let sLength = roadFolder.add(controls, 'Street Segment Length', [2 ,4, 8, 12, 16]).listen();
-
-  rSeed.onChange(loadScene);
-  rLength.onChange(loadScene);
-  rIter.onChange(loadScene);
-  rAngle.onChange(loadScene);
-  sIter.onChange(loadScene);
-  sLength.onChange(loadScene);
-}
-
-
-
-function addBuildingControls() {
-  let buildingFolder = gui.addFolder('building');
-  let eSeed = buildingFolder.add(controls, 'Num Buildings', [10,100,1000, 2000, 3000, 4000, 8000]).listen();
-  eSeed.onChange(loadScene);
-
-  // mapType.onChange();
-}
 
 function adjustLevel(i: number, property: string) {
   switch(property) {
@@ -390,7 +354,7 @@ function main() {
   setGL(gl);
 
 
-  const camera = new Camera(vec3.fromValues(25, 21, 14  ), vec3.fromValues(0, 9, -9));
+  const camera = new Camera(vec3.fromValues(25, 21, 14  ), vec3.fromValues(0, 13, -9));
 
   const renderer = new OpenGLRenderer(canvas);
   renderer.setClearColor3(getBackgroundColor());
@@ -432,9 +396,6 @@ function main() {
     roadShader: roadShader,
     renderer: renderer
   });
-  addTerrainControls();
-  //addRoadControls();
-  //addBuildingControls();
   addLevelControls();
 
 

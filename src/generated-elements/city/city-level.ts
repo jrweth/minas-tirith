@@ -708,7 +708,8 @@ export class CityLevel {
       pos: vec3.fromValues(this.city.pos[0], this.getWallTopElevation() + size /4, this.city.pos[2] + size /6.2),
       rotation: vec3.fromValues(0,0,0),
       seed:  Math.pow(this.seed[1], this.city.palaceSeed),
-      footprint: vec3.fromValues(size,size/2, size/3.1)
+      footprint: vec3.fromValues(size,size/2, size/3.1),
+      maxReplacements: this.city.maxBuildingIterations
     });
     palace.runReplacements();
     this.buildings.push(palace);
@@ -717,7 +718,8 @@ export class CityLevel {
       pos: vec3.fromValues(this.city.pos[0] - size/2 - 1.1, this.getWallTopElevation() + size*1.2/2, this.city.pos[2] + 0.5 ),
       rotation: vec3.fromValues(0,0,0),
       seed:  Math.pow(this.seed[1], this.city.towerSeed),
-      footprint: vec3.fromValues(2,size * 1.2, 2)
+      footprint: vec3.fromValues(2,size * 1.2, 2),
+      maxReplacements: this.city.maxBuildingIterations
     });
     tower.runReplacements();
     this.buildings.push(tower);
@@ -882,7 +884,8 @@ export class CityLevel {
       pos: this.getBuildingPosition(centerGridPosI,centerGridPosJ, foot[1]),
       rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
       seed:  Math.pow(this.seed[1] + 1.3434,this.buildings.length + 1),
-      footprint: foot
+      footprint: foot,
+      maxReplacements: this.city.maxBuildingIterations
     }));
     this.buildings[this.buildings.length - 1].runReplacements();
 

@@ -13,13 +13,15 @@ export class Building {
   rotation: vec3;
   shapes: Shape[];
   seed: number;
+  maxReplacements = 20;
 
 
   constructor(options: {
     pos: vec3,
     footprint: vec3,
     rotation: vec3,
-    seed: number
+    seed: number,
+    maxReplacements?: number
   }) {
     this.pos = options.pos;
     this.footprint = options.footprint;
@@ -32,7 +34,8 @@ export class Building {
         rotation: this.rotation,
       })
     ];
-    this.runReplacement();
+    if(typeof options.maxReplacements !== 'undefined') this.maxReplacements = options.maxReplacements;
+    //this.runReplacement();
   }
 
   getBlocks(): Block[] {
@@ -52,7 +55,7 @@ export class Building {
 
   runReplacements() {
     let count: number = 0;
-    while(!this.allShapesTerminal() && count < 20) {
+    while(!this.allShapesTerminal() && count < this.maxReplacements) {
       count++;
       this.runReplacement();
 

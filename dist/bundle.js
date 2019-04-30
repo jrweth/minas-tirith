@@ -1121,6 +1121,7 @@ class ConstraintAdjustment {
 
 class Building {
     constructor(options) {
+        this.maxReplacements = 20;
         this.pos = options.pos;
         this.footprint = options.footprint;
         this.rotation = options.rotation;
@@ -1132,7 +1133,9 @@ class Building {
                 rotation: this.rotation,
             })
         ];
-        this.runReplacement();
+        if (typeof options.maxReplacements !== 'undefined')
+            this.maxReplacements = options.maxReplacements;
+        //this.runReplacement();
     }
     getBlocks() {
         let blocks = [];
@@ -1150,7 +1153,7 @@ class Building {
     }
     runReplacements() {
         let count = 0;
-        while (!this.allShapesTerminal() && count < 20) {
+        while (!this.allShapesTerminal() && count < this.maxReplacements) {
             count++;
             this.runReplacement();
         }
@@ -7684,7 +7687,8 @@ class CityLevel {
             pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0], this.getWallTopElevation() + size / 4, this.city.pos[2] + size / 6.2),
             rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0),
             seed: Math.pow(this.seed[1], this.city.palaceSeed),
-            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(size, size / 2, size / 3.1)
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(size, size / 2, size / 3.1),
+            maxReplacements: this.city.maxBuildingIterations
         });
         palace.runReplacements();
         this.buildings.push(palace);
@@ -7692,7 +7696,8 @@ class CityLevel {
             pos: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(this.city.pos[0] - size / 2 - 1.1, this.getWallTopElevation() + size * 1.2 / 2, this.city.pos[2] + 0.5),
             rotation: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(0, 0, 0),
             seed: Math.pow(this.seed[1], this.city.towerSeed),
-            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(2, size * 1.2, 2)
+            footprint: __WEBPACK_IMPORTED_MODULE_2_gl_matrix__["c" /* vec3 */].fromValues(2, size * 1.2, 2),
+            maxReplacements: this.city.maxBuildingIterations
         });
         tower.runReplacements();
         this.buildings.push(tower);
@@ -7831,7 +7836,8 @@ class CityLevel {
             pos: this.getBuildingPosition(centerGridPosI, centerGridPosJ, foot[1]),
             rotation: this.getRotFromGridPos(centerGridPosI, centerGridPosJ),
             seed: Math.pow(this.seed[1] + 1.3434, this.buildings.length + 1),
-            footprint: foot
+            footprint: foot,
+            maxReplacements: this.city.maxBuildingIterations
         }));
         this.buildings[this.buildings.length - 1].runReplacements();
     }
@@ -7914,6 +7920,7 @@ const controls = {
     'Show Spur': true,
     'Palace Seed': 0.4,
     'Tower Seed': 0.2,
+    'Building Iterations': 20,
     'Elevation Seed': 8,
     'Population Seed': 1.234,
     'Road Seed': 5.43,
@@ -8048,6 +8055,7 @@ function addDisplayControls(options) {
     let sampleBuildings = displayFolder.add(controls, 'Sample Buildings');
     let palaceSeed = displayFolder.add(controls, 'Palace Seed').min(0).max(1.0).step(0.05).listen();
     let towerSeed = displayFolder.add(controls, 'Tower Seed').min(0).max(1.0).step(0.05).listen();
+    let maxReplace = displayFolder.add(controls, 'Building Iterations').min(1).max(20).step(1).listen();
     showBuildings.onChange(() => { city.showBuildings = controls["Show Buildings"]; loadScene(); });
     showStreets.onChange(() => { city.showRoads = controls["Show Streets"]; loadScene(); });
     showWalls.onChange(() => { city.showWalls = controls["Show Walls"]; loadScene(); });
@@ -8060,43 +8068,11 @@ function addDisplayControls(options) {
         options.buildingShader.setDisplayOptions(getDisplayOptions());
         options.renderer.setClearColor3(getBackgroundColor());
     });
-    //showHighways.onChange(redoRoads);
-    //showStreets.onChange(redoRoads);
-    //showPop.onChange(() => {
-    //  options.terrainShader.setDisplayOptions(getDisplayOptions());
-    //});
-    // showBuildSites.onChange(() => {
-    //   options.terrainShader.setDisplayOptions(getDisplayOptions());
-    // })
-}
-function addRoadControls() {
-    let roadFolder = gui.addFolder('roads');
-    let rSeed = roadFolder.add(controls, 'Road Seed', { 'seed 1': 8.987, 'seed 2': 5.43, 'seed 3': 1.234, 'seed 4': 43.343 }).listen();
-    let rLength = roadFolder.add(controls, 'Highway Segment Length', [1, 2, 4, 8, 12, 16, 32]).listen();
-    let rIter = roadFolder.add(controls, 'Highway Iterations', [3, 4, 5]).listen();
-    let rAngle = roadFolder.add(controls, 'Highway Max Turn Angle', {
-        '2 deg': Math.PI / 90,
-        '5 deg': Math.PI / 36,
-        '10 deg': Math.PI / 18,
-        '15 deg': Math.PI / 12,
-        '20 deg': Math.PI / 9,
-        '30 deg': Math.PI / 6,
-        '45 deg': Math.PI / 4
-    }).listen();
-    let sIter = roadFolder.add(controls, 'Street Iterations', [3, 4, 5, 6, 7]).listen();
-    let sLength = roadFolder.add(controls, 'Street Segment Length', [2, 4, 8, 12, 16]).listen();
-    rSeed.onChange(loadScene);
-    rLength.onChange(loadScene);
-    rIter.onChange(loadScene);
-    rAngle.onChange(loadScene);
-    sIter.onChange(loadScene);
-    sLength.onChange(loadScene);
-}
-function addBuildingControls() {
-    let buildingFolder = gui.addFolder('building');
-    let eSeed = buildingFolder.add(controls, 'Num Buildings', [10, 100, 1000, 2000, 3000, 4000, 8000]).listen();
-    eSeed.onChange(loadScene);
-    // mapType.onChange();
+    maxReplace.onChange(() => {
+        city.maxBuildingIterations = controls["Building Iterations"] - 1;
+        city.initBuildings();
+        loadScene();
+    });
 }
 function adjustLevel(i, property) {
     switch (property) {
@@ -8229,7 +8205,7 @@ function main() {
     // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
     // Later, we can import `gl` from `globals.ts` to access it
     Object(__WEBPACK_IMPORTED_MODULE_8__globals__["b" /* setGL */])(gl);
-    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(25, 21, 14), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 9, -9));
+    const camera = new __WEBPACK_IMPORTED_MODULE_7__Camera__["a" /* default */](__WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(25, 21, 14), __WEBPACK_IMPORTED_MODULE_0_gl_matrix__["c" /* vec3 */].fromValues(0, 13, -9));
     const renderer = new __WEBPACK_IMPORTED_MODULE_6__rendering_gl_OpenGLRenderer__["a" /* default */](canvas);
     renderer.setClearColor3(getBackgroundColor());
     gl.enable(gl.DEPTH_TEST);
@@ -8263,9 +8239,6 @@ function main() {
         roadShader: roadShader,
         renderer: renderer
     });
-    addTerrainControls();
-    //addRoadControls();
-    //addBuildingControls();
     addLevelControls();
     /**
      * more control stuff
@@ -20700,6 +20673,7 @@ class City {
         this.showWalls = true;
         this.showSampleBuildings = false;
         this.sampleBuildings = [];
+        this.maxBuildingIterations = 20;
         this.pos = options.pos;
         this.seed = options.seed;
         this.towerSeed = options.towerSeed;
