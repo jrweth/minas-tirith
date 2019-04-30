@@ -151,13 +151,16 @@ when the buildings scale, the windows are appropriately placed evenly
 throughout the building.  Also, as the buildings increase in size, new floors
 are automatically generated 
 
+![](img/buildings2.png)
+
+
 ### Floor dividing ledges
 
 Again in the fragment shader, the normal was manipulated at the 
 divisions between each floor to give a further sense of their being separate floors.
 
-![](img/buildings2.png)
 
+![](img/buildings3.png)
 
 ### FBM Texture
 Finally to give the building a more plaster feel, the surface of the buildings
