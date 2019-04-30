@@ -166,9 +166,7 @@ were decorated with FBM to give them a plaster look.
 
 ![](img/buildings5.png)
 
-![](img/palace1.png)
 
-![](img/palace2.png)
 
 ## Lighting
 
